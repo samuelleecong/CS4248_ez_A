@@ -14,6 +14,13 @@ NLP project for text-to-code generation and code search on the [MBPP dataset](ht
 .
 ├── ML_PIPELINE.md              # Start here — 7-stage pipeline walkthrough
 ├── MBPP_TUTORIAL.md            # Full tutorial for both tasks + advanced techniques
+├── experiments/
+│   └── kai/
+│       ├── notebooks/          # Notebook workspace (mbpp.ipynb)
+│       ├── artifacts/          # Kai-local generated artifacts (ignored by git)
+│       ├── results/            # Kai-local run outputs (ignored by git)
+│       ├── README.md           # Experiment-specific usage
+│       └── scripts/            # Reproducible runners/plotters
 ├── assignment_details/
 │   ├── PROJ_reqs.md            # Original project requirements
 │   └── cs4248-iu-template.pdf  # Report template
@@ -29,9 +36,19 @@ NLP project for text-to-code generation and code search on the [MBPP dataset](ht
 
 3. **Install dependencies**:
    ```bash
-   pip install torch transformers datasets peft bitsandbytes
-   pip install huggingface_hub trl accelerate
-   pip install sentence-transformers  # for Task 2
+   uv sync
+   ```
+
+4. **Run reproducible MBPP retrieval matrix**:
+   ```bash
+   python experiments/kai/scripts/run_mbpp_experiments.py \
+     --output-dir experiments/kai/results \
+     --run-id mbpp_full_matrix \
+     --device auto \
+     --seed 42 \
+     --full-matrix \
+     --finetune-all-pretrained
+   python experiments/kai/scripts/plot_mbpp_results.py --run-dir experiments/kai/results/mbpp_full_matrix
    ```
 
 ## Key Models
