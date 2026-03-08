@@ -8,13 +8,13 @@ without running the full experiment matrix.
 
 Prerequisites:
   1. Export teacher targets once:
-       python experiments/kai/scripts/export_teacher_targets.py \\
+       python knowledge-distillation/export_teacher_targets.py \\
            --teacher <teacher_model> --split all
 
   2. Run KD:
-       python experiments/kai/scripts/run_kd_experiments.py \\
+       python knowledge-distillation/run_kd_experiments.py \\
            --student sentence-transformers/all-MiniLM-L6-v2 \\
-           --teacher-targets experiments/kai/artifacts/kd_targets/<file>.npz \\
+           --teacher-targets knowledge-distillation/artifacts/kd_targets/<file>.npz \\
            --run-id my_kd_run
 
 Output mirrors run_mbpp_experiments.py (same CSV schema) so results from both
@@ -489,7 +489,7 @@ def parse_args() -> argparse.Namespace:
     # Run identity
     parser.add_argument("--run-id", default=None,
                         help="Run identifier. Defaults to a UTC timestamp.")
-    parser.add_argument("--output-dir", default="experiments/kai/results",
+    parser.add_argument("--output-dir", default="knowledge-distillation/results",
                         help="Output root relative to project root.")
     parser.add_argument("--device", choices=["auto", "cpu", "mps"], default="auto")
     parser.add_argument("--seed", type=int, default=42)

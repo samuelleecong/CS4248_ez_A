@@ -18,7 +18,7 @@ Usage:
   python export_teacher_targets.py \\
       --teacher BAAI/bge-base-en-v1.5 \\
       --split all \\
-      --output-dir experiments/kai/artifacts \\
+      --output-dir knowledge-distillation/artifacts \\
       --batch-size 32 \\
       --device auto
 """
@@ -115,7 +115,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--output-dir",
-        default="experiments/kai/artifacts",
+        default="knowledge-distillation/artifacts",
         metavar="DIR",
         help="Root output dir relative to project root. Targets go under <DIR>/kd_targets/.",
     )
