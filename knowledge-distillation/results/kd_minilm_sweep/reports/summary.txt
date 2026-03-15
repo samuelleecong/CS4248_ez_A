@@ -1,0 +1,15 @@
+MBPP KD Summary | run_id=kd_minilm_sweep
+student=sentence-transformers/all-MiniLM-L6-v2  teacher=sentence-transformers/all-mpnet-base-v2
+device=mps  seed=42
+
+Held-out test results:
+  kd::kd_mnr::kd_e2_b16_lr2e5_a05_t4 mrr=0.8075  recall@10=0.9460
+  kd::kd_mnr::kd_e1_b16_lr2e5_a05_t4 mrr=0.8040  recall@10=0.9440
+  kd::kd_mnr::kd_e1_b16_lr2e5_a07_t4 mrr=0.8004  recall@10=0.9480
+  kd::kd_mnr::kd_e1_b16_lr2e5_a03_t4 mrr=0.8001  recall@10=0.9420
+  pretrained::pretrained::zero_shot mrr=0.7714  recall@10=0.9220
+
+Comparisons:
+  kd_vs_student_zero_shot mrr: delta=0.0361  ci=[0.020387094091771, 0.0529142785775465]  status=success
+  kd_vs_student_zero_shot recall@1: delta=0.0440  ci=[0.018, 0.0719999999999999]  status=success
+  kd_vs_student_zero_shot recall@10: delta=0.0240  ci=[0.0099999999999998, 0.0399999999999999]  status=success

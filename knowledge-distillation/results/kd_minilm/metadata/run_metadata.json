@@ -1,0 +1,57 @@
+{
+  "run_id": "kd_minilm",
+  "started_at": "2026-03-08T18:02:27.186944+00:00",
+  "script": "run_kd_experiments.py",
+  "python_version": "3.11.14 (main, Oct  9 2025, 16:16:55) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "torch_version": "2.10.0",
+  "cuda_available": false,
+  "mps_available": true,
+  "device_arg": "auto",
+  "resolved_device": "mps",
+  "seed": 42,
+  "student_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "teacher_model": "sentence-transformers/all-mpnet-base-v2",
+  "teacher_targets_path": "/Users/samuel/dev/CS4248_ez_A/knowledge-distillation/artifacts/kd_targets/sentence-transformers__all-mpnet-base-v2_all.npz",
+  "kd_configs": [
+    {
+      "config_id": "kd_e2_b16_lr2e5_a0_t4",
+      "epochs": 2,
+      "batch_size": 16,
+      "lr": 2e-05,
+      "warmup_ratio": 0.1,
+      "weight_decay": 0.01,
+      "max_grad_norm": 1.0,
+      "alpha": 0.5,
+      "temperature": 4.0
+    }
+  ],
+  "args": {
+    "student": "sentence-transformers/all-MiniLM-L6-v2",
+    "teacher_targets": "knowledge-distillation/artifacts/kd_targets/sentence-transformers__all-mpnet-base-v2_all.npz",
+    "run_id": "kd_minilm",
+    "output_dir": "knowledge-distillation/results",
+    "device": "auto",
+    "seed": 42,
+    "epochs": 2,
+    "batch_size": 16,
+    "lr": 2e-05,
+    "warmup_ratio": 0.1,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "alpha": 0.5,
+    "temperature": 4.0,
+    "full_matrix": false,
+    "resume": false,
+    "fast_smoke": false
+  },
+  "finished_at": "2026-03-08T18:02:49.631356+00:00",
+  "elapsed_sec": 22.44474687500042,
+  "artifacts": {
+    "metrics_all_csv": "/Users/samuel/dev/CS4248_ez_A/knowledge-distillation/results/kd_minilm/metrics/metrics_all.csv",
+    "training_stats_csv": "/Users/samuel/dev/CS4248_ez_A/knowledge-distillation/results/kd_minilm/metrics/training_stats.csv",
+    "comparisons_csv": "/Users/samuel/dev/CS4248_ez_A/knowledge-distillation/results/kd_minilm/metrics/comparisons.csv",
+    "summary_md": "/Users/samuel/dev/CS4248_ez_A/knowledge-distillation/results/kd_minilm/reports/summary.md",
+    "summary_txt": "/Users/samuel/dev/CS4248_ez_A/knowledge-distillation/results/kd_minilm/reports/summary.txt",
+    "failures_log": "/Users/samuel/dev/CS4248_ez_A/knowledge-distillation/results/kd_minilm/logs/failures.log"
+  }
+}

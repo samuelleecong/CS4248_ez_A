@@ -70,6 +70,7 @@ METRIC_COLUMNS = [
     "protocol", "train_split", "eval_split", "config_id",
     "mrr", "recall@1", "recall@5", "recall@10", "recall@20",
     "map@10", "ndcg@10", "precision@10", "mean_rank",
+    "latency_ms_per_query", "throughput_qps", "model_params_m", "model_size_mb",
     "runtime_sec", "status", "ranks_file", "error",
 ]
 TRAINING_COLUMNS = [
@@ -82,7 +83,8 @@ COMPARISON_COLUMNS = [
     "base_method", "base_stage", "base_model",
     "compare_method", "compare_stage", "compare_model",
     "base_value", "compare_value", "delta", "ci_low", "ci_high",
-    "n_bootstrap", "status", "notes",
+    "n_bootstrap", "quality_retention", "speedup", "size_ratio", "teacher_mrr",
+    "status", "notes",
 ]
 
 
@@ -261,6 +263,62 @@ def evaluate_dense(
     return ranks, compute_metrics_from_ranks(ranks)
 
 
+def get_model_info(model: SentenceTransformer) -> dict[str, float]:
+    """Return parameter count (millions) and estimated float32 size (MB)."""
+    n_params = sum(p.numel() for p in model.parameters())
+    return {
+        "model_params_m": round(n_params / 1e6, 3),
+        "model_size_mb": round(n_params * 4 / 1e6, 1),
+    }
+
+
+def measure_query_latency(
+    model: SentenceTransformer,
+    model_name: str,
+    queries: list[str],
+    batch_size: int = 16,
+    n_warmup: int = 2,
+) -> dict[str, float]:
+    """Time query-only encoding (the hot path in production retrieval)."""
+    q_fmt, _ = format_texts_for_model(model_name, queries, [""] * len(queries))
+    warmup_batch = q_fmt[: min(batch_size, len(q_fmt))]
+    for _ in range(n_warmup):
+        model.encode(
+            warmup_batch, batch_size=batch_size,
+            convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False,
+        )
+    t0 = time.perf_counter()
+    model.encode(
+        q_fmt, batch_size=batch_size,
+        convert_to_numpy=True, normalize_embeddings=True, show_progress_bar=False,
+    )
+    elapsed = time.perf_counter() - t0
+    n = len(queries)
+    return {
+        "latency_ms_per_query": round(elapsed * 1000 / n, 3),
+        "throughput_qps": round(n / elapsed, 1),
+    }
+
+
+def evaluate_teacher_on_test(
+    teacher_task_id_map: dict[int, int],
+    teacher_q_emb: np.ndarray,
+    teacher_c_emb: np.ndarray,
+    test_pairs: list[dict[str, Any]],
+) -> dict[str, float]:
+    """Compute retrieval metrics for the teacher using pre-exported embeddings."""
+    valid = [
+        (p["task_id"], teacher_task_id_map[p["task_id"]])
+        for p in test_pairs
+        if p["task_id"] in teacher_task_id_map
+    ]
+    if not valid:
+        return {}
+    idxs = [v[1] for v in valid]
+    ranks = compute_ranks_from_embeddings(teacher_q_emb[idxs], teacher_c_emb[idxs])
+    return compute_metrics_from_ranks(ranks)
+
+
 def rank_file_relpath(
     method: str, stage: str, technique: str,
     model_name: str, protocol: str, config_id: str,
@@ -298,8 +356,9 @@ def bootstrap_diff_ci(
         a, b = ranks_a[idx], ranks_b[idx]
         if metric == "mrr":
             va, vb = float(np.mean(1.0 / a)), float(np.mean(1.0 / b))
-        elif metric == "recall@10":
-            va, vb = float(np.mean(a <= 10)), float(np.mean(b <= 10))
+        elif metric.startswith("recall@"):
+            k = int(metric.split("@")[1])
+            va, vb = float(np.mean(a <= k)), float(np.mean(b <= k))
         else:
             raise ValueError(f"Unsupported bootstrap metric: {metric}")
         diffs[i] = va - vb
@@ -687,7 +746,8 @@ def main() -> int:
             "ranks_file": ranks_relpath, "error": error,
         }
         for col in ["mrr", "recall@1", "recall@5", "recall@10", "recall@20",
-                    "map@10", "ndcg@10", "precision@10", "mean_rank"]:
+                    "map@10", "ndcg@10", "precision@10", "mean_rank",
+                    "latency_ms_per_query", "throughput_qps", "model_params_m", "model_size_mb"]:
             row[col] = float(metrics[col]) if (metrics and col in metrics) else np.nan
         append_row(metrics_path, row, METRIC_COLUMNS)
         if status == "success":
@@ -737,6 +797,9 @@ def main() -> int:
             ranks, metrics = evaluate_dense(
                 student_zs_model, args.student, pool["queries"], pool["codes"]
             )
+            if protocol_name == "heldout_test":
+                metrics.update(measure_query_latency(student_zs_model, args.student, pool["queries"]))
+                metrics.update(get_model_info(student_zs_model))
             save_ranks(run_dir, rank_rel, ranks)
             write_metric_row(
                 method="pretrained", stage="pretrained", technique="zero_shot",
@@ -745,7 +808,9 @@ def main() -> int:
                 metrics=metrics, runtime_sec=time.perf_counter() - t0, status="success",
                 ranks_relpath=rank_rel,
             )
-            print(f"  {protocol_name}: MRR={metrics['mrr']:.4f}  R@10={metrics['recall@10']:.4f}")
+            print(f"  {protocol_name}: MRR={metrics['mrr']:.4f}  R@10={metrics['recall@10']:.4f}"
+                  + (f"  lat={metrics['latency_ms_per_query']:.2f}ms/q"
+                     if "latency_ms_per_query" in metrics else ""))
         except Exception as exc:
             tb = traceback.format_exc(limit=5)
             log_failure(f"zero_shot eval failed ({protocol_name}): {exc}\n{tb}")
@@ -767,6 +832,34 @@ def main() -> int:
     print(f"Loading teacher targets from {teacher_targets_path} ...")
     teacher_task_id_map, teacher_q_emb, teacher_c_emb = load_teacher_targets(teacher_targets_path)
     print(f"  {len(teacher_task_id_map)} task_ids loaded, embed_dim={teacher_q_emb.shape[1]}")
+
+    # Compute teacher quality and efficiency metrics for KD-specific comparisons.
+    teacher_mrr: float = float("nan")
+    teacher_latency_ms: float = float("nan")
+    teacher_params_m: float = float("nan")
+    try:
+        t_metrics = evaluate_teacher_on_test(
+            teacher_task_id_map, teacher_q_emb, teacher_c_emb, test_pairs
+        )
+        teacher_mrr = t_metrics.get("mrr", float("nan"))
+        print(f"  teacher MRR on heldout_test: {teacher_mrr:.4f}")
+    except Exception as exc:
+        print(f"  [warn] teacher MRR computation failed: {exc}")
+    try:
+        print(f"  Loading teacher model for latency/size measurement: {teacher_model_name}")
+        _teacher_model = SentenceTransformer(teacher_model_name)
+        _teacher_model.to(resolved_device)
+        _teacher_info = get_model_info(_teacher_model)
+        teacher_params_m = _teacher_info["model_params_m"]
+        _t_lat = measure_query_latency(
+            _teacher_model, teacher_model_name,
+            [p["query"] for p in test_pairs],
+        )
+        teacher_latency_ms = _t_lat["latency_ms_per_query"]
+        print(f"  teacher: {teacher_params_m:.1f}M params  lat={teacher_latency_ms:.2f}ms/q")
+        del _teacher_model
+    except Exception as exc:
+        print(f"  [warn] teacher latency/size measurement failed: {exc}")
 
     for cfg in kd_configs:
         kd_ckpt = run_dir / "checkpoints" / "kd_mnr" / safe_slug(args.student) / cfg.config_id
@@ -837,6 +930,9 @@ def main() -> int:
             t0 = time.perf_counter()
             try:
                 ranks, metrics = evaluate_dense(kd_model, args.student, pool["queries"], pool["codes"])
+                if protocol_name == "heldout_test":
+                    metrics.update(measure_query_latency(kd_model, args.student, pool["queries"]))
+                    metrics.update(get_model_info(kd_model))
                 save_ranks(run_dir, rank_rel, ranks)
                 write_metric_row(
                     method="kd", stage="kd_mnr", technique="kd_kl",
@@ -846,7 +942,9 @@ def main() -> int:
                     runtime_sec=time.perf_counter() - t0, status="success",
                     ranks_relpath=rank_rel,
                 )
-                print(f"  {protocol_name} [{cfg.config_id}]: MRR={metrics['mrr']:.4f}  R@10={metrics['recall@10']:.4f}")
+                print(f"  {protocol_name} [{cfg.config_id}]: MRR={metrics['mrr']:.4f}  R@10={metrics['recall@10']:.4f}"
+                      + (f"  lat={metrics['latency_ms_per_query']:.2f}ms/q"
+                         if "latency_ms_per_query" in metrics else ""))
             except Exception as exc:
                 tb = traceback.format_exc(limit=5)
                 log_failure(f"kd eval failed ({cfg.config_id}, {protocol_name}): {exc}\n{tb}")
@@ -896,8 +994,31 @@ def main() -> int:
     if comparisons_path.exists():
         comparisons_path.unlink()
 
+    # KD-specific derived metrics pulled from metrics_df for the best student row.
+    best_student_latency_ms: float = float("nan")
+    best_student_params_m: float = float("nan")
+    if best_kd_row is not None:
+        best_student_latency_ms = float(best_kd_row.get("latency_ms_per_query", float("nan")))
+        best_student_params_m = float(best_kd_row.get("model_params_m", float("nan")))
+
+    def _kd_derived(compare_mrr: float) -> dict[str, Any]:
+        retention = (compare_mrr / teacher_mrr
+                     if (not np.isnan(teacher_mrr) and teacher_mrr > 0) else float("nan"))
+        spd = (teacher_latency_ms / best_student_latency_ms
+               if (not np.isnan(teacher_latency_ms) and not np.isnan(best_student_latency_ms)
+                   and best_student_latency_ms > 0) else float("nan"))
+        sz = (teacher_params_m / best_student_params_m
+              if (not np.isnan(teacher_params_m) and not np.isnan(best_student_params_m)
+                  and best_student_params_m > 0) else float("nan"))
+        return {
+            "quality_retention": retention,
+            "speedup": spd,
+            "size_ratio": sz,
+            "teacher_mrr": teacher_mrr,
+        }
+
     for cmp_name, row_a, row_b in comparison_specs:
-        for metric in ("mrr", "recall@10"):
+        for metric in ("mrr", "recall@1", "recall@10"):
             base_value = float(row_b[metric])
             compare_value = float(row_a[metric])
             delta_agg = compare_value - base_value
@@ -920,6 +1041,7 @@ def main() -> int:
                 notes = f"Bootstrap failed: {exc}"
                 log_failure(f"bootstrap failed ({cmp_name}, {metric}): {exc}")
 
+            kd_extra = _kd_derived(compare_value if metric == "mrr" else float("nan"))
             append_row(comparisons_path, {
                 "run_id": run_id, "timestamp": utc_now_iso(),
                 "comparison": cmp_name, "protocol": "heldout_test", "metric": metric,
@@ -929,7 +1051,7 @@ def main() -> int:
                 "compare_model": str(row_a["model_name"]),
                 "base_value": base_value, "compare_value": compare_value,
                 "delta": delta_agg, "ci_low": ci_low, "ci_high": ci_high,
-                "n_bootstrap": 2000, "status": status, "notes": notes,
+                "n_bootstrap": 2000, **kd_extra, "status": status, "notes": notes,
             }, COMPARISON_COLUMNS)
 
     # ------------------------------------------------------------------
@@ -945,7 +1067,9 @@ def main() -> int:
     comps_df = load_df_or_empty(comparisons_path, COMPARISON_COLUMNS)
 
     display_cols = ["method", "stage", "technique", "model_name", "config_id",
-                    "mrr", "recall@1", "recall@5", "recall@10", "recall@20", "map@10", "ndcg@10"]
+                    "mrr", "recall@1", "recall@5", "recall@10", "recall@20", "map@10", "ndcg@10",
+                    "latency_ms_per_query", "throughput_qps", "model_params_m", "model_size_mb"]
+    display_cols = [c for c in display_cols if c in metrics_success.columns]
 
     md_lines = [
         f"# MBPP KD Results: `{run_id}`",
