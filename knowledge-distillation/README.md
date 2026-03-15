@@ -1,17 +1,25 @@
 # Knowledge Distillation — MBPP Code Search (Task 2)
 
-Trains a student `SentenceTransformer` to mimic a stronger teacher by matching
-their per-batch similarity distributions, combined with the standard MNR
-retrieval objective.
+Trains a student `SentenceTransformer` to mimic a stronger teacher, combined
+with the standard MNR retrieval objective. Two KD loss modes are supported via
+`--kd-loss`.
 
-**Loss per batch:**
+**Listwise (default) — KL divergence on full similarity matrix:**
 ```
 total = alpha × KL( softmax(student_sims / T) ‖ softmax(teacher_sims / T) )
       + (1 − alpha) × MNR_CrossEntropy(student_sims)
 ```
 
+**Pairwise — Margin MSE (Hofstätter et al., 2021):**
+```
+total = alpha × mean( (student_margin_ij − teacher_margin_ij)² )
+      + (1 − alpha) × MNR_CrossEntropy(student_sims)
+
+where margin_ij = sim(query_i, pos_i) − sim(query_i, neg_j)  for j ≠ i
+```
+
 - `alpha` — trade-off between distillation and task loss (0 = pure MNR, 1 = pure KD, default 0.5)
-- `T` — softmax temperature; higher values spread probability across near-misses (default 4.0)
+- `T` — softmax temperature for listwise mode; higher values spread probability across near-misses (default 4.0)
 - Similarity matrices are compared, not raw vectors — teacher and student can have **different embedding dimensions**
 
 ---
@@ -68,12 +76,19 @@ Output goes to `knowledge-distillation/artifacts/kd_targets/`.
 ### Step 2 — Run KD
 
 ```bash
-# Single config (control hyperparams via CLI flags)
+# Single config — listwise KD (default)
 python knowledge-distillation/run_kd_experiments.py \
   --student sentence-transformers/all-MiniLM-L6-v2 \
   --teacher-targets knowledge-distillation/artifacts/kd_targets/sentence-transformers__all-mpnet-base-v2_all.npz \
   --run-id kd_minilm \
   --epochs 2 --alpha 0.5 --temperature 4.0
+
+# Single config — pairwise KD (Margin MSE)
+python knowledge-distillation/run_kd_experiments.py \
+  --student sentence-transformers/all-MiniLM-L6-v2 \
+  --teacher-targets knowledge-distillation/artifacts/kd_targets/sentence-transformers__all-mpnet-base-v2_all.npz \
+  --run-id kd_minilm_pairwise \
+  --epochs 2 --alpha 0.5 --kd-loss pairwise
 
 # Sweep 4 configs (alpha × epochs)
 python knowledge-distillation/run_kd_experiments.py \
@@ -114,7 +129,8 @@ python knowledge-distillation/run_kd_experiments.py \
 | `--weight-decay` | 0.01 | |
 | `--max-grad-norm` | 1.0 | |
 | `--alpha` | 0.5 | KD loss weight (0 = pure MNR, 1 = pure distillation) |
-| `--temperature` | 4.0 | Softmax temperature for similarity distributions |
+| `--temperature` | 4.0 | Softmax temperature for similarity distributions (listwise only) |
+| `--kd-loss` | `listwise` | `listwise` (KL on full sim matrix) or `pairwise` (Margin MSE) |
 | `--full-matrix` | off | Sweep 4 configs instead of using CLI hyperparams |
 | `--resume` | off | Skip already-completed steps |
 | `--fast-smoke` | off | Zero-shot eval only, no training |
@@ -155,7 +171,7 @@ Comparison written: **`kd_vs_student_zero_shot`** — bootstrap CI delta between
 |---|---|
 | `method` | `pretrained` (zero-shot), `kd` |
 | `stage` | `pretrained`, `kd_mnr` |
-| `technique` | `zero_shot`, `kd_kl` |
+| `technique` | `zero_shot`, `kd_kl` (listwise), `kd_margin_mse` (pairwise) |
 | `protocol` | `heldout_test` (primary), `full_corpus` (diagnostic) |
 | `status` | `success`, `failed` |
 

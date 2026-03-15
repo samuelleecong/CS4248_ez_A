@@ -20,12 +20,18 @@ Prerequisites:
 Output mirrors run_mbpp_experiments.py (same CSV schema) so results from both
 scripts can be merged and plotted together.
 
-Loss per batch:
+Loss per batch (--kd-loss listwise, default):
   total = alpha * KL( softmax(S_student / T) || softmax(S_teacher / T) )
         + (1 - alpha) * CrossEntropy( S_student * 20, diagonal_labels )
 
   where S_* is the (B, B) pairwise cosine-similarity matrix for the batch,
   T is the softmax temperature, and alpha weights KD vs task loss.
+
+Loss per batch (--kd-loss pairwise, Margin MSE):
+  total = alpha * mean( (student_margin_ij - teacher_margin_ij)^2 )
+        + (1 - alpha) * CrossEntropy( S_student * 20, diagonal_labels )
+
+  where margin_ij = sim(query_i, pos_i) - sim(query_i, neg_j) for j != i.
 """
 
 from __future__ import annotations
@@ -414,13 +420,21 @@ def finetune_with_kd(
     teacher_c_emb: np.ndarray,
     device: str,
     cfg: KDConfig,
+    kd_loss_type: str = "listwise",
 ) -> tuple[SentenceTransformer, dict[str, Any]]:
-    """Fine-tune student with KL-divergence knowledge distillation.
+    """Fine-tune student with knowledge distillation.
 
-    Per-batch loss:
+    kd_loss_type="listwise"  (default):
       KD   = KL( softmax(S_student/T) || softmax(S_teacher/T) )
       Task = CrossEntropy( S_student * 20, diagonal_labels )    [MNR]
       Total = alpha * KD + (1 - alpha) * Task
+
+    kd_loss_type="pairwise"  (Margin MSE, Hofstätter et al. 2021):
+      For every (query_i, pos_i, neg_j) triple in the batch (j != i):
+        teacher_margin = teacher_sim[i,i] - teacher_sim[i,j]
+        student_margin = student_sim[i,i] - student_sim[i,j]
+        KD = mean( (student_margin - teacher_margin)^2 )
+      Total = alpha * KD + (1 - alpha) * Task  [same MNR task loss]
 
     Similarity matrices are compared — not raw vectors — so teacher and student
     can have different embedding dimensions.
@@ -482,16 +496,29 @@ def finetune_with_kd(
             labels = torch.arange(B, device=dev)
             mnr_loss = torch.nn.functional.cross_entropy(mnr_scores, labels)
 
-            # KD loss: KL on per-query soft similarity distributions
+            # KD loss
             teacher_sims = torch.mm(t_q, t_c.T)
-            teacher_probs = torch.nn.functional.softmax(teacher_sims / cfg.temperature, dim=1)
             student_sims = torch.mm(s_q, s_c.T)
-            student_log_probs = torch.nn.functional.log_softmax(student_sims / cfg.temperature, dim=1)
-            kl_loss = torch.nn.functional.kl_div(
-                student_log_probs, teacher_probs, reduction="batchmean"
-            )
 
-            loss = cfg.alpha * kl_loss + (1.0 - cfg.alpha) * mnr_loss
+            if kd_loss_type == "pairwise":
+                # Margin MSE: match teacher's similarity margins for all
+                # (query_i, pos_i, neg_j) triples where j != i.
+                pos_t = teacher_sims.diag().unsqueeze(1)   # (B, 1)
+                pos_s = student_sims.diag().unsqueeze(1)   # (B, 1)
+                teacher_margin = pos_t - teacher_sims       # (B, B); diagonal == 0
+                student_margin = pos_s - student_sims       # (B, B)
+                # Mask diagonal (pos vs itself) to keep only true negatives.
+                mask = 1.0 - torch.eye(B, device=dev)
+                kd_loss = (mask * (student_margin - teacher_margin) ** 2).sum() / mask.sum()
+            else:
+                # Listwise: KL divergence on soft similarity distributions.
+                teacher_probs = torch.nn.functional.softmax(teacher_sims / cfg.temperature, dim=1)
+                student_log_probs = torch.nn.functional.log_softmax(student_sims / cfg.temperature, dim=1)
+                kd_loss = torch.nn.functional.kl_div(
+                    student_log_probs, teacher_probs, reduction="batchmean"
+                )
+
+            loss = cfg.alpha * kd_loss + (1.0 - cfg.alpha) * mnr_loss
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.max_grad_norm)
             optimizer.step()
@@ -500,7 +527,7 @@ def finetune_with_kd(
             running_loss += float(loss.item())
             pbar.set_postfix(
                 loss=f"{loss.item():.4f}",
-                kl=f"{kl_loss.item():.4f}",
+                kd=f"{kd_loss.item():.4f}",
                 mnr=f"{mnr_loss.item():.4f}",
             )
 
@@ -565,7 +592,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--alpha", type=float, default=0.5,
                         help="Weight on KD loss. 0 = pure MNR, 1 = pure distillation.")
     parser.add_argument("--temperature", type=float, default=4.0,
-                        help="Softmax temperature for similarity distributions.")
+                        help="Softmax temperature for similarity distributions (listwise only).")
+    parser.add_argument("--kd-loss", choices=["listwise", "pairwise"], default="listwise",
+                        help="KD loss type: 'listwise' (KL on full sim matrix) or "
+                             "'pairwise' (Margin MSE on pos/neg margins).")
 
     # Sweep / run modes
     parser.add_argument("--full-matrix", action="store_true",
@@ -861,15 +891,17 @@ def main() -> int:
     except Exception as exc:
         print(f"  [warn] teacher latency/size measurement failed: {exc}")
 
+    kd_technique = "kd_margin_mse" if args.kd_loss == "pairwise" else "kd_kl"
+
     for cfg in kd_configs:
         kd_ckpt = run_dir / "checkpoints" / "kd_mnr" / safe_slug(args.student) / cfg.config_id
         kd_model = None
 
-        train_key = step_key("kd", "kd_mnr", "kd_kl", args.student, "train_only",
+        train_key = step_key("kd", "kd_mnr", kd_technique, args.student, "train_only",
                              "train+validation+prompt", "n/a", cfg.config_id)
 
         if not (args.resume and train_key in done_keys and kd_ckpt.exists()):
-            print(f"[kd] Training {cfg.config_id}  (alpha={cfg.alpha}, T={cfg.temperature}, epochs={cfg.epochs}) ...")
+            print(f"[kd] Training {cfg.config_id}  (loss={args.kd_loss}, alpha={cfg.alpha}, T={cfg.temperature}, epochs={cfg.epochs}) ...")
             t0 = time.perf_counter()
             try:
                 kd_model, stats = finetune_with_kd(
@@ -880,16 +912,17 @@ def main() -> int:
                     teacher_c_emb=teacher_c_emb,
                     device=resolved_device,
                     cfg=cfg,
+                    kd_loss_type=args.kd_loss,
                 )
                 kd_ckpt.mkdir(parents=True, exist_ok=True)
                 kd_model.save(str(kd_ckpt))
                 write_training_rows(
-                    stage="kd_mnr", technique="kd_kl",
+                    stage="kd_mnr", technique=kd_technique,
                     model_name=args.student, config_id=cfg.config_id,
                     train_split="train+validation+prompt", stats=stats,
                 )
                 write_metric_row(
-                    method="kd", stage="kd_mnr", technique="kd_kl",
+                    method="kd", stage="kd_mnr", technique=kd_technique,
                     model_name=args.student, protocol="train_only",
                     train_split="train+validation+prompt", eval_split="n/a",
                     config_id=cfg.config_id,
@@ -900,7 +933,7 @@ def main() -> int:
                 tb = traceback.format_exc(limit=5)
                 log_failure(f"kd training failed ({cfg.config_id}): {exc}\n{tb}")
                 write_metric_row(
-                    method="kd", stage="kd_mnr", technique="kd_kl",
+                    method="kd", stage="kd_mnr", technique=kd_technique,
                     model_name=args.student, protocol="train_only",
                     train_split="train+validation+prompt", eval_split="n/a",
                     config_id=cfg.config_id, metrics=None,
@@ -918,9 +951,9 @@ def main() -> int:
 
         for protocol_name, pool in protocols.items():
             eval_split = str(pool["eval_split"])
-            key = step_key("kd", "kd_mnr", "kd_kl", args.student, protocol_name,
+            key = step_key("kd", "kd_mnr", kd_technique, args.student, protocol_name,
                            "train+validation+prompt", eval_split, cfg.config_id)
-            rank_rel = rank_file_relpath("kd", "kd_mnr", "kd_kl",
+            rank_rel = rank_file_relpath("kd", "kd_mnr", kd_technique,
                                          args.student, protocol_name, cfg.config_id)
             rank_exists = (run_dir / rank_rel).exists()
             if args.resume and key in done_keys and rank_exists:
@@ -935,7 +968,7 @@ def main() -> int:
                     metrics.update(get_model_info(kd_model))
                 save_ranks(run_dir, rank_rel, ranks)
                 write_metric_row(
-                    method="kd", stage="kd_mnr", technique="kd_kl",
+                    method="kd", stage="kd_mnr", technique=kd_technique,
                     model_name=args.student, protocol=protocol_name,
                     train_split="train+validation+prompt", eval_split=eval_split,
                     config_id=cfg.config_id, metrics=metrics,
@@ -949,7 +982,7 @@ def main() -> int:
                 tb = traceback.format_exc(limit=5)
                 log_failure(f"kd eval failed ({cfg.config_id}, {protocol_name}): {exc}\n{tb}")
                 write_metric_row(
-                    method="kd", stage="kd_mnr", technique="kd_kl",
+                    method="kd", stage="kd_mnr", technique=kd_technique,
                     model_name=args.student, protocol=protocol_name,
                     train_split="train+validation+prompt", eval_split=eval_split,
                     config_id=cfg.config_id, metrics=None,
@@ -978,6 +1011,7 @@ def main() -> int:
     kd_rows = metrics_df[
         (metrics_df["method"] == "kd") &
         (metrics_df["stage"] == "kd_mnr") &
+        (metrics_df["technique"] == kd_technique) &
         (metrics_df["model_name"] == args.student) &
         (metrics_df["protocol"] == "heldout_test") &
         (metrics_df["status"] == "success")
