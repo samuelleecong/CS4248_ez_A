@@ -1,3 +1,0 @@
-run_id,timestamp,stage,technique,model_name,config_id,train_split,epoch,avg_loss,total_steps,warmup_steps,runtime_sec,status,error
-kd_minilm,2026-03-08T18:02:47.825825+00:00,kd_mnr,kd_kl,sentence-transformers/all-MiniLM-L6-v2,kd_e2_b16_lr2e5_a0_t4,train+validation+prompt,1,0.0899456084609545,58,5,6.007158207998145,success,
-kd_minilm,2026-03-08T18:02:47.826824+00:00,kd_mnr,kd_kl,sentence-transformers/all-MiniLM-L6-v2,kd_e2_b16_lr2e5_a0_t4,train+validation+prompt,2,0.05231324562417536,58,5,6.007158207998145,success,

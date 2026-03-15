@@ -1,6 +1,0 @@
-run_id,timestamp,stage,technique,model_name,config_id,train_split,epoch,avg_loss,total_steps,warmup_steps,runtime_sec,status,error
-kd_minilm_sweep,2026-03-15T10:25:15.842591+00:00,kd_mnr,kd_kl,sentence-transformers/all-MiniLM-L6-v2,kd_e1_b16_lr2e5_a05_t4,train+validation+prompt,1,0.0894068699843924,29,2,3.671428750036284,success,
-kd_minilm_sweep,2026-03-15T10:25:26.729675+00:00,kd_mnr,kd_kl,sentence-transformers/all-MiniLM-L6-v2,kd_e2_b16_lr2e5_a05_t4,train+validation+prompt,1,0.0917509257279593,58,5,4.686969458009116,success,
-kd_minilm_sweep,2026-03-15T10:25:26.731290+00:00,kd_mnr,kd_kl,sentence-transformers/all-MiniLM-L6-v2,kd_e2_b16_lr2e5_a05_t4,train+validation+prompt,2,0.0535580554559569,58,5,4.686969458009116,success,
-kd_minilm_sweep,2026-03-15T10:25:35.381204+00:00,kd_mnr,kd_kl,sentence-transformers/all-MiniLM-L6-v2,kd_e1_b16_lr2e5_a03_t4,train+validation+prompt,1,0.1207397437236946,29,2,2.051907624991145,success,
-kd_minilm_sweep,2026-03-15T10:25:43.573755+00:00,kd_mnr,kd_kl,sentence-transformers/all-MiniLM-L6-v2,kd_e1_b16_lr2e5_a07_t4,train+validation+prompt,1,0.0546165804924636,29,2,1.9475413339678198,success,

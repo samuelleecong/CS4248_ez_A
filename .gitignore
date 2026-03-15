@@ -48,3 +48,6 @@ experiments/kai/artifacts/*
 
 experiments/kai/results/*
 !experiments/kai/results/README.md
+
+knowledge-distillation/results/*
+!knowledge-distillation/results/README.md
