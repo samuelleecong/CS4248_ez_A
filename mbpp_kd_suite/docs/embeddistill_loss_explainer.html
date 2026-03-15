@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EmbedDistill Loss Explainer</title>
+  <style>
+    :root {
+      --bg: #f6f1e8;
+      --panel: rgba(255, 252, 247, 0.94);
+      --panel-strong: #fffdf8;
+      --ink: #1e2831;
+      --muted: #5f6d77;
+      --line: rgba(30, 40, 49, 0.12);
+      --accent: #a03a2a;
+      --accent-soft: rgba(160, 58, 42, 0.12);
+      --accent-2: #0f6670;
+      --success: #256046;
+      --warn: #8d5417;
+      --shadow: 0 20px 48px rgba(52, 37, 18, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(160, 58, 42, 0.12), transparent 25%),
+        radial-gradient(circle at top right, rgba(15, 102, 112, 0.12), transparent 24%),
+        linear-gradient(180deg, #fbf8f1 0%, var(--bg) 44%, #efe6d8 100%);
+      line-height: 1.58;
+    }
+
+    main {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 40px 0 72px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      border-radius: 30px;
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      bottom: -80px;
+      width: 240px;
+      height: 240px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(15, 102, 112, 0.16), transparent 72%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      font-family: "Fraunces", "Iowan Old Style", Georgia, serif;
+      line-height: 1.06;
+      margin: 0;
+    }
+
+    h1 {
+      margin-top: 16px;
+      font-size: clamp(2.3rem, 5vw, 4.5rem);
+      max-width: 11ch;
+    }
+
+    h2 {
+      font-size: 1.7rem;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 1.18rem;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    section {
+      margin-top: 26px;
+    }
+
+    .lead {
+      margin-top: 18px;
+      max-width: 78ch;
+      color: var(--muted);
+      font-size: 1.03rem;
+    }
+
+    .grid-2,
+    .grid-3,
+    .hero-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-grid {
+      margin-top: 28px;
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .panel {
+      border-radius: 22px;
+      padding: 22px;
+    }
+
+    .stat,
+    .mini-card,
+    .step,
+    .formula,
+    .flow-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.64);
+    }
+
+    .stat {
+      padding: 18px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+
+    .stat .value {
+      margin-top: 8px;
+      font-size: 1.92rem;
+      font-weight: 800;
+    }
+
+    .mini-card {
+      padding: 16px 18px;
+    }
+
+    .mini-card strong {
+      color: var(--accent-2);
+    }
+
+    .callout {
+      padding: 18px 20px;
+      border-left: 5px solid var(--accent);
+      background: rgba(160, 58, 42, 0.08);
+      border-radius: 18px;
+    }
+
+    .callout.success {
+      border-left-color: var(--success);
+      background: rgba(37, 96, 70, 0.09);
+    }
+
+    .callout.warn {
+      border-left-color: var(--warn);
+      background: rgba(141, 84, 23, 0.09);
+    }
+
+    .flow {
+      display: grid;
+      gap: 14px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 14px;
+      padding: 16px;
+      align-items: start;
+    }
+
+    .step-num {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      color: white;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), #cf6e38);
+    }
+
+    .formula {
+      padding: 16px 18px;
+      font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.95rem;
+      overflow-x: auto;
+    }
+
+    .formula strong {
+      font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--accent-2);
+    }
+
+    .flow-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .flow-box {
+      padding: 14px;
+      text-align: center;
+    }
+
+    .flow-box .title {
+      font-weight: 800;
+    }
+
+    .arrow {
+      text-align: center;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 6px 0;
+    }
+
+    code {
+      font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      background: rgba(30, 40, 49, 0.08);
+      padding: 0.12rem 0.35rem;
+      border-radius: 8px;
+      font-size: 0.95em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 0.95rem;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(15, 102, 112, 0.08);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-2);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+
+    .loss-card {
+      display: grid;
+      gap: 12px;
+    }
+
+    .loss-card .io {
+      display: grid;
+      gap: 10px;
+    }
+
+    .loss-card .io div {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.58);
+      padding: 12px 14px;
+    }
+
+    .loss-card .io strong {
+      color: var(--accent-2);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .example-row {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .example-row div {
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.58);
+      font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92rem;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid,
+      .grid-2,
+      .grid-3,
+      .flow-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .step {
+        grid-template-columns: 48px 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="eyebrow">EmbedDistill Losses</span>
+      <h1>What Goes In, What Comes Out, Why KL Helps</h1>
+      <p class="lead">
+        This page explains the exact <code>embed_distill</code> batch used in this repo. It focuses on the three losses,
+        the tensor inputs and outputs for each one, and what each loss is actually teaching the student to do.
+      </p>
+
+      <div class="hero-grid">
+        <div class="grid-3">
+          <div class="stat">
+            <div class="label">Teacher</div>
+            <div class="value">Frozen</div>
+          </div>
+          <div class="stat">
+            <div class="label">Student</div>
+            <div class="value">Trainable</div>
+          </div>
+          <div class="stat">
+            <div class="label">Final Output</div>
+            <div class="value">1 Scalar Loss</div>
+          </div>
+        </div>
+
+        <div class="mini-card">
+          <strong>Repo-specific note</strong>
+          <p style="margin-top: 8px;">
+            This is the local MBPP/TACO adaptation of <code>EmbedDistill: A Geometric Knowledge Distillation for Information Retrieval</code>.
+            It is a practical approximation, not an exact paper reproduction.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>Plain-English Summary</h2>
+        <div class="callout">
+          The student reads a batch of queries. The teacher has already cached embeddings for the matching queries and code snippets.
+          The student is trained to do three things at once: pick the correct code, mimic the teacher's ranking over the batch,
+          and place its query embedding near the teacher's query embedding.
+        </div>
+        <div class="callout success" style="margin-top: 14px;">
+          The important distinction is that the dataset still matters. <code>embed_distill</code> is not only "copy the teacher".
+          It still has a real retrieval loss anchored to the matched query-code pairs.
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>Final Batch Formula</h2>
+        <div class="formula">
+          <strong>In code:</strong><br><br>
+          final_loss = one_hot_loss(student_scores)<br>
+          &nbsp;&nbsp;+ distill_weight * distill_kl(student_scores, teacher_scores)<br>
+          &nbsp;&nbsp;+ align_weight * align_loss(student_q, target_q)
+        </div>
+        <p style="margin-top: 14px;">
+          In this branch, the code is in
+          <code>pipeline.py</code> lines 1202 to 1212 and the final sum is lines 1247 to 1253.
+        </p>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>One Minibatch, Step By Step</h2>
+      <div class="flow">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <h3>Batch input</h3>
+            <p>The KD loader gives two things: batch indices and raw query text. No code text is loaded for the student in this training path.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <h3>Student forward pass</h3>
+            <p>The student encodes the query batch and outputs <code>student_q</code>, one embedding per query.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <h3>Teacher lookup</h3>
+            <p>The batch indices are used to fetch <code>target_q</code> and <code>target_d</code> from the frozen teacher cache.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <h3>Build score matrices</h3>
+            <p><code>student_scores = student_q @ target_d^T</code> and <code>teacher_scores = target_q @ target_d^T</code>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div>
+            <h3>Compute the three losses</h3>
+            <p>The code computes <code>one_hot_loss</code>, <code>distill_kl</code>, and <code>align_loss</code>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div>
+            <h3>Backprop</h3>
+            <p>The summed scalar loss is backpropagated through the student only. The teacher remains frozen.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Tensor Map</h2>
+      <p>This is the cleanest way to read the batch. Every later loss consumes one or more rows from this table.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Shape</th>
+            <th>Source</th>
+            <th>Meaning</th>
+            <th>Used By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>batch_indices</code></td>
+            <td><code>[B]</code></td>
+            <td>query-only dataloader</td>
+            <td>Which dataset rows this batch corresponds to</td>
+            <td>teacher target lookup</td>
+          </tr>
+          <tr>
+            <td><code>student_q</code></td>
+            <td><code>[B, d]</code></td>
+            <td>student encoder</td>
+            <td>Student embedding for each query in the batch</td>
+            <td>all three losses</td>
+          </tr>
+          <tr>
+            <td><code>target_q</code></td>
+            <td><code>[B, d]</code></td>
+            <td>frozen teacher cache</td>
+            <td>Teacher embedding for each query in the batch</td>
+            <td><code>distill_kl</code>, <code>align_loss</code></td>
+          </tr>
+          <tr>
+            <td><code>target_d</code></td>
+            <td><code>[B, d]</code></td>
+            <td>frozen teacher cache</td>
+            <td>Teacher embedding for each matched code snippet in the batch</td>
+            <td><code>one_hot_loss</code>, <code>distill_kl</code></td>
+          </tr>
+          <tr>
+            <td><code>student_scores</code></td>
+            <td><code>[B, B]</code></td>
+            <td><code>student_q @ target_d^T</code></td>
+            <td>How strongly each student query matches every teacher doc in the batch</td>
+            <td><code>one_hot_loss</code>, <code>distill_kl</code></td>
+          </tr>
+          <tr>
+            <td><code>teacher_scores</code></td>
+            <td><code>[B, B]</code></td>
+            <td><code>target_q @ target_d^T</code></td>
+            <td>How strongly the teacher thinks each query matches every doc in the batch</td>
+            <td><code>distill_kl</code></td>
+          </tr>
+          <tr>
+            <td><code>loss_hot</code></td>
+            <td><code>[]</code> scalar</td>
+            <td><code>one_hot_loss(student_scores)</code></td>
+            <td>Dataset retrieval objective</td>
+            <td>final loss sum</td>
+          </tr>
+          <tr>
+            <td><code>loss_kl</code></td>
+            <td><code>[]</code> scalar</td>
+            <td><code>distill_kl(student_scores, teacher_scores)</code></td>
+            <td>Teacher ranking imitation objective</td>
+            <td>final loss sum</td>
+          </tr>
+          <tr>
+            <td><code>loss_align</code></td>
+            <td><code>[]</code> scalar</td>
+            <td><code>align_loss(student_q, target_q)</code></td>
+            <td>Teacher query geometry matching objective</td>
+            <td>final loss sum</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Data Flow At A Glance</h2>
+      <div class="flow-grid">
+        <div class="flow-box">
+          <div class="title">Student branch</div>
+          <p style="margin-top: 8px;"><code>queries -&gt; student encoder -&gt; student_q</code></p>
+        </div>
+        <div class="flow-box">
+          <div class="title">Teacher branch</div>
+          <p style="margin-top: 8px;"><code>batch_indices -&gt; target_q, target_d</code></p>
+        </div>
+        <div class="flow-box">
+          <div class="title">Loss branch</div>
+          <p style="margin-top: 8px;"><code>student_q + target_q + target_d -&gt; 3 losses -&gt; final scalar</code></p>
+        </div>
+      </div>
+      <div class="arrow">student_q and teacher targets meet only inside the loss computations</div>
+    </section>
+
+    <section class="grid-3">
+      <article class="panel loss-card">
+        <h2>1. <code>one_hot_loss</code></h2>
+        <p>This is the normal dataset retrieval loss.</p>
+        <div class="io">
+          <div>
+            <strong>Inputs</strong>
+            <span><code>student_scores</code> with shape <code>[B, B]</code>, plus temperature.</span>
+          </div>
+          <div>
+            <strong>Output</strong>
+            <span>One scalar. Lower is better.</span>
+          </div>
+        </div>
+        <div class="formula">
+          labels = [0, 1, 2, ..., B-1]<br>
+          loss = cross_entropy(student_scores / temperature, labels)
+        </div>
+        <p>
+          Row <code>i</code> corresponds to query <code>i</code>. Column <code>i</code> is the matched code.
+          The loss pushes the diagonal score to be the largest in each row.
+        </p>
+        <div class="mini-card">
+          <strong>What it teaches</strong>
+          <p style="margin-top: 8px;">
+            It teaches task correctness. Geometrically, it pushes each student query closer to the matched document direction
+            and away from the non-matching document directions inside the batch.
+          </p>
+        </div>
+      </article>
+
+      <article class="panel loss-card">
+        <h2>2. <code>distill_kl</code></h2>
+        <p>This is the teacher imitation loss on rankings.</p>
+        <div class="io">
+          <div>
+            <strong>Inputs</strong>
+            <span><code>student_scores</code> and <code>teacher_scores</code>, both <code>[B, B]</code>, plus temperature.</span>
+          </div>
+          <div>
+            <strong>Output</strong>
+            <span>One scalar. Lower is better.</span>
+          </div>
+        </div>
+        <div class="formula">
+          student_log_probs = log_softmax(student_scores / temperature)<br>
+          teacher_probs = softmax(teacher_scores / temperature)<br>
+          loss = KL(student_log_probs, teacher_probs)
+        </div>
+        <p>
+          This does not just say "get the right answer." It says "copy the teacher's whole distribution over this batch of candidates."
+        </p>
+        <div class="mini-card">
+          <strong>What it teaches</strong>
+          <p style="margin-top: 8px;">
+            It teaches ranking shape. Geometrically, it encourages the student query to have similar angles to all batch documents
+            as the teacher query does, not just to the positive document.
+          </p>
+        </div>
+      </article>
+
+      <article class="panel loss-card">
+        <h2>3. <code>align_loss</code></h2>
+        <p>This is the direct embedding alignment loss.</p>
+        <div class="io">
+          <div>
+            <strong>Inputs</strong>
+            <span><code>student_q</code> and <code>target_q</code>, both <code>[B, d]</code>.</span>
+          </div>
+          <div>
+            <strong>Output</strong>
+            <span>One scalar. Lower is better.</span>
+          </div>
+        </div>
+        <div class="formula">
+          loss = mean(|| student_q - target_q ||_2)
+        </div>
+        <p>
+          This teaches the student to place each query embedding near the teacher embedding for the same query.
+        </p>
+        <div class="mini-card">
+          <strong>What it teaches</strong>
+          <p style="margin-top: 8px;">
+            It teaches absolute query placement. Geometrically, it directly pulls the student query vector toward the teacher query vector.
+          </p>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>How Geometry Is Aligned</h2>
+        <p>
+          In this repo, geometry is aligned in two different ways: directly in query space, and indirectly through document-relative scores.
+        </p>
+
+        <div class="mini-card" style="margin-top: 14px;">
+          <strong>Direct alignment</strong>
+          <p style="margin-top: 8px;">
+            <code>align_loss(student_q, target_q)</code> explicitly pulls the student query embedding toward the teacher query embedding
+            for the same example.
+          </p>
+        </div>
+
+        <div class="mini-card" style="margin-top: 12px;">
+          <strong>Indirect alignment</strong>
+          <p style="margin-top: 8px;">
+            <code>distill_kl(student_scores, teacher_scores)</code> makes the student query produce similar similarity patterns
+            against the same teacher document embeddings. That means it is also learning the teacher's local neighborhood structure.
+          </p>
+        </div>
+
+        <div class="callout success" style="margin-top: 14px;">
+          Since the embeddings are normalized before scoring, matching positions mostly means matching directions and angles.
+          In practice, this is very close to saying "match cosine geometry."
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>What Is And Is Not Explicitly Aligned</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Object</th>
+              <th>Explicitly aligned?</th>
+              <th>How</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>student query to teacher query</td>
+              <td>Yes</td>
+              <td><code>align_loss(student_q, target_q)</code></td>
+            </tr>
+            <tr>
+              <td>student query to teacher docs</td>
+              <td>Indirectly</td>
+              <td><code>one_hot_loss</code> and <code>distill_kl</code> through <code>student_scores</code></td>
+            </tr>
+            <tr>
+              <td>student code to teacher code during KD training</td>
+              <td>No</td>
+              <td>Not explicitly in this local <code>embed_distill</code> branch</td>
+            </tr>
+            <tr>
+              <td>full teacher space reproduction</td>
+              <td>Partially</td>
+              <td>Query side is stronger; code side is more indirect in this implementation</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 14px;">
+          This is one of the important "lightweight adaptation" details in this suite: the geometry matching is strongest on the query side.
+        </p>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>Why KL Helps</h2>
+        <p>
+          The dataset loss is "hard" supervision. It only says the diagonal item is correct and the others are wrong.
+          KL gives "soft" supervision. It transfers how the teacher ranks all candidates, not just which one is first.
+        </p>
+
+        <div class="example-row">
+          <div>teacher_probs for one query: [0.72, 0.18, 0.07, 0.03]</div>
+          <div>student_probs before training: [0.30, 0.25, 0.23, 0.22]</div>
+        </div>
+
+        <ul>
+          <li>The teacher says candidate 2 is a hard negative, not a random wrong answer.</li>
+          <li>The teacher says candidate 3 is somewhat related, but clearly less relevant than candidate 2.</li>
+          <li>The student gets gradient on every column in the row, not just "make column 1 bigger".</li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <h2>What KL Is Buying You</h2>
+        <div class="mini-card">
+          <strong>Without KL</strong>
+          <p style="margin-top: 8px;">
+            The student only learns a coarse rule: the matching code should beat the rest of the batch.
+          </p>
+        </div>
+        <div class="mini-card" style="margin-top: 12px;">
+          <strong>With KL</strong>
+          <p style="margin-top: 8px;">
+            The student also learns the teacher's margin structure, hard negatives, and relative similarity pattern.
+          </p>
+        </div>
+        <div class="callout warn" style="margin-top: 14px;">
+          KL helps only if the teacher distribution is useful. If the teacher is weak or badly mismatched to the student space,
+          KL can fight the dataset loss instead of helping it.
+        </div>
+      </article>
+    </section>
+
+    <section class="grid-2">
+      <article class="panel">
+        <h2>Input And Output Checklist</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Piece</th>
+              <th>Input</th>
+              <th>Output</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>student encoder</td>
+              <td>tokenized query batch</td>
+              <td><code>student_q [B, d]</code></td>
+            </tr>
+            <tr>
+              <td>teacher lookup</td>
+              <td><code>batch_indices [B]</code></td>
+              <td><code>target_q [B, d]</code>, <code>target_d [B, d]</code></td>
+            </tr>
+            <tr>
+              <td>score build</td>
+              <td><code>student_q</code>, <code>target_q</code>, <code>target_d</code></td>
+              <td><code>student_scores [B, B]</code>, <code>teacher_scores [B, B]</code></td>
+            </tr>
+            <tr>
+              <td><code>one_hot_loss</code></td>
+              <td><code>student_scores [B, B]</code></td>
+              <td>scalar</td>
+            </tr>
+            <tr>
+              <td><code>distill_kl</code></td>
+              <td><code>student_scores [B, B]</code>, <code>teacher_scores [B, B]</code></td>
+              <td>scalar</td>
+            </tr>
+            <tr>
+              <td><code>align_loss</code></td>
+              <td><code>student_q [B, d]</code>, <code>target_q [B, d]</code></td>
+              <td>scalar</td>
+            </tr>
+            <tr>
+              <td>final loss</td>
+              <td>three scalar losses and weights</td>
+              <td>one scalar for backprop</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="panel">
+        <h2>What Changes During Training?</h2>
+        <div class="mini-card">
+          <strong>Changes</strong>
+          <ul>
+            <li>student backbone weights</li>
+            <li>student projection weights, if present</li>
+          </ul>
+        </div>
+        <div class="mini-card" style="margin-top: 12px;">
+          <strong>Does not change</strong>
+          <ul>
+            <li>teacher weights</li>
+            <li>teacher cached embeddings</li>
+            <li>the matched query-code pairing inside the dataset</li>
+          </ul>
+        </div>
+        <div class="callout success" style="margin-top: 14px;">
+          A useful mental model: the teacher provides targets, but the student still has to solve the actual retrieval task.
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>Code References</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Topic</th>
+            <th>Where In Code</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>loss function definitions</td>
+            <td><code>pipeline.py</code> lines 512 to 524</td>
+          </tr>
+          <tr>
+            <td>build <code>student_scores</code> and <code>teacher_scores</code></td>
+            <td><code>pipeline.py</code> lines 1202 to 1204</td>
+          </tr>
+          <tr>
+            <td><code>embed_distill</code> branch</td>
+            <td><code>pipeline.py</code> lines 1210 to 1212</td>
+          </tr>
+          <tr>
+            <td>final loss sum</td>
+            <td><code>pipeline.py</code> lines 1247 to 1253</td>
+          </tr>
+          <tr>
+            <td>teacher freeze and precompute</td>
+            <td><code>pipeline.py</code> lines 1537 to 1615</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="footer-note" style="margin-top: 14px;">
+        Fair comparison reminder: after training, <code>embed_distill</code> should be compared against <code>supervised_student</code>,
+        not against the zero-shot <code>direct_small_student</code>.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,27 @@
+[project]
+name = "mbpp-kd-suite"
+version = "0.1.0"
+description = "Shared MBPP benchmark suite for embedding-focused KD methods"
+readme = "README.md"
+authors = [
+    { name = "Samuel", email = "samuelleecong@gmail.com" }
+]
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "accelerate>=0.33.0",
+    "datasets>=2.20.0",
+    "numpy>=1.26.0",
+    "scikit-learn>=1.5.0",
+    "sentence-transformers>=3.0.0",
+    "torch>=2.5.1",
+    "tqdm>=4.66.0",
+    "transformers>=4.44.0",
+]
+
+[project.scripts]
+mbpp-kd-suite = "mbpp_kd_suite:main"
+mbpp-kd-inventory = "mbpp_kd_suite.experiment_inventory:main"
+
+[build-system]
+requires = ["uv_build>=0.8.3,<0.9.0"]
+build-backend = "uv_build"

@@ -1,0 +1,50 @@
+[
+  {
+    "paper_id": "embed_distill",
+    "title": "EmbedDistill: A Geometric Knowledge Distillation for Information Retrieval",
+    "year": 2023,
+    "pdf_name": "01_embeddistill_2301.12005.pdf",
+    "pdf_url": "https://arxiv.org/pdf/2301.12005.pdf",
+    "source_hint": "../../assignment_details/papers/06_embeddistill_2301.12005.pdf"
+  },
+  {
+    "paper_id": "qed_align",
+    "title": "Query Encoder Distillation via Embedding Alignment",
+    "year": 2023,
+    "pdf_name": "02_qed_align_2023.sustainlp-1.23.pdf",
+    "pdf_url": "https://aclanthology.org/2023.sustainlp-1.23.pdf",
+    "source_hint": ""
+  },
+  {
+    "paper_id": "distilcse",
+    "title": "DistilCSE: Effective Knowledge Distillation For Contrastive Sentence Embeddings",
+    "year": 2023,
+    "pdf_name": "03_distilcse_2112.05638.pdf",
+    "pdf_url": "https://arxiv.org/pdf/2112.05638.pdf",
+    "source_hint": "../../assignment_details/papers/05_distilcse_2112.05638.pdf"
+  },
+  {
+    "paper_id": "pair_distill",
+    "title": "PAIR DISTILL: Pairwise Relevance Distillation for Dense Retrieval",
+    "year": 2024,
+    "pdf_name": "04_pairdistill_2024.emnlp-main.1013.pdf",
+    "pdf_url": "https://aclanthology.org/2024.emnlp-main.1013.pdf",
+    "source_hint": "../../assignment_details/papers/08_pairdistill_2024.emnlp-main.1013.pdf"
+  },
+  {
+    "paper_id": "adam",
+    "title": "ADAM: Dense Retrieval Distillation with Adaptive Dark Examples",
+    "year": 2024,
+    "pdf_name": "05_adam_2024.findings-acl.692.pdf",
+    "pdf_url": "https://aclanthology.org/2024.findings-acl.692.pdf",
+    "source_hint": "../../assignment_details/papers/09_adam_2024.findings-acl.692.pdf"
+  },
+  {
+    "paper_id": "hpd",
+    "title": "Compressing Sentence Representation for Semantic Retrieval via Homomorphic Projective Distillation",
+    "year": 2022,
+    "pdf_name": "06_hpd_2022.findings-acl.64.pdf",
+    "pdf_url": "https://aclanthology.org/2022.findings-acl.64.pdf",
+    "source_hint": ""
+  }
+]

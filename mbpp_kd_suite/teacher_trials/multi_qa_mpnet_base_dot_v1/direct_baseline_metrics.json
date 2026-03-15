@@ -1,0 +1,17 @@
+{
+  "teacher_model": "sentence-transformers/multi-qa-mpnet-base-dot-v1",
+  "validation": {
+    "MRR": 0.8943121693121694,
+    "Recall@1": 0.8222222222222222,
+    "Recall@5": 0.9888888888888889,
+    "Recall@10": 0.9888888888888889,
+    "MedianRank": 1.0
+  },
+  "test": {
+    "MRR": 0.7715405254766865,
+    "Recall@1": 0.672,
+    "Recall@5": 0.896,
+    "Recall@10": 0.94,
+    "MedianRank": 1.0
+  }
+}
