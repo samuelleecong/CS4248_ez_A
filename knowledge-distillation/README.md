@@ -18,6 +18,16 @@ total = alpha × mean( (student_margin_ij − teacher_margin_ij)² )
 where margin_ij = sim(query_i, pos_i) − sim(query_i, neg_j)  for j ≠ i
 ```
 
+**PairDistill — binary KL on pairwise preferences (Huang & Chen, EMNLP 2024):**
+```
+P(pos ≻ neg | q) = softmax([sim(q, pos), sim(q, neg)])[0]
+
+total = alpha × mean( KL( P_teacher(pos ≻ neg | q_i) ‖ P_student(pos ≻ neg | q_i) ) )
+      + (1 − alpha) × MNR_CrossEntropy(student_sims)
+```
+
+Instead of absolute relevance scores, the teacher signal is a *relative preference* — which document wins a head-to-head comparison. This produces more reliable ranking signals for similarly-scored documents.
+
 - `alpha` — trade-off between distillation and task loss (0 = pure MNR, 1 = pure KD, default 0.5)
 - `T` — softmax temperature for listwise mode; higher values spread probability across near-misses (default 4.0)
 - Similarity matrices are compared, not raw vectors — teacher and student can have **different embedding dimensions**
@@ -90,6 +100,13 @@ python knowledge-distillation/run_kd_experiments.py \
   --run-id kd_minilm_pairwise \
   --epochs 2 --alpha 0.5 --kd-loss pairwise
 
+# Single config — PairDistill (binary KL on pairwise preferences)
+python knowledge-distillation/run_kd_experiments.py \
+  --student sentence-transformers/all-MiniLM-L6-v2 \
+  --teacher-targets knowledge-distillation/artifacts/kd_targets/sentence-transformers__all-mpnet-base-v2_all.npz \
+  --run-id kd_minilm_pairdistil \
+  --epochs 2 --alpha 0.5 --kd-loss pairdistil
+
 # Sweep 4 configs (alpha × epochs)
 python knowledge-distillation/run_kd_experiments.py \
   --student sentence-transformers/all-MiniLM-L6-v2 \
@@ -130,7 +147,7 @@ python knowledge-distillation/run_kd_experiments.py \
 | `--max-grad-norm` | 1.0 | |
 | `--alpha` | 0.5 | KD loss weight (0 = pure MNR, 1 = pure distillation) |
 | `--temperature` | 4.0 | Softmax temperature for similarity distributions (listwise only) |
-| `--kd-loss` | `listwise` | `listwise` (KL on full sim matrix) or `pairwise` (Margin MSE) |
+| `--kd-loss` | `listwise` | `listwise` (KL on full sim matrix), `pairwise` (Margin MSE), or `pairdistil` (binary KL on pairwise preferences) |
 | `--full-matrix` | off | Sweep 4 configs instead of using CLI hyperparams |
 | `--resume` | off | Skip already-completed steps |
 | `--fast-smoke` | off | Zero-shot eval only, no training |
@@ -171,7 +188,7 @@ Comparison written: **`kd_vs_student_zero_shot`** — bootstrap CI delta between
 |---|---|
 | `method` | `pretrained` (zero-shot), `kd` |
 | `stage` | `pretrained`, `kd_mnr` |
-| `technique` | `zero_shot`, `kd_kl` (listwise), `kd_margin_mse` (pairwise) |
+| `technique` | `zero_shot`, `kd_kl` (listwise), `kd_margin_mse` (pairwise), `kd_pairdistil` (pairdistil) |
 | `protocol` | `heldout_test` (primary), `full_corpus` (diagnostic) |
 | `status` | `success`, `failed` |
 

@@ -32,6 +32,12 @@ Loss per batch (--kd-loss pairwise, Margin MSE):
         + (1 - alpha) * CrossEntropy( S_student * 20, diagonal_labels )
 
   where margin_ij = sim(query_i, pos_i) - sim(query_i, neg_j) for j != i.
+
+Loss per batch (--kd-loss pairdistil, PairDistill):
+  total = alpha * mean( KL( P_teacher(pos ≻ neg | q_i) || P_student(pos ≻ neg | q_i) ) )
+        + (1 - alpha) * CrossEntropy( S_student * 20, diagonal_labels )
+
+  where P(pos ≻ neg | q) = softmax([sim(q, pos), sim(q, neg)]).
 """
 
 from __future__ import annotations
@@ -436,6 +442,13 @@ def finetune_with_kd(
         KD = mean( (student_margin - teacher_margin)^2 )
       Total = alpha * KD + (1 - alpha) * Task  [same MNR task loss]
 
+    kd_loss_type="pairdistil"  (PairDistill, Huang & Chen EMNLP 2024):
+      For every (query_i, pos_i, neg_j) triple in the batch (j != i):
+        teacher preference: P_t(pos ≻ neg | q_i) = softmax([t_sim[i,i], t_sim[i,j]])
+        student preference: P_s(pos ≻ neg | q_i) = softmax([s_sim[i,i], s_sim[i,j]])
+        KD = mean( KL( P_t || P_s ) )   [binary KL over the 2-way preference]
+      Total = alpha * KD + (1 - alpha) * Task  [same MNR task loss]
+
     Similarity matrices are compared — not raw vectors — so teacher and student
     can have different embedding dimensions.
     """
@@ -510,6 +523,23 @@ def finetune_with_kd(
                 # Mask diagonal (pos vs itself) to keep only true negatives.
                 mask = 1.0 - torch.eye(B, device=dev)
                 kd_loss = (mask * (student_margin - teacher_margin) ** 2).sum() / mask.sum()
+            elif kd_loss_type == "pairdistil":
+                # PairDistill (Huang & Chen, EMNLP 2024): for each (query_i, pos_i, neg_j)
+                # triple, distill the teacher's 2-way preference via binary KL divergence.
+                #   P(pos ≻ neg | q) = softmax([sim(q, pos), sim(q, neg)])[0]
+                # pair_*[i, j, 0] = sim(q_i, pos_i),  pair_*[i, j, 1] = sim(q_i, neg_j)
+                pos_t = teacher_sims.diag().unsqueeze(1).expand(B, B)   # (B, B)
+                pos_s = student_sims.diag().unsqueeze(1).expand(B, B)   # (B, B)
+                pair_teacher = torch.stack([pos_t, teacher_sims], dim=2)  # (B, B, 2)
+                pair_student = torch.stack([pos_s, student_sims], dim=2)  # (B, B, 2)
+                teacher_pair_probs = torch.nn.functional.softmax(pair_teacher, dim=2)
+                student_pair_log_probs = torch.nn.functional.log_softmax(pair_student, dim=2)
+                # KL per (query, neg) pair; shape (B, B)
+                kl_per_pair = torch.nn.functional.kl_div(
+                    student_pair_log_probs, teacher_pair_probs, reduction="none"
+                ).sum(dim=2)
+                mask = 1.0 - torch.eye(B, device=dev)
+                kd_loss = (kl_per_pair * mask).sum() / mask.sum()
             else:
                 # Listwise: KL divergence on soft similarity distributions.
                 teacher_probs = torch.nn.functional.softmax(teacher_sims / cfg.temperature, dim=1)
@@ -593,9 +623,10 @@ def parse_args() -> argparse.Namespace:
                         help="Weight on KD loss. 0 = pure MNR, 1 = pure distillation.")
     parser.add_argument("--temperature", type=float, default=4.0,
                         help="Softmax temperature for similarity distributions (listwise only).")
-    parser.add_argument("--kd-loss", choices=["listwise", "pairwise"], default="listwise",
-                        help="KD loss type: 'listwise' (KL on full sim matrix) or "
-                             "'pairwise' (Margin MSE on pos/neg margins).")
+    parser.add_argument("--kd-loss", choices=["listwise", "pairwise", "pairdistil"], default="listwise",
+                        help="KD loss type: 'listwise' (KL on full sim matrix), "
+                             "'pairwise' (Margin MSE on pos/neg margins), or "
+                             "'pairdistil' (binary KL on pairwise preferences, Huang & Chen EMNLP 2024).")
 
     # Sweep / run modes
     parser.add_argument("--full-matrix", action="store_true",
@@ -891,7 +922,7 @@ def main() -> int:
     except Exception as exc:
         print(f"  [warn] teacher latency/size measurement failed: {exc}")
 
-    kd_technique = "kd_margin_mse" if args.kd_loss == "pairwise" else "kd_kl"
+    kd_technique = {"pairwise": "kd_margin_mse", "pairdistil": "kd_pairdistil"}.get(args.kd_loss, "kd_kl")
 
     for cfg in kd_configs:
         kd_ckpt = run_dir / "checkpoints" / "kd_mnr" / safe_slug(args.student) / cfg.config_id
