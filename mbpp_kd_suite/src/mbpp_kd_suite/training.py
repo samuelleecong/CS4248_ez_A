@@ -153,6 +153,22 @@ def contrastive_kd_loss(
     return one_hot_loss(relation_scores, temperature)
 
 
+def margin_mse_loss(student_scores: torch.Tensor, teacher_scores: torch.Tensor) -> torch.Tensor:
+    batch_size = student_scores.size(0)
+    if batch_size < 2:
+        return torch.zeros((), device=student_scores.device)
+    pos_s = student_scores.diag().unsqueeze(1)
+    pos_t = teacher_scores.diag().unsqueeze(1)
+    student_margin = pos_s - student_scores
+    teacher_margin = pos_t - teacher_scores
+    mask = 1.0 - torch.eye(batch_size, device=student_scores.device)
+    return (mask * (student_margin - teacher_margin) ** 2).sum() / mask.sum()
+
+
+def pointwise_loss(student_scores: torch.Tensor, teacher_scores: torch.Tensor) -> torch.Tensor:
+    return F.mse_loss(student_scores, teacher_scores)
+
+
 def pairwise_preference_loss(
     student_scores: torch.Tensor,
     teacher_scores: torch.Tensor,
@@ -359,6 +375,10 @@ def _compute_kd_batch_losses(
             hard_negatives=cfg.dark_negatives,
             dark_mix_ratio=cfg.dark_mix_ratio,
         )
+    elif name == "margin_mse":
+        losses.pairwise = margin_mse_loss(student_scores, teacher_scores)
+    elif name == "pointwise":
+        losses.distill_kl = pointwise_loss(student_scores, teacher_scores)
     elif name == "hpd":
         losses.align = align_loss(student_q, target_q)
     else:
