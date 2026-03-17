@@ -14,6 +14,8 @@ KD_METHOD_ORDER = [
     "pair_distill",
     "adam_lite",
     "hpd",
+    "margin_mse",
+    "pointwise",
 ]
 
 METHOD_ORDER = [TRAINED_BASELINE_NAME, *KD_METHOD_ORDER]
@@ -93,5 +95,14 @@ PAPER_SPECS = [
         pdf_name="06_hpd_2022.findings-acl.64.pdf",
         method_name="hpd",
         implementation_note="PCA-compressed target space distillation",
+    ),
+    PaperSpec(
+        paper_id="margin_mse",
+        title="Efficiently Teaching an Effective Dense Retriever with Balanced Topic Aware Sampling",
+        venue="SIGIR",
+        year=2021,
+        pdf_name="07_margin_mse.pdf",
+        method_name="margin_mse",
+        implementation_note="Margin-MSE distillation matching teacher similarity margins for all in-batch negatives",
     ),
 ]
