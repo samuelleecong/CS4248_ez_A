@@ -1,0 +1,26 @@
+{
+  "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+  "target_space": "student_native",
+  "evaluation_mode": "symmetric",
+  "train": {
+    "MRR": 0.9336007130124776,
+    "Recall@1": 0.8770053475935828,
+    "Recall@5": 1.0,
+    "Recall@10": 1.0,
+    "MedianRank": 1.0
+  },
+  "validation": {
+    "MRR": 0.935,
+    "Recall@1": 0.9,
+    "Recall@5": 1.0,
+    "Recall@10": 1.0,
+    "MedianRank": 1.0
+  },
+  "test": {
+    "MRR": 0.8136627700794268,
+    "Recall@1": 0.732,
+    "Recall@5": 0.924,
+    "Recall@10": 0.948,
+    "MedianRank": 1.0
+  }
+}

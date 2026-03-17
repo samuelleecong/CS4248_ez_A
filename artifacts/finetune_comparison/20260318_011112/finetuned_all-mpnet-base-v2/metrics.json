@@ -1,0 +1,26 @@
+{
+  "model_name": "sentence-transformers/all-mpnet-base-v2",
+  "target_space": "student_native",
+  "evaluation_mode": "symmetric",
+  "train": {
+    "MRR": 0.9470588235294118,
+    "Recall@1": 0.9010695187165776,
+    "Recall@5": 1.0,
+    "Recall@10": 1.0,
+    "MedianRank": 1.0
+  },
+  "validation": {
+    "MRR": 0.9475308641975307,
+    "Recall@1": 0.9111111111111111,
+    "Recall@5": 0.9888888888888889,
+    "Recall@10": 1.0,
+    "MedianRank": 1.0
+  },
+  "test": {
+    "MRR": 0.8422034132534133,
+    "Recall@1": 0.758,
+    "Recall@5": 0.948,
+    "Recall@10": 0.974,
+    "MedianRank": 1.0
+  }
+}

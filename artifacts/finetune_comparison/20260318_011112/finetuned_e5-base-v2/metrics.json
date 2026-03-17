@@ -1,0 +1,26 @@
+{
+  "model_name": "intfloat/e5-base-v2",
+  "target_space": "student_native",
+  "evaluation_mode": "symmetric",
+  "train": {
+    "MRR": 0.964126559714795,
+    "Recall@1": 0.93048128342246,
+    "Recall@5": 1.0,
+    "Recall@10": 1.0,
+    "MedianRank": 1.0
+  },
+  "validation": {
+    "MRR": 0.93,
+    "Recall@1": 0.8888888888888888,
+    "Recall@5": 0.9888888888888889,
+    "Recall@10": 1.0,
+    "MedianRank": 1.0
+  },
+  "test": {
+    "MRR": 0.8076342924715517,
+    "Recall@1": 0.716,
+    "Recall@5": 0.918,
+    "Recall@10": 0.954,
+    "MedianRank": 1.0
+  }
+}

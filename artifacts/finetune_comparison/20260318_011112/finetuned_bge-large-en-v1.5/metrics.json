@@ -1,0 +1,26 @@
+{
+  "model_name": "BAAI/bge-large-en-v1.5",
+  "target_space": "student_native",
+  "evaluation_mode": "symmetric",
+  "train": {
+    "MRR": 0.8904429030482169,
+    "Recall@1": 0.8288770053475936,
+    "Recall@5": 0.9705882352941176,
+    "Recall@10": 0.983957219251337,
+    "MedianRank": 1.0
+  },
+  "validation": {
+    "MRR": 0.9259104938271605,
+    "Recall@1": 0.8888888888888888,
+    "Recall@5": 0.9666666666666667,
+    "Recall@10": 0.9888888888888889,
+    "MedianRank": 1.0
+  },
+  "test": {
+    "MRR": 0.7753572912179708,
+    "Recall@1": 0.686,
+    "Recall@5": 0.876,
+    "Recall@10": 0.918,
+    "MedianRank": 1.0
+  }
+}
