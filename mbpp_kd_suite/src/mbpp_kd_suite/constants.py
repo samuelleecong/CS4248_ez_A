@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 TRAINED_BASELINE_NAME = "supervised_student"
+FINETUNED_TEACHER_NAME = "finetuned_teacher"
 
 KD_METHOD_ORDER = [
     "score_distill",

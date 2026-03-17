@@ -9,7 +9,7 @@ from typing import Any
 from transformers import AutoModel, AutoTokenizer
 
 from .config import DistillTargets, RetrievalSplits, TrainConfig, build_arg_parser, resolve_output_root, train_config_from_args
-from .constants import METHOD_ORDER, PAPER_SPECS
+from .constants import FINETUNED_TEACHER_NAME, METHOD_ORDER, PAPER_SPECS
 from .data import dataset_dict_to_splits, load_retrieval_dataset
 from .metrics import evaluate_symmetric_backbone, score_metrics_from_embeddings, summarize_analysis
 from .modeling import encode_texts_backbone, infer_model_encoding_spec
@@ -32,6 +32,7 @@ def _build_run_dir(cfg: TrainConfig) -> tuple[Path, Path]:
 def _write_run_metadata(run_dir: Path, cfg: TrainConfig, output_root: Path) -> None:
     config_payload = asdict(cfg)
     config_payload["methods"] = list(cfg.methods)
+    config_payload["extra_baseline_models"] = list(cfg.extra_baseline_models)
     config_payload["resolved_output_dir"] = str(output_root)
     _write_json(run_dir / "config.json", config_payload)
     _write_json(run_dir / "paper_registry.json", [asdict(spec) for spec in PAPER_SPECS])
@@ -106,14 +107,20 @@ def _encode_teacher_targets(
     return DistillTargets(name="teacher_full", **encoded)
 
 
+def _model_slug(model_name: str) -> str:
+    return model_name.split("/")[-1]
+
+
 def _print_final_metrics(result: dict[str, Any]) -> None:
     print("\n=== Final Test Metrics ===")
-    for run_name in ["direct_big_teacher", "direct_small_student", *METHOD_ORDER]:
+    fixed_order = ["direct_big_teacher", "direct_small_student", FINETUNED_TEACHER_NAME, *METHOD_ORDER]
+    extra_keys = sorted(k for k in result if k not in fixed_order and k != "analysis")
+    for run_name in [*fixed_order, *extra_keys]:
         if run_name not in result:
             continue
         metric = result[run_name]["test"]
         print(
-            f"{run_name:>20} | MRR={metric['MRR']:.4f} | R@1={metric['Recall@1']:.4f} | "
+            f"{run_name:>35} | MRR={metric['MRR']:.4f} | R@1={metric['Recall@1']:.4f} | "
             f"R@5={metric['Recall@5']:.4f} | R@10={metric['Recall@10']:.4f}"
         )
 
@@ -169,6 +176,53 @@ def run(cfg: TrainConfig) -> dict[str, Any]:
             eval_batch_size=cfg.eval_batch_size,
             device=device,
         )
+
+    if cfg.run_finetuned_teacher:
+        print(f"Training finetuned teacher baseline: {cfg.teacher_model}")
+        ft_teacher_metrics, _, _ = train_student(
+            name=FINETUNED_TEACHER_NAME,
+            cfg=cfg,
+            run_dir=run_dir,
+            device=device,
+            data=data,
+            targets=teacher_targets,
+            full_teacher_targets=teacher_targets,
+            model_name=cfg.teacher_model,
+            supervised=True,
+        )
+        result[FINETUNED_TEACHER_NAME] = ft_teacher_metrics
+
+    for extra_model in cfg.extra_baseline_models:
+        slug = _model_slug(extra_model)
+
+        direct_name = f"direct_{slug}"
+        print(f"Running direct baseline: {extra_model} (zero-shot)")
+        result[direct_name] = evaluate_symmetric_backbone(
+            model_name=extra_model,
+            val_queries=data.validation.queries,
+            val_codes=data.validation.codes,
+            test_queries=data.test.queries,
+            test_codes=data.test.codes,
+            max_query_length=cfg.max_query_length,
+            max_code_length=cfg.max_code_length,
+            eval_batch_size=cfg.eval_batch_size,
+            device=device,
+        )
+
+        ft_name = f"finetuned_{slug}"
+        print(f"Training finetuned baseline: {extra_model}")
+        ft_extra_metrics, _, _ = train_student(
+            name=ft_name,
+            cfg=cfg,
+            run_dir=run_dir,
+            device=device,
+            data=data,
+            targets=teacher_targets,
+            full_teacher_targets=teacher_targets,
+            model_name=extra_model,
+            supervised=True,
+        )
+        result[ft_name] = ft_extra_metrics
 
     for method_name in cfg.methods:
         print(f"Training method: {method_name}")

@@ -38,6 +38,8 @@ class TrainConfig:
     taco_val_size: int = 1000
     save_models: bool = False
     run_direct_baselines: bool = True
+    run_finetuned_teacher: bool = True
+    extra_baseline_models: tuple[str, ...] = ()
     run_diagnostics: bool = True
     optimize_for_mps: bool = False
 
@@ -144,9 +146,21 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--taco-val-size", type=int, default=TrainConfig.taco_val_size)
     parser.add_argument("--save-models", action="store_true")
     parser.add_argument("--skip-direct-baselines", action="store_true")
+    parser.add_argument("--skip-finetuned-teacher", action="store_true")
+    parser.add_argument(
+        "--extra-baseline-models",
+        default="",
+        help="Comma-separated list of extra model names to evaluate zero-shot and fine-tuned",
+    )
     parser.add_argument("--skip-diagnostics", action="store_true")
     parser.add_argument("--optimize-for-mps", action="store_true")
     return parser
+
+
+def parse_extra_baseline_models(raw: str) -> tuple[str, ...]:
+    if not raw.strip():
+        return ()
+    return tuple(m.strip() for m in raw.split(",") if m.strip())
 
 
 def train_config_from_args(args: argparse.Namespace) -> TrainConfig:
@@ -177,6 +191,8 @@ def train_config_from_args(args: argparse.Namespace) -> TrainConfig:
         taco_val_size=args.taco_val_size,
         save_models=args.save_models,
         run_direct_baselines=not args.skip_direct_baselines,
+        run_finetuned_teacher=not args.skip_finetuned_teacher,
+        extra_baseline_models=parse_extra_baseline_models(args.extra_baseline_models),
         run_diagnostics=not args.skip_diagnostics,
         optimize_for_mps=args.optimize_for_mps,
     )

@@ -1,5 +1,7 @@
 # MBPP Project Tutorial: Text-to-Code Generation & Code Search
 
+> **New here? Start with [QUICKSTART.md](./QUICKSTART.md)** — a 15-minute conceptual overview. This document is the full reference with runnable code, advanced techniques, and paper lists.
+
 **Dataset**: [MBPP (Mostly Basic Python Problems)](https://huggingface.co/datasets/google-research-datasets/mbpp) — 974 Python programming tasks with natural language descriptions, code solutions, and test cases.
 
 ---
@@ -820,13 +822,152 @@ Papers:
 
 ---
 
-### 4.9 Technique Comparison
+### 4.9 Knowledge Distillation (Code Generation)
+
+**Idea**: Train a small student model to mimic a large teacher model's outputs. Get 70B-quality code from a 7B model.
+
+```
+Teacher (70B) generates solutions → Student (7B) learns to reproduce them
+```
+
+**Why distillation over just using the small model?** A 7B model fine-tuned on MBPP with SFT hits ~48% pass@1. The same 7B model *distilled* from a 70B teacher can hit ~57% — because it learns the teacher's reasoning patterns, not just the training data.
+
+#### Three approaches (easiest to hardest):
+
+**1. Response-based distillation (simplest)**
+Generate solutions with a strong teacher, then SFT the student on them:
+```python
+# Use a strong model (API or local) as teacher
+for problem in mbpp_train:
+    teacher_solution = teacher_generate(problem["text"])  # GPT-4, Llama-70B, etc.
+    if execute_code(teacher_solution, problem["test_list"]):
+        distill_data.append({"text": problem["text"], "code": teacher_solution})
+
+# Then SFT the student on teacher outputs (same as Part 1)
+```
+This is what Magicoder and WizardCoder do at scale. Simple and effective.
+
+**2. Reasoning distillation (CodePLAN)**
+Teacher generates *solution plans* (pseudocode/reasoning steps) alongside code. Student learns both:
+```
+Teacher output:  Plan: "1. iterate list, 2. filter evens, 3. sum" + Code: "def sum_evens(lst)..."
+Student learns:  Plan generation + Code generation (multi-task)
+```
+Backward reasoning (deduce plans from correct code) produces higher quality signals than forward reasoning. CodePLAN showed 130%+ improvement on APPS dataset using CodeT5-770M.
+
+**3. Structural alignment distillation**
+Add a semantic similarity loss (via CodeBERT embeddings) so the student's code matches the teacher's code *structurally*, not just token-by-token:
+```python
+# Dual loss with curriculum
+loss = code_ce_loss + alpha(epoch) * (1 - cosine_sim(
+    codebert.encode(student_code), codebert.encode(teacher_code)
+))
+# alpha grows from 0→1: token accuracy first, semantic alignment later
+```
+Llama 3.1 8B distilled from 70B: MBPP 48.2% → 56.9% with this approach.
+
+#### Expected performance:
+
+| Compression | Method | Typical Accuracy Drop |
+|-------------|--------|----------------------|
+| 70B → 7B | Response-based only | 15–25% relative |
+| 70B → 7B | + Reasoning distillation | 10–15% relative |
+| 70B → 7B | + Structural alignment | 3–8% relative |
+
+**Effort**: 8–16 hours (response-based is fast; structural alignment adds complexity). **GPU**: 16GB for student training. Teacher can be API-based.
+
+**Tooling**:
+- [HuggingFace TRL GKDTrainer](https://huggingface.co/docs/trl/en/gkd_trainer) — Generalized Knowledge Distillation
+- [DistillKit (Arcee AI)](https://github.com/arcee-ai/DistillKit) — production-ready logit distillation
+- [EasyDistill (Modelscope)](https://github.com/modelscope/easydistill) — multi-strategy toolkit
+- [DistiLLM](https://github.com/jongwooko/distillm) — optimized for generative models (ICML 2024)
+
+Papers:
+- [CodePLAN — Reasoning Distillation for Code](https://arxiv.org/abs/2403.13271)
+- [Reasoning Distillation + Structural Alignment](https://arxiv.org/html/2510.17598)
+- [Personalised Distillation for Code Gen](https://arxiv.org/abs/2310.18628) (EMNLP 2023)
+- [AMR-Evol — Adaptive Modular Response Evolution](https://arxiv.org/abs/2410.00558) (EMNLP 2024)
+- [MiniLLM — Reverse KLD for LLM Distillation](https://arxiv.org/abs/2306.08543) (ICLR 2024)
+- [DistiLLM-2 — Contrastive Distillation](https://arxiv.org/abs/2503.07067) (ICML 2025)
+
+---
+
+### 4.10 Knowledge Distillation (Embedding Models / Code Search)
+
+**Idea**: Compress your code search model (Task 2) from 125M → 33M or smaller while keeping 95%+ retrieval quality.
+
+For embedding models, distillation means: the student's embeddings should land in the same place as the teacher's.
+
+```
+Teacher (UniXcoder-125M) encodes "find sum of list" → vec_teacher
+Student (MiniLM-22M)     encodes "find sum of list" → vec_student
+Loss = MSE(vec_student, vec_teacher)  or  1 - cosine_sim(vec_student, vec_teacher)
+```
+
+#### Three approaches:
+
+**1. Embedding alignment (simplest)**
+Train student to match teacher embeddings directly. Sentence-Transformers has built-in support:
+```python
+from sentence_transformers import SentenceTransformer, losses
+
+teacher = SentenceTransformer("microsoft/unixcoder-base")       # 125M
+student = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")  # 22M
+
+# Distillation loss: match student embeddings to teacher
+train_loss = losses.MSELoss(model=student)
+
+# Generate training pairs: (text, teacher_embedding)
+train_examples = []
+for pair in train_pairs:
+    teacher_emb = teacher.encode(pair['query'])
+    train_examples.append(InputExample(texts=[pair['query']], label=teacher_emb))
+```
+
+**2. Layer reduction**
+Remove layers from the teacher (e.g., 12 → 6 layers). Retains teacher weights for remaining layers:
+- 12 → 6 layers: 99.4% performance, 2.3x speedup
+- 12 → 4 layers: ~97% performance, 3x speedup
+
+**3. Contrastive Knowledge Distillation (CKD)**
+Use the same InfoNCE contrastive loss for distillation as you use for training. This keeps the objective consistent across all stages:
+```python
+# Stage 1: Distill on unlabeled code-text pairs (InfoNCE with teacher embeddings)
+# Stage 2: Fine-tune student with contrastive learning on labeled pairs
+# Same loss function throughout → no objective mismatch
+```
+DistilCSE showed a 110M student outperforming Sentence-T5 (11B) with 1% of parameters.
+
+#### Expected performance:
+
+| Compression | Method | MRR Retention | Speedup |
+|-------------|--------|---------------|---------|
+| 125M → 66M (layer reduction) | Layer removal | ~99% | 2x |
+| 125M → 33M | Embedding alignment | ~95% | 3–4x |
+| 125M → 22M | CKD + fine-tune | ~92% | 5–6x |
+
+**Effort**: 4–8 hours. **GPU**: 8GB (embedding models are small).
+
+**Key insight**: For code search, you can also use **asymmetric deployment** — keep the large teacher for encoding the code corpus (done once) and use the small student only for encoding queries (done at search time). This gives you teacher-quality code embeddings with student-speed queries.
+
+Papers:
+- [SPENCER — Self-Adaptive Distillation for Code Retrieval](https://arxiv.org/abs/2508.00546) (ACM TOSEM 2024)
+- [DistilCSE — Contrastive KD for Sentence Embeddings](https://arxiv.org/abs/2112.05638) (EMNLP 2023)
+- [EmbedDistill — Geometric KD for Retrieval](https://arxiv.org/abs/2301.12005)
+- [LEAF — Teacher-Aligned Representations](https://arxiv.org/abs/2509.12539)
+- [Sentence-Transformers Distillation Docs](https://sbert.net/examples/sentence_transformer/training/distillation/README.html)
+
+---
+
+### 4.11 Technique Comparison
 
 | Technique | Effort | GPU | pass@1 Boost | Complexity |
 |-----------|--------|-----|-------------|------------|
 | Best-of-N sampling | 2–3h | Same | +15–30% | Trivial |
 | RAG (search→generate) | 3–4h | Same | +5–15% | Low |
 | Synthetic data | 6–16h | 8GB | +3–8% | Medium |
+| Distillation (code gen) | 8–16h | 16GB | +5–15% | Medium |
+| Distillation (embeddings) | 4–8h | 8GB | N/A (search) | Medium |
 | DPO | 12–20h | 16GB | +5–10% | Medium |
 | Self-Play (SPIN) | 12–15h | 16GB | +5–10% | Medium-High |
 | RLEF (PPO + execution) | 20–30h | 24GB+ | +10–15% | High |
@@ -836,9 +977,10 @@ Papers:
 **Suggested progression**:
 1. SFT baseline (Part 1) → measure pass@k
 2. Best-of-N + RAG → immediate boost, no retraining
-3. Synthetic data → more training data, retrain SFT
-4. DPO → preference optimization on top of SFT
-5. RLEF / Self-Play → if you want the best possible results
+3. Distillation → get strong-teacher quality in a small student model
+4. Synthetic data → more training data, retrain SFT
+5. DPO → preference optimization on top of SFT
+6. RLEF / Self-Play → if you want the best possible results
 
 ---
 
@@ -874,6 +1016,12 @@ Papers:
 | **Reward model** | Model trained to score quality of generated outputs |
 | **GGUF** | Quantization format for running LLMs locally with llama.cpp/Ollama |
 | **Constitutional AI** | Using AI-defined principles to evaluate and improve model outputs |
+| **Knowledge distillation** | Training a small student model to mimic a large teacher model |
+| **Teacher-student** | Distillation setup: large model (teacher) transfers knowledge to small model (student) |
+| **Reasoning distillation** | Distilling intermediate reasoning steps (plans, CoT) alongside final outputs |
+| **CKD** | Contrastive Knowledge Distillation — uses InfoNCE loss for embedding distillation |
+| **Layer reduction** | Removing transformer layers from teacher to create student (e.g., 12→6) |
+| **Asymmetric deployment** | Using large model for corpus encoding, small model for query encoding |
 
 ---
 
@@ -952,6 +1100,29 @@ Papers:
 
 22. **Constitutional AI** — Bai et al., 2022
     [arxiv.org/abs/2212.08073](https://arxiv.org/abs/2212.08073)
+
+### Knowledge Distillation (Part 4 references)
+
+23. **CodePLAN** — Reasoning Distillation for Code Generation, 2024
+    [arxiv.org/abs/2403.13271](https://arxiv.org/abs/2403.13271)
+
+24. **MiniLLM** — Reverse KLD for LLM Distillation (ICLR 2024)
+    [arxiv.org/abs/2306.08543](https://arxiv.org/abs/2306.08543)
+
+25. **DistiLLM-2** — Contrastive LLM Distillation (ICML 2025)
+    [arxiv.org/abs/2503.07067](https://arxiv.org/abs/2503.07067)
+
+26. **Personalised Distillation** — Adaptive Learning for Code Generation (EMNLP 2023)
+    [arxiv.org/abs/2310.18628](https://arxiv.org/abs/2310.18628)
+
+27. **SPENCER** — Self-Adaptive Distillation for Code Retrieval (ACM TOSEM 2024)
+    [arxiv.org/abs/2508.00546](https://arxiv.org/abs/2508.00546)
+
+28. **DistilCSE** — Contrastive KD for Sentence Embeddings (EMNLP 2023)
+    [arxiv.org/abs/2112.05638](https://arxiv.org/abs/2112.05638)
+
+29. **EmbedDistill** — Geometric KD for Information Retrieval, 2023
+    [arxiv.org/abs/2301.12005](https://arxiv.org/abs/2301.12005)
 
 ---
 

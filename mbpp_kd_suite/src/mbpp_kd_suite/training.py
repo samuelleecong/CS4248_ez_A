@@ -524,11 +524,15 @@ def train_student(
     data: RetrievalSplits,
     targets: DistillTargets,
     full_teacher_targets: DistillTargets,
+    model_name: str | None = None,
+    supervised: bool | None = None,
 ) -> tuple[dict[str, Any], StudentQueryEncoder, AutoTokenizer]:
-    student_tokenizer = AutoTokenizer.from_pretrained(cfg.student_model)
+    effective_model = model_name or cfg.student_model
+    is_supervised = supervised if supervised is not None else (name == TRAINED_BASELINE_NAME)
+    student_tokenizer = AutoTokenizer.from_pretrained(effective_model)
     student_model = StudentQueryEncoder(
-        model_name=cfg.student_model,
-        target_hidden_size=None if name == TRAINED_BASELINE_NAME else targets.hidden_size,
+        model_name=effective_model,
+        target_hidden_size=None if is_supervised else targets.hidden_size,
     ).to(device)
     init_stats = initialize_projection_from_targets(
         cfg=cfg,
@@ -544,8 +548,9 @@ def train_student(
         lr=cfg.lr,
         weight_decay=cfg.weight_decay,
     )
+    loader_name = TRAINED_BASELINE_NAME if is_supervised else name
     train_loader = _build_train_loader(
-        name=name,
+        name=loader_name,
         split=data.train,
         tokenizer=student_tokenizer,
         student_model=student_model,
@@ -572,7 +577,7 @@ def train_student(
 
         pbar = tqdm(train_loader, desc=f"{name} epoch {epoch}/{cfg.epochs}", leave=False)
         for batch in pbar:
-            if name == TRAINED_BASELINE_NAME:
+            if is_supervised:
                 losses = _compute_supervised_batch_losses(
                     student_model=student_model,
                     batch=batch,
@@ -635,7 +640,8 @@ def train_student(
         device=device,
     )
     metrics: dict[str, Any] = {
-        "target_space": "student_native" if name == TRAINED_BASELINE_NAME else targets.name,
+        "model_name": effective_model,
+        "target_space": "student_native" if is_supervised else targets.name,
         "evaluation_mode": cfg.eval_mode,
         "train": final_metrics["train"],
         "validation": final_metrics["validation"],
