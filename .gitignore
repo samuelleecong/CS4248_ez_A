@@ -40,6 +40,12 @@ dist/
 *~
 
 # ----------------------------
+# Data & binary artifacts
+# ----------------------------
+*.npz
+*.npy
+
+# ----------------------------
 # Experiment outputs (large/generated)
 # Keep experiment docs trackable.
 # ----------------------------
@@ -49,5 +55,14 @@ experiments/kai/artifacts/*
 experiments/kai/results/*
 !experiments/kai/results/README.md
 
+knowledge-distillation/artifacts/*
 knowledge-distillation/results/*
 !knowledge-distillation/results/README.md
+
+# Timestamped run output dirs under artifacts/
+artifacts/finetune_comparison/[0-9]*/
+
+# ----------------------------
+# Reference papers (download via mbpp_kd_suite/papers/download_papers.sh)
+# ----------------------------
+mbpp_kd_suite/papers/*.pdf
