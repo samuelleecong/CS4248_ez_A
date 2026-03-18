@@ -113,6 +113,7 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=None, help="Override number of epochs")
     parser.add_argument("--max-train-samples", type=int, default=None, help="Cap training set size")
     parser.add_argument("--batch-size", type=int, default=None, help="Override batch size (default: 32)")
+    parser.add_argument("--models", default=None, help="Comma-separated model short names to run (default: all)")
     args = parser.parse_args()
 
     set_seed(SEED)
@@ -191,7 +192,17 @@ def main() -> None:
                     ft_results[slug] = json.load(f)
                 print(f"Loaded cached result for {slug} from {metrics_file}")
 
-    for model_name in MODELS:
+    # Filter models if --models is specified
+    if args.models:
+        selected = {m.strip() for m in args.models.split(",")}
+        run_models = [m for m in MODELS if short_name(m) in selected]
+        if not run_models:
+            print(f"ERROR: No matching models. Available: {[short_name(m) for m in MODELS]}")
+            return
+    else:
+        run_models = MODELS
+
+    for model_name in run_models:
         slug = short_name(model_name)
         if slug in ft_results:
             print(f"Skipping {model_name} (already have results)")
