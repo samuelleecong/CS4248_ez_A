@@ -207,11 +207,18 @@ def taco_row_to_pair(row: dict[str, Any]) -> tuple[str, str] | None:
 
 
 def make_taco_retrieval_dataset(dataset_name: str, taco_val_size: int, seed: int) -> DatasetDict:
-    load_kwargs: dict[str, Any] = {}
+    # BAAI/TACO uses a legacy loading script no longer supported by datasets>=3.
+    # Automatically fall back to the Parquet mirror.
+    effective_name = dataset_name
     if dataset_name == "BAAI/TACO":
-        load_kwargs["trust_remote_code"] = True
-
-    raw_dataset = load_dataset(dataset_name, **load_kwargs)
+        try:
+            raw_dataset = load_dataset(dataset_name, trust_remote_code=True)
+        except (RuntimeError, TypeError):
+            print(f"BAAI/TACO loading script not supported, falling back to BEE-spoke-data/TACO-hf")
+            effective_name = "BEE-spoke-data/TACO-hf"
+            raw_dataset = load_dataset(effective_name)
+    else:
+        raw_dataset = load_dataset(effective_name)
     if "train" not in raw_dataset or "test" not in raw_dataset:
         raise ValueError(f"TACO dataset {dataset_name} must provide train and test splits.")
 
