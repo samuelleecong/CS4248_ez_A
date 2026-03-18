@@ -191,16 +191,17 @@ def main() -> None:
                     ft_results[slug] = json.load(f)
                 print(f"Loaded cached result for {slug} from {metrics_file}")
 
-    # On CUDA (Colab), large models fit fine with full batch size
-    use_large_cfg = device.type == "mps"
-
     for model_name in MODELS:
         slug = short_name(model_name)
         if slug in ft_results:
             print(f"Skipping {model_name} (already have results)")
             continue
 
-        model_cfg = CFG_LARGE if (use_large_cfg and model_name in LARGE_MODELS) else CFG
+        # Use reduced config for large models unless batch size was explicitly set
+        if model_name in LARGE_MODELS and not args.batch_size:
+            model_cfg = CFG_LARGE
+        else:
+            model_cfg = CFG
         print(f"\n{'='*60}")
         print(f"Fine-tuning: {model_name} (batch_size={model_cfg.batch_size})")
         print(f"{'='*60}")
