@@ -108,6 +108,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Fine-tune and compare all models")
     parser.add_argument("--dataset-name", default="google-research-datasets/mbpp")
     parser.add_argument("--taco-val-size", type=int, default=1000)
+    parser.add_argument("--epochs", type=int, default=None, help="Override number of epochs")
+    parser.add_argument("--max-train-samples", type=int, default=None, help="Cap training set size")
     args = parser.parse_args()
 
     set_seed(SEED)
@@ -121,10 +123,26 @@ def main() -> None:
         dataset_name=dataset_name, taco_val_size=args.taco_val_size, seed=SEED,
     )
     data = dataset_dict_to_splits(dataset)
+
+    # Truncate training set if requested
+    if args.max_train_samples and len(data.train.queries) > args.max_train_samples:
+        from mbpp_kd_suite.config import RetrievalSplit, RetrievalSplits
+        n = args.max_train_samples
+        data = RetrievalSplits(
+            train=RetrievalSplit(queries=data.train.queries[:n], codes=data.train.codes[:n]),
+            validation=data.validation,
+            test=data.test,
+        )
+
     print(
         f"Splits -> train: {len(data.train.queries)}, "
         f"val: {len(data.validation.queries)}, test: {len(data.test.queries)}"
     )
+
+    # Apply epoch override to configs
+    if args.epochs:
+        CFG.epochs = args.epochs
+        CFG_LARGE.epochs = args.epochs
 
     # Load zero-shot results from previous run
     zs_path = Path(f"artifacts/baseline_comparison_{dataset_slug}/results.json")
