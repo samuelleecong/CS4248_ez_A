@@ -149,8 +149,8 @@ def main() -> None:
     if args.batch_size:
         CFG.batch_size = args.batch_size
         CFG.eval_batch_size = args.batch_size * 2
-        # Large models get 1/8 batch size (335M params need ~4 on T4 16GB)
-        large_bs = max(2, args.batch_size // 8)
+        # Large models get 1/4 batch size (335M params vs ~110M)
+        large_bs = max(2, args.batch_size // 4)
         CFG_LARGE.batch_size = large_bs
         CFG_LARGE.eval_batch_size = large_bs * 2
 
