@@ -26,14 +26,16 @@ from mbpp_kd_suite.training import train_student
 from transformers import AutoModel, AutoTokenizer
 
 MODELS = [
-    "sentence-transformers/all-MiniLM-L6-v2",
-    "sentence-transformers/all-MiniLM-L12-v2",
-    "sentence-transformers/all-mpnet-base-v2",
-    "sentence-transformers/multi-qa-mpnet-base-dot-v1",
-    "BAAI/bge-base-en-v1.5",
-    "intfloat/e5-base-v2",
+    # Large models first (most likely to OOM — fail fast)
     "BAAI/bge-large-en-v1.5",
     "intfloat/e5-large-v2",
+    # Base models
+    "sentence-transformers/all-mpnet-base-v2",
+    "BAAI/bge-base-en-v1.5",
+    "intfloat/e5-base-v2",
+    "sentence-transformers/multi-qa-mpnet-base-dot-v1",
+    "sentence-transformers/all-MiniLM-L12-v2",
+    "sentence-transformers/all-MiniLM-L6-v2",
 ]
 
 SEED = 42
