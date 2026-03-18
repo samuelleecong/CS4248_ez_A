@@ -1,6 +1,7 @@
 """Fine-tune all baseline models and compare zero-shot vs fine-tuned performance."""
 from __future__ import annotations
 
+import argparse
 import gc
 import json
 import os
@@ -104,13 +105,20 @@ def encode_dummy_targets(
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Fine-tune and compare all models")
+    parser.add_argument("--dataset-name", default="google-research-datasets/mbpp")
+    parser.add_argument("--taco-val-size", type=int, default=1000)
+    args = parser.parse_args()
+
     set_seed(SEED)
     device = pick_device()
     print(f"Device: {device}")
 
-    print("Loading MBPP dataset...")
+    dataset_name = args.dataset_name
+    dataset_slug = dataset_name.split("/")[-1]
+    print(f"Loading dataset: {dataset_name}")
     dataset = load_retrieval_dataset(
-        dataset_name="google-research-datasets/mbpp", taco_val_size=1000, seed=SEED,
+        dataset_name=dataset_name, taco_val_size=args.taco_val_size, seed=SEED,
     )
     data = dataset_dict_to_splits(dataset)
     print(
@@ -119,13 +127,13 @@ def main() -> None:
     )
 
     # Load zero-shot results from previous run
-    zs_path = Path("artifacts/baseline_comparison/results.json")
+    zs_path = Path(f"artifacts/baseline_comparison_{dataset_slug}/results.json")
     if zs_path.exists():
         with zs_path.open() as f:
             zs_results = json.load(f)
         print(f"Loaded zero-shot results from {zs_path}")
     else:
-        print("WARNING: No zero-shot results found. Run baseline_comparison.py first.")
+        print(f"WARNING: No zero-shot results found. Run: mbpp-kd-baselines --dataset-name {dataset_name}")
         zs_results = {}
 
     # We need DistillTargets for the train_student signatures.
@@ -138,7 +146,7 @@ def main() -> None:
         data=data, cfg=CFG, device=device,
     )
 
-    out_dir = Path("artifacts/finetune_comparison")
+    out_dir = Path(f"artifacts/finetune_comparison_{dataset_slug}")
     out_dir.mkdir(parents=True, exist_ok=True)
     run_dir = out_dir / time.strftime("%Y%m%d_%H%M%S")
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -259,7 +267,7 @@ def main() -> None:
             ax.legend(fontsize=9)
 
     fig.suptitle(
-        "Zero-Shot vs Fine-Tuned (8 epochs, supervised contrastive) on MBPP test",
+        f"Zero-Shot vs Fine-Tuned (8 epochs, supervised contrastive) on {dataset_slug.upper()} test",
         fontsize=14, fontweight="bold",
     )
     fig.tight_layout(rect=[0, 0, 1, 0.95])

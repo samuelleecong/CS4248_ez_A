@@ -1,6 +1,7 @@
 """Zero-shot baseline comparison across all teacher/student candidates."""
 from __future__ import annotations
 
+import argparse
 import json
 import time
 from pathlib import Path
@@ -38,14 +39,21 @@ def short_name(model: str) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Zero-shot baseline comparison")
+    parser.add_argument("--dataset-name", default="google-research-datasets/mbpp")
+    parser.add_argument("--taco-val-size", type=int, default=1000)
+    args = parser.parse_args()
+
     set_seed(SEED)
     device = pick_device()
     print(f"Device: {device}")
 
-    print("Loading MBPP dataset...")
+    dataset_name = args.dataset_name
+    dataset_slug = dataset_name.split("/")[-1]
+    print(f"Loading dataset: {dataset_name}")
     dataset = load_retrieval_dataset(
-        dataset_name="google-research-datasets/mbpp",
-        taco_val_size=1000,
+        dataset_name=dataset_name,
+        taco_val_size=args.taco_val_size,
         seed=SEED,
     )
     data = dataset_dict_to_splits(dataset)
@@ -82,7 +90,7 @@ def main() -> None:
         )
 
     # Save raw results
-    out_dir = Path("artifacts/baseline_comparison")
+    out_dir = Path(f"artifacts/baseline_comparison_{dataset_slug}")
     out_dir.mkdir(parents=True, exist_ok=True)
     with (out_dir / "results.json").open("w") as f:
         json.dump(results, f, indent=2)
@@ -151,7 +159,7 @@ def main() -> None:
     ]
     fig.legend(handles=legend_elements, loc="lower center", ncol=4, fontsize=9, frameon=False)
 
-    fig.suptitle("Zero-Shot Baseline Comparison on MBPP (test split)", fontsize=14, fontweight="bold")
+    fig.suptitle(f"Zero-Shot Baseline Comparison on {dataset_slug.upper()} (test split)", fontsize=14, fontweight="bold")
     fig.tight_layout(rect=[0, 0.05, 1, 0.95])
 
     chart_path = out_dir / "baseline_comparison.png"
