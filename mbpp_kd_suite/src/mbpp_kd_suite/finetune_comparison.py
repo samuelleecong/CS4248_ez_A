@@ -110,6 +110,7 @@ def main() -> None:
     parser.add_argument("--taco-val-size", type=int, default=1000)
     parser.add_argument("--epochs", type=int, default=None, help="Override number of epochs")
     parser.add_argument("--max-train-samples", type=int, default=None, help="Cap training set size")
+    parser.add_argument("--batch-size", type=int, default=None, help="Override batch size (default: 32)")
     args = parser.parse_args()
 
     set_seed(SEED)
@@ -139,10 +140,15 @@ def main() -> None:
         f"val: {len(data.validation.queries)}, test: {len(data.test.queries)}"
     )
 
-    # Apply epoch override to configs
+    # Apply overrides to configs
     if args.epochs:
         CFG.epochs = args.epochs
         CFG_LARGE.epochs = args.epochs
+    if args.batch_size:
+        CFG.batch_size = args.batch_size
+        CFG.eval_batch_size = args.batch_size * 2
+        CFG_LARGE.batch_size = args.batch_size
+        CFG_LARGE.eval_batch_size = args.batch_size * 2
 
     # Load zero-shot results from previous run
     zs_path = Path(f"artifacts/baseline_comparison_{dataset_slug}/results.json")
