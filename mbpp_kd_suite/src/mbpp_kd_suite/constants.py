@@ -26,6 +26,11 @@ TACO_DATASET_NAMES = {
     "BEE-spoke-data/TACO-hf",
 }
 
+CSN_DATASET_NAMES = {
+    "code_search_net",
+    "code-search-net/code_search_net",
+}
+
 MPS_TRAIN_BATCH_CAP = 8
 MPS_EVAL_BATCH_CAP = 16
 ARTIFACT_ROOT = Path("artifacts")

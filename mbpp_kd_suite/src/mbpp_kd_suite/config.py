@@ -13,7 +13,7 @@ from .constants import ARTIFACT_ROOT, METHOD_ORDER
 class TrainConfig:
     teacher_model: str = "sentence-transformers/all-MiniLM-L12-v2"
     student_model: str = "sentence-transformers/all-MiniLM-L6-v2"
-    dataset_name: str = "google-research-datasets/mbpp"
+    dataset_name: str = "code_search_net"
     methods: tuple[str, ...] = tuple(METHOD_ORDER)
     batch_size: int = 32
     eval_batch_size: int = 64

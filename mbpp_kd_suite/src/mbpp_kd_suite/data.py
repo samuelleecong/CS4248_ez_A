@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, Dataset as TorchDataset
 from transformers import AutoTokenizer
 
 from .config import RetrievalSplit, RetrievalSplits
-from .constants import TACO_DATASET_NAMES
+from .constants import CSN_DATASET_NAMES, TACO_DATASET_NAMES
 from .modeling import ModelEncodingSpec, format_texts_for_role
 
 
@@ -214,7 +214,7 @@ def make_taco_retrieval_dataset(dataset_name: str, taco_val_size: int, seed: int
         try:
             raw_dataset = load_dataset(dataset_name, trust_remote_code=True)
         except (RuntimeError, TypeError):
-            print(f"BAAI/TACO loading script not supported, falling back to BEE-spoke-data/TACO-hf")
+            print("BAAI/TACO loading script not supported, falling back to BEE-spoke-data/TACO-hf")
             effective_name = "BEE-spoke-data/TACO-hf"
             raw_dataset = load_dataset(effective_name)
     else:
@@ -248,6 +248,38 @@ def make_taco_retrieval_dataset(dataset_name: str, taco_val_size: int, seed: int
     )
 
 
+def make_csn_retrieval_dataset(dataset_name: str) -> DatasetDict:
+    """Load CodeSearchNet Python split and normalise to {text, code} schema.
+
+    CSN ships with predefined train/validation/test splits.  Rows with an
+    empty docstring are filtered out because they cannot serve as queries.
+    """
+    raw = load_dataset(dataset_name, "python")
+    for split_name in ("train", "validation", "test"):
+        if split_name not in raw:
+            raise ValueError(f"CodeSearchNet dataset is missing the '{split_name}' split.")
+
+    def _to_pairs(split: Any) -> list[tuple[str, str]]:
+        pairs = []
+        for row in split:
+            doc = row.get("func_documentation_string", "")
+            if not isinstance(doc, str):
+                continue
+            doc = doc.strip()
+            if not doc:
+                continue
+            pairs.append((doc, row["whole_func_string"]))
+        return pairs
+
+    return DatasetDict(
+        {
+            "train": pairs_to_dataset(_to_pairs(raw["train"])),
+            "validation": pairs_to_dataset(_to_pairs(raw["validation"])),
+            "test": pairs_to_dataset(_to_pairs(raw["test"])),
+        }
+    )
+
+
 def load_retrieval_dataset(dataset_name: str, taco_val_size: int, seed: int) -> DatasetDict:
     if dataset_name in TACO_DATASET_NAMES:
         return make_taco_retrieval_dataset(
@@ -255,4 +287,6 @@ def load_retrieval_dataset(dataset_name: str, taco_val_size: int, seed: int) -> 
             taco_val_size=taco_val_size,
             seed=seed,
         )
+    if dataset_name in CSN_DATASET_NAMES:
+        return make_csn_retrieval_dataset(dataset_name)
     return load_mbpp_dataset(dataset_name)
