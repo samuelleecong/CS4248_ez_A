@@ -137,7 +137,7 @@ def one_hot_loss(student_scores: torch.Tensor, temperature: float) -> torch.Tens
 def distill_kl(student_scores: torch.Tensor, teacher_scores: torch.Tensor, temperature: float) -> torch.Tensor:
     student_log_probs = F.log_softmax(student_scores / temperature, dim=-1)
     teacher_probs = F.softmax(teacher_scores / temperature, dim=-1)
-    return F.kl_div(student_log_probs, teacher_probs, reduction="batchmean")
+    return F.kl_div(student_log_probs, teacher_probs, reduction="batchmean") * (temperature ** 2)
 
 
 def align_loss(student_query_emb: torch.Tensor, target_query_emb: torch.Tensor) -> torch.Tensor:
@@ -242,7 +242,9 @@ def adam_dark_example_loss(
 
 
 def fit_hpd_targets(cfg: TrainConfig, full_teacher_targets: DistillTargets) -> DistillTargets:
-    fit_matrix = torch.cat([full_teacher_targets.train_query, full_teacher_targets.train_doc], dim=0).numpy()
+    fit_matrix = torch.cat(
+        [full_teacher_targets.train_query, full_teacher_targets.train_doc], dim=0
+    ).detach().cpu().numpy()
     pca = PCA(n_components=cfg.hpd_dim, random_state=cfg.seed)
     pca.fit(fit_matrix)
 
