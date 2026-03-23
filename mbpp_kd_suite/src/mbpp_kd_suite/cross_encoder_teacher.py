@@ -13,12 +13,23 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
+from transformers import (
+    AutoModel,
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    get_linear_schedule_with_warmup,
+)
 
 from .config import resolve_output_root
 from .data import dataset_dict_to_splits, load_retrieval_dataset
-from .metrics import reciprocal_rank_metrics
-from .runtime import apply_device_runtime_optimizations, maybe_empty_device_cache, pick_device, set_seed
+from .metrics import evaluate_symmetric_backbone, reciprocal_rank_metrics
+from .modeling import encode_texts_backbone, infer_model_encoding_spec
+from .runtime import (
+    apply_device_runtime_optimizations,
+    maybe_empty_device_cache,
+    pick_device,
+    set_seed,
+)
 
 
 @dataclass
@@ -31,8 +42,17 @@ class CrossEncoderTrainConfig:
     lr: float = 2e-5
     weight_decay: float = 1e-2
     warmup_ratio: float = 0.1
-    negatives_per_query: int = 4
-    max_length: int = 384
+    negatives_per_query: int = 6
+    negative_strategy: str = "mixed"
+    negative_miner_model: str = "sentence-transformers/all-mpnet-base-v2"
+    hard_negative_pool_size: int = 20
+    train_objective: str = "combined"
+    pair_bce_weight: float = 0.25
+    max_length: int = 512
+    miner_batch_size: int = 64
+    miner_max_query_length: int = 160
+    miner_max_code_length: int = 256
+    baseline_bi_encoder_model: str = "sentence-transformers/all-mpnet-base-v2"
     seed: int = 42
     output_dir: str = "cross_encoder_teacher"
     taco_val_size: int = 1000
@@ -40,16 +60,24 @@ class CrossEncoderTrainConfig:
     max_train_queries: int | None = None
     max_eval_queries: int | None = None
     save_model: bool = True
+    compare_to_baseline: bool = True
 
 
-class LabeledPairDataset(Dataset):
-    def __init__(self, examples: list[tuple[str, str, float]]) -> None:
+@dataclass(frozen=True)
+class GroupedQueryExample:
+    query: str
+    positive_doc: str
+    negative_docs: tuple[str, ...]
+
+
+class GroupedQueryDataset(Dataset):
+    def __init__(self, examples: list[GroupedQueryExample]) -> None:
         self.examples = examples
 
     def __len__(self) -> int:
         return len(self.examples)
 
-    def __getitem__(self, idx: int) -> tuple[str, str, float]:
+    def __getitem__(self, idx: int) -> GroupedQueryExample:
         return self.examples[idx]
 
 
@@ -66,7 +94,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--weight-decay", type=float, default=CrossEncoderTrainConfig.weight_decay)
     parser.add_argument("--warmup-ratio", type=float, default=CrossEncoderTrainConfig.warmup_ratio)
     parser.add_argument("--negatives-per-query", type=int, default=CrossEncoderTrainConfig.negatives_per_query)
+    parser.add_argument(
+        "--negative-strategy",
+        choices=("random", "hard", "mixed"),
+        default=CrossEncoderTrainConfig.negative_strategy,
+    )
+    parser.add_argument("--negative-miner-model", default=CrossEncoderTrainConfig.negative_miner_model)
+    parser.add_argument("--hard-negative-pool-size", type=int, default=CrossEncoderTrainConfig.hard_negative_pool_size)
+    parser.add_argument(
+        "--train-objective",
+        choices=("bce", "group_softmax", "combined"),
+        default=CrossEncoderTrainConfig.train_objective,
+    )
+    parser.add_argument("--pair-bce-weight", type=float, default=CrossEncoderTrainConfig.pair_bce_weight)
     parser.add_argument("--max-length", type=int, default=CrossEncoderTrainConfig.max_length)
+    parser.add_argument("--miner-batch-size", type=int, default=CrossEncoderTrainConfig.miner_batch_size)
+    parser.add_argument("--miner-max-query-length", type=int, default=CrossEncoderTrainConfig.miner_max_query_length)
+    parser.add_argument("--miner-max-code-length", type=int, default=CrossEncoderTrainConfig.miner_max_code_length)
+    parser.add_argument("--baseline-bi-encoder-model", default=CrossEncoderTrainConfig.baseline_bi_encoder_model)
     parser.add_argument("--seed", type=int, default=CrossEncoderTrainConfig.seed)
     parser.add_argument("--output-dir", default=CrossEncoderTrainConfig.output_dir)
     parser.add_argument("--taco-val-size", type=int, default=CrossEncoderTrainConfig.taco_val_size)
@@ -74,6 +119,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-train-queries", type=int, default=None)
     parser.add_argument("--max-eval-queries", type=int, default=None)
     parser.add_argument("--no-save-model", action="store_true")
+    parser.add_argument("--skip-baseline-compare", action="store_true")
     return parser
 
 
@@ -88,7 +134,16 @@ def config_from_args(args: argparse.Namespace) -> CrossEncoderTrainConfig:
         weight_decay=args.weight_decay,
         warmup_ratio=args.warmup_ratio,
         negatives_per_query=args.negatives_per_query,
+        negative_strategy=args.negative_strategy,
+        negative_miner_model=args.negative_miner_model,
+        hard_negative_pool_size=args.hard_negative_pool_size,
+        train_objective=args.train_objective,
+        pair_bce_weight=args.pair_bce_weight,
         max_length=args.max_length,
+        miner_batch_size=args.miner_batch_size,
+        miner_max_query_length=args.miner_max_query_length,
+        miner_max_code_length=args.miner_max_code_length,
+        baseline_bi_encoder_model=args.baseline_bi_encoder_model,
         seed=args.seed,
         output_dir=args.output_dir,
         taco_val_size=args.taco_val_size,
@@ -96,6 +151,7 @@ def config_from_args(args: argparse.Namespace) -> CrossEncoderTrainConfig:
         max_train_queries=args.max_train_queries,
         max_eval_queries=args.max_eval_queries,
         save_model=not args.no_save_model,
+        compare_to_baseline=not args.skip_baseline_compare,
     )
 
 
@@ -121,55 +177,180 @@ def maybe_truncate_queries(
     return queries[:limit], codes[:limit]
 
 
-def make_train_examples(
+def _dedupe_preserve_order(values: list[int]) -> list[int]:
+    seen: set[int] = set()
+    ordered: list[int] = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        ordered.append(value)
+    return ordered
+
+
+@torch.no_grad()
+def mine_hard_negative_indices(
     queries: list[str],
     codes: list[str],
-    negatives_per_query: int,
-    seed: int,
-) -> list[tuple[str, str, float]]:
-    if negatives_per_query < 1:
-        raise ValueError("--negatives-per-query must be at least 1.")
+    cfg: CrossEncoderTrainConfig,
+    device: torch.device,
+) -> list[list[int]]:
+    if len(queries) != len(codes):
+        raise ValueError("Queries and codes must be aligned for hard negative mining.")
+    if len(queries) < 2:
+        return [[] for _ in queries]
 
-    rng = torch.Generator().manual_seed(seed)
-    n = len(queries)
-    if n < 2:
-        raise ValueError("Need at least 2 training pairs to sample negatives.")
+    print(f"Mining hard negatives with bi-encoder: {cfg.negative_miner_model}")
+    tokenizer = AutoTokenizer.from_pretrained(cfg.negative_miner_model)
+    model = AutoModel.from_pretrained(cfg.negative_miner_model).to(device)
+    encoding_spec = infer_model_encoding_spec(
+        cfg.negative_miner_model,
+        getattr(model.config, "_name_or_path", None),
+        getattr(tokenizer, "name_or_path", None),
+    )
+    model.eval()
 
-    examples: list[tuple[str, str, float]] = []
+    query_embs = encode_texts_backbone(
+        model=model,
+        tokenizer=tokenizer,
+        texts=queries,
+        text_role="query",
+        encoding_spec=encoding_spec,
+        max_length=cfg.miner_max_query_length,
+        batch_size=cfg.miner_batch_size,
+        device=device,
+        desc="mine_q",
+    )
+    doc_embs = encode_texts_backbone(
+        model=model,
+        tokenizer=tokenizer,
+        texts=codes,
+        text_role="document",
+        encoding_spec=encoding_spec,
+        max_length=cfg.miner_max_code_length,
+        batch_size=cfg.miner_batch_size,
+        device=device,
+        desc="mine_d",
+    )
+    del model
+    maybe_empty_device_cache(device)
+
+    top_k = min(cfg.hard_negative_pool_size, len(codes) - 1)
+    if top_k <= 0:
+        return [[] for _ in queries]
+
+    hard_pools: list[list[int]] = []
+    doc_embs_t = doc_embs.T
+    for start in tqdm(range(0, len(queries), cfg.miner_batch_size), desc="mine_topk", leave=False):
+        query_batch = query_embs[start : start + cfg.miner_batch_size]
+        scores = query_batch @ doc_embs_t
+        row_indices = torch.arange(start, start + query_batch.size(0))
+        scores[torch.arange(query_batch.size(0)), row_indices] = -1e9
+        top_indices = scores.topk(top_k, dim=-1).indices.tolist()
+        hard_pools.extend(top_indices)
+    return hard_pools
+
+
+def build_grouped_examples(
+    queries: list[str],
+    codes: list[str],
+    cfg: CrossEncoderTrainConfig,
+    hard_negative_pools: list[list[int]] | None,
+) -> tuple[list[GroupedQueryExample], dict[str, Any]]:
+    if len(queries) != len(codes):
+        raise ValueError("Queries and codes must have the same length.")
+    if len(queries) < 2:
+        raise ValueError("Need at least 2 training pairs to build negative groups.")
+
+    rng = torch.Generator().manual_seed(cfg.seed)
+    total_docs = len(codes)
+    actual_negatives = min(cfg.negatives_per_query, total_docs - 1)
+    if actual_negatives <= 0:
+        raise ValueError("Need at least one negative candidate per query.")
+
+    examples: list[GroupedQueryExample] = []
+    hard_counts: list[int] = []
+    random_counts: list[int] = []
+
     for idx, query in enumerate(queries):
-        examples.append((query, codes[idx], 1.0))
+        hard_pool = hard_negative_pools[idx] if hard_negative_pools is not None else []
+        hard_pool = [candidate for candidate in _dedupe_preserve_order(hard_pool) if candidate != idx]
+        hard_pool_set = set(hard_pool)
 
-        candidates = torch.arange(n)
-        mask = candidates != idx
-        negative_pool = candidates[mask]
-        sample_count = min(negatives_per_query, negative_pool.numel())
-        perm = negative_pool[torch.randperm(negative_pool.numel(), generator=rng)[:sample_count]]
-        for neg_idx in perm.tolist():
-            examples.append((query, codes[neg_idx], 0.0))
-    return examples
+        if cfg.negative_strategy == "hard":
+            hard_target = actual_negatives
+        elif cfg.negative_strategy == "mixed":
+            hard_target = min(actual_negatives, max(1, math.ceil(actual_negatives * 0.75)))
+        else:
+            hard_target = 0
+
+        selected: list[int] = hard_pool[:hard_target]
+        selected_set = set(selected)
+
+        remaining_needed = actual_negatives - len(selected)
+        if remaining_needed > 0:
+            candidates = [candidate for candidate in range(total_docs) if candidate != idx and candidate not in selected_set]
+            if remaining_needed > len(candidates):
+                raise ValueError("Not enough unique negatives to complete the training groups.")
+            perm = torch.randperm(len(candidates), generator=rng)[:remaining_needed].tolist()
+            selected.extend(candidates[pos] for pos in perm)
+
+        selected = _dedupe_preserve_order(selected)
+        if len(selected) != actual_negatives:
+            raise ValueError("Negative sampling did not produce a fixed group size.")
+
+        negatives = tuple(codes[neg_idx] for neg_idx in selected)
+        examples.append(
+            GroupedQueryExample(
+                query=query,
+                positive_doc=codes[idx],
+                negative_docs=negatives,
+            )
+        )
+        hard_used = sum(1 for neg_idx in selected if neg_idx in hard_pool_set)
+        hard_counts.append(hard_used)
+        random_counts.append(actual_negatives - hard_used)
+
+    summary = {
+        "queries": float(len(examples)),
+        "actual_negatives_per_query": float(actual_negatives),
+        "avg_hard_negatives_per_query": float(sum(hard_counts) / len(hard_counts)),
+        "avg_random_negatives_per_query": float(sum(random_counts) / len(random_counts)),
+        "negative_strategy": cfg.negative_strategy,
+    }
+    return examples, summary
 
 
 def make_train_loader(
-    examples: list[tuple[str, str, float]],
+    examples: list[GroupedQueryExample],
     tokenizer: AutoTokenizer,
     batch_size: int,
     max_length: int,
 ) -> DataLoader:
-    dataset = LabeledPairDataset(examples)
+    dataset = GroupedQueryDataset(examples)
+    group_size = 1 + len(examples[0].negative_docs)
 
-    def collate_fn(batch: list[tuple[str, str, float]]) -> tuple[dict[str, torch.Tensor], torch.Tensor]:
-        queries = [query for query, _, _ in batch]
-        docs = [doc for _, doc, _ in batch]
-        labels = torch.tensor([label for _, _, label in batch], dtype=torch.float32)
+    def collate_fn(batch: list[GroupedQueryExample]) -> tuple[dict[str, torch.Tensor], torch.Tensor, int]:
+        flat_queries: list[str] = []
+        flat_docs: list[str] = []
+        pair_labels: list[float] = []
+
+        for example in batch:
+            docs = [example.positive_doc, *example.negative_docs]
+            flat_queries.extend([example.query] * len(docs))
+            flat_docs.extend(docs)
+            pair_labels.extend([1.0] + [0.0] * (len(docs) - 1))
+
         tokens = tokenizer(
-            queries,
-            docs,
+            flat_queries,
+            flat_docs,
             truncation=True,
             padding=True,
             max_length=max_length,
             return_tensors="pt",
         )
-        return tokens, labels
+        labels = torch.tensor(pair_labels, dtype=torch.float32)
+        return tokens, labels, group_size
 
     return DataLoader(dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
@@ -238,14 +419,61 @@ def evaluate_split(
     return metrics
 
 
+def compute_training_loss(
+    logits: torch.Tensor,
+    pair_labels: torch.Tensor,
+    group_size: int,
+    objective: str,
+    pair_bce_weight: float,
+) -> tuple[torch.Tensor, float, float]:
+    group_logits = logits.view(-1, group_size)
+    group_targets = torch.zeros(group_logits.size(0), dtype=torch.long, device=logits.device)
+    group_loss = F.cross_entropy(group_logits, group_targets)
+    pair_loss = F.binary_cross_entropy_with_logits(logits, pair_labels)
+
+    if objective == "bce":
+        total_loss = pair_loss
+    elif objective == "group_softmax":
+        total_loss = group_loss
+    elif objective == "combined":
+        total_loss = group_loss + pair_bce_weight * pair_loss
+    else:
+        raise ValueError(f"Unsupported train objective: {objective}")
+    return total_loss, float(group_loss.item()), float(pair_loss.item())
+
+
+def evaluate_bi_encoder_baseline(
+    cfg: CrossEncoderTrainConfig,
+    data: Any,
+    device: torch.device,
+) -> dict[str, dict[str, float]]:
+    val_queries, val_codes = maybe_truncate_queries(data.validation.queries, data.validation.codes, cfg.max_eval_queries)
+    test_queries, test_codes = maybe_truncate_queries(data.test.queries, data.test.codes, cfg.max_eval_queries)
+    return evaluate_symmetric_backbone(
+        model_name=cfg.baseline_bi_encoder_model,
+        val_queries=val_queries,
+        val_codes=val_codes,
+        test_queries=test_queries,
+        test_codes=test_codes,
+        max_query_length=cfg.miner_max_query_length,
+        max_code_length=cfg.miner_max_code_length,
+        eval_batch_size=cfg.miner_batch_size,
+        device=device,
+    )
+
+
 def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
     set_seed(cfg.seed)
     device = pick_device()
-    runtime_cfg = type("RuntimeCfg", (), {
-        "batch_size": cfg.batch_size,
-        "eval_batch_size": cfg.eval_batch_size,
-        "optimize_for_mps": cfg.optimize_for_mps,
-    })()
+    runtime_cfg = type(
+        "RuntimeCfg",
+        (),
+        {
+            "batch_size": cfg.batch_size,
+            "eval_batch_size": cfg.eval_batch_size,
+            "optimize_for_mps": cfg.optimize_for_mps,
+        },
+    )()
     apply_device_runtime_optimizations(cfg=runtime_cfg, device=device)
     cfg.batch_size = runtime_cfg.batch_size
     cfg.eval_batch_size = runtime_cfg.eval_batch_size
@@ -270,6 +498,17 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
         "Dataset splits -> "
         f"train: {len(train_queries)}, val: {len(data.validation.queries)}, test: {len(data.test.queries)}"
     )
+
+    baseline_metrics: dict[str, Any] | None = None
+    if cfg.compare_to_baseline:
+        print(f"Evaluating bi-encoder baseline teacher: {cfg.baseline_bi_encoder_model}")
+        baseline_metrics = evaluate_bi_encoder_baseline(cfg=cfg, data=data, device=device)
+        print(
+            "Baseline bi-encoder test -> "
+            f"MRR={baseline_metrics['test']['MRR']:.4f} "
+            f"R@1={baseline_metrics['test']['Recall@1']:.4f} "
+            f"R@10={baseline_metrics['test']['Recall@10']:.4f}"
+        )
 
     print(f"Loading cross-encoder teacher: {cfg.model_name}")
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_name)
@@ -300,18 +539,29 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
         ),
     }
     print(
-        "Zero-shot test -> "
+        "Zero-shot cross-encoder test -> "
         f"MRR={zero_shot['test']['MRR']:.4f} "
         f"R@1={zero_shot['test']['Recall@1']:.4f} "
         f"R@10={zero_shot['test']['Recall@10']:.4f}"
     )
 
-    train_examples = make_train_examples(
+    hard_negative_pools: list[list[int]] | None = None
+    if cfg.negative_strategy in {"hard", "mixed"}:
+        hard_negative_pools = mine_hard_negative_indices(
+            queries=train_queries,
+            codes=train_codes,
+            cfg=cfg,
+            device=device,
+        )
+
+    train_examples, negative_sampling = build_grouped_examples(
         queries=train_queries,
         codes=train_codes,
-        negatives_per_query=cfg.negatives_per_query,
-        seed=cfg.seed,
+        cfg=cfg,
+        hard_negative_pools=hard_negative_pools,
     )
+    write_json(run_dir / "negative_sampling.json", negative_sampling)
+
     train_loader = make_train_loader(
         examples=train_examples,
         tokenizer=tokenizer,
@@ -334,23 +584,33 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
     for epoch in range(1, cfg.epochs + 1):
         model.train()
         loss_sum = 0.0
+        group_sum = 0.0
+        pair_sum = 0.0
         steps = 0
         pbar = tqdm(train_loader, desc=f"cross-encoder epoch {epoch}/{cfg.epochs}", leave=False)
-        for tokenized, labels in pbar:
+        for tokenized, pair_labels, group_size in pbar:
             tokenized = to_device(tokenized, device)
-            labels = labels.to(device)
+            pair_labels = pair_labels.to(device)
 
             logits = model(**tokenized).logits.squeeze(-1)
-            loss = F.binary_cross_entropy_with_logits(logits, labels)
+            total_loss, group_loss, pair_loss = compute_training_loss(
+                logits=logits,
+                pair_labels=pair_labels,
+                group_size=group_size,
+                objective=cfg.train_objective,
+                pair_bce_weight=cfg.pair_bce_weight,
+            )
 
             optimizer.zero_grad(set_to_none=True)
-            loss.backward()
+            total_loss.backward()
             optimizer.step()
             scheduler.step()
 
             steps += 1
-            loss_sum += float(loss.item())
-            pbar.set_postfix(loss=f"{loss.item():.4f}")
+            loss_sum += float(total_loss.item())
+            group_sum += group_loss
+            pair_sum += pair_loss
+            pbar.set_postfix(loss=f"{total_loss.item():.4f}", group=f"{group_loss:.4f}")
 
         maybe_empty_device_cache(device)
         val_metrics = evaluate_split(
@@ -365,6 +625,8 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
         epoch_stats = {
             "epoch": float(epoch),
             "train_loss": loss_sum / max(steps, 1),
+            "train_group_loss": group_sum / max(steps, 1),
+            "train_pair_bce": pair_sum / max(steps, 1),
             "val_MRR": val_metrics["MRR"],
             "val_Recall@1": val_metrics["Recall@1"],
             "val_Recall@10": val_metrics["Recall@10"],
@@ -400,12 +662,35 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
         ),
     }
 
+    comparisons: dict[str, Any] = {}
+    if baseline_metrics is not None:
+        comparisons["zero_shot_vs_baseline"] = {
+            "validation_mrr_delta": zero_shot["validation"]["MRR"] - baseline_metrics["validation"]["MRR"],
+            "test_mrr_delta": zero_shot["test"]["MRR"] - baseline_metrics["test"]["MRR"],
+        }
+        comparisons["finetuned_vs_baseline"] = {
+            "validation_mrr_delta": finetuned["validation"]["MRR"] - baseline_metrics["validation"]["MRR"],
+            "test_mrr_delta": finetuned["test"]["MRR"] - baseline_metrics["test"]["MRR"],
+        }
+
     summary = {
         "teacher_type": "cross_encoder_reranker",
         "model_name": cfg.model_name,
         "dataset_name": cfg.dataset_name,
+        "training_design": {
+            "train_objective": cfg.train_objective,
+            "pair_bce_weight": cfg.pair_bce_weight,
+            "negative_strategy": cfg.negative_strategy,
+            "negative_miner_model": cfg.negative_miner_model if cfg.negative_strategy in {"hard", "mixed"} else None,
+            "hard_negative_pool_size": cfg.hard_negative_pool_size,
+            "negatives_per_query": cfg.negatives_per_query,
+            "max_length": cfg.max_length,
+        },
+        "negative_sampling": negative_sampling,
+        "baseline_bi_encoder": baseline_metrics,
         "zero_shot": zero_shot,
         "best_finetuned": finetuned,
+        "comparisons": comparisons,
         "improvement": {
             "validation_mrr_delta": finetuned["validation"]["MRR"] - zero_shot["validation"]["MRR"],
             "test_mrr_delta": finetuned["test"]["MRR"] - zero_shot["test"]["MRR"],
@@ -422,11 +707,14 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
         tokenizer.save_pretrained(model_dir)
 
     print(
-        "Best finetuned test -> "
+        "Best finetuned cross-encoder test -> "
         f"MRR={finetuned['test']['MRR']:.4f} "
         f"R@1={finetuned['test']['Recall@1']:.4f} "
         f"R@10={finetuned['test']['Recall@10']:.4f}"
     )
+    if baseline_metrics is not None:
+        delta = comparisons["finetuned_vs_baseline"]["test_mrr_delta"]
+        print(f"Finetuned cross-encoder vs baseline bi-encoder (test MRR delta): {delta:+.4f}")
     print(f"Artifacts saved to: {run_dir}")
     return summary
 

@@ -95,16 +95,29 @@ Train and evaluate a cross-encoder reranker teacher first:
 
 ```bash
 uv run mbpp-kd-cross-teacher \
-  --model-name cross-encoder/ms-marco-MiniLM-L-6-v2 \
-  --epochs 1 \
+  --model-name microsoft/codebert-base \
+  --epochs 3 \
   --batch-size 16 \
   --eval-batch-size 32 \
+  --negative-strategy mixed \
+  --negative-miner-model sentence-transformers/all-mpnet-base-v2 \
+  --train-objective combined \
+  --baseline-bi-encoder-model sentence-transformers/all-mpnet-base-v2 \
   --output-dir teachers/cross_encoder_smoke
 ```
 
 If `--model-name` points to a generic encoder checkpoint instead of an existing reranker,
 the command loads it as a single-score sequence-classification model and fine-tunes that head
 for retrieval reranking.
+
+The cross-encoder teacher now supports stronger training measures:
+
+- hard negative mining from a configurable bi-encoder miner
+- mixed hard+random negative groups
+- per-query grouped softmax ranking loss, optionally combined with pairwise BCE
+- side-by-side comparison against a chosen bi-encoder baseline teacher
+
+See `docs/CROSS_ENCODER_TEACHER.md` for the detailed workflow and rationale.
 
 `--projection-init least_squares_queries` and `--projection-init least_squares_both` are meant for cross-family KD runs where the student must learn a new embedding dimension, such as `MiniLM -> MPNet`.
 The default evaluation mode is `symmetric`, which makes checkpoint selection and reported metrics use student-query x student-code retrieval for fair trained-student comparisons.
@@ -165,6 +178,7 @@ Historical runs from the earlier flat layout now live under `artifacts/legacy/`.
 - `papers/`: paper registry and download script
 - `DISTILL_METHOD_QUICKSTART.md`: focused quickstart for the `embed_distill` / `pair_distill` workflows
 - `docs/PAPER_IMPLEMENTATIONS.md`: method notes and faithfulness/gap summary
+- `docs/CROSS_ENCODER_TEACHER.md`: cross-encoder teacher training recipe and comparison workflow
 - `docs/ORGANIZATION.md`: suite layout and experiment storage conventions
 - `docs/EMBEDDISTILL_MERMAID.md`: focused Mermaid diagram for the `embed_distill` method
 - `docs/embeddistill_loss_explainer.html`: HTML explainer for the `embed_distill` losses, tensors, and KL intuition
