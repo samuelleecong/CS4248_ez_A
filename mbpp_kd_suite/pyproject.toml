@@ -24,6 +24,7 @@ mbpp-kd-suite = "mbpp_kd_suite:main"
 mbpp-kd-inventory = "mbpp_kd_suite.experiment_inventory:main"
 mbpp-kd-baselines = "mbpp_kd_suite.baseline_comparison:main"
 mbpp-kd-finetune = "mbpp_kd_suite.finetune_comparison:main"
+mbpp-kd-cross-teacher = "mbpp_kd_suite.cross_encoder_teacher:main"
 
 [build-system]
 requires = ["hatchling"]

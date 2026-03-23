@@ -91,6 +91,21 @@ uv run mbpp-kd-inventory
 uv run mbpp-kd-inventory --json
 ```
 
+Train and evaluate a cross-encoder reranker teacher first:
+
+```bash
+uv run mbpp-kd-cross-teacher \
+  --model-name cross-encoder/ms-marco-MiniLM-L-6-v2 \
+  --epochs 1 \
+  --batch-size 16 \
+  --eval-batch-size 32 \
+  --output-dir teachers/cross_encoder_smoke
+```
+
+If `--model-name` points to a generic encoder checkpoint instead of an existing reranker,
+the command loads it as a single-score sequence-classification model and fine-tunes that head
+for retrieval reranking.
+
 `--projection-init least_squares_queries` and `--projection-init least_squares_both` are meant for cross-family KD runs where the student must learn a new embedding dimension, such as `MiniLM -> MPNet`.
 The default evaluation mode is `symmetric`, which makes checkpoint selection and reported metrics use student-query x student-code retrieval for fair trained-student comparisons.
 `--eval-mode asymmetric` keeps the teacher-document evaluation path for explicit ablation runs.
@@ -146,6 +161,7 @@ Historical runs from the earlier flat layout now live under `artifacts/legacy/`.
 - `src/mbpp_kd_suite/config.py`: `TrainConfig`, output-dir resolution, and CLI parsing
 - `src/mbpp_kd_suite/runtime.py`: device selection, cache clearing, and MPS-safe runtime tuning
 - `src/mbpp_kd_suite/experiment_inventory.py`: CLI for locating saved experiment runs
+- `src/mbpp_kd_suite/cross_encoder_teacher.py`: teacher-first training and evaluation for cross-encoder rerankers
 - `papers/`: paper registry and download script
 - `DISTILL_METHOD_QUICKSTART.md`: focused quickstart for the `embed_distill` / `pair_distill` workflows
 - `docs/PAPER_IMPLEMENTATIONS.md`: method notes and faithfulness/gap summary
