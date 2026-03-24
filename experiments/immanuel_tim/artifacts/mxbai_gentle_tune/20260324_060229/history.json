@@ -1,0 +1,11 @@
+[
+  {
+    "epoch": 1.0,
+    "train_loss": NaN,
+    "train_group_loss": NaN,
+    "train_pair_bce": NaN,
+    "val_MRR": 0.06206849098681895,
+    "val_Recall@1": 0.0125,
+    "val_Recall@10": 0.125
+  }
+]

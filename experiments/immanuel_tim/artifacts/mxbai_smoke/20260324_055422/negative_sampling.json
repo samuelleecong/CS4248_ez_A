@@ -1,0 +1,7 @@
+{
+  "queries": 96.0,
+  "actual_negatives_per_query": 4.0,
+  "avg_hard_negatives_per_query": 0.0,
+  "avg_random_negatives_per_query": 4.0,
+  "negative_strategy": "random"
+}

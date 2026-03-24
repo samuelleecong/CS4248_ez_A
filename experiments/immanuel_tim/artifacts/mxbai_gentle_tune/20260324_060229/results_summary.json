@@ -1,0 +1,67 @@
+{
+  "teacher_type": "cross_encoder_reranker",
+  "model_name": "mixedbread-ai/mxbai-rerank-base-v1",
+  "dataset_name": "google-research-datasets/mbpp",
+  "training_design": {
+    "train_objective": "combined",
+    "pair_bce_weight": 0.1,
+    "negative_strategy": "mixed",
+    "negative_miner_model": "sentence-transformers/all-MiniLM-L12-v2",
+    "hard_negative_pool_size": 8,
+    "negatives_per_query": 2,
+    "max_length": 256
+  },
+  "negative_sampling": {
+    "queries": 192.0,
+    "actual_negatives_per_query": 2.0,
+    "avg_hard_negatives_per_query": 2.0,
+    "avg_random_negatives_per_query": 0.0,
+    "negative_strategy": "mixed"
+  },
+  "baseline_bi_encoder": null,
+  "zero_shot": {
+    "validation": {
+      "MRR": 0.8820459413150568,
+      "Recall@1": 0.825,
+      "Recall@5": 0.9625,
+      "Recall@10": 0.9625,
+      "MedianRank": 1.0,
+      "num_queries": 80.0,
+      "num_docs": 80.0
+    },
+    "test": {
+      "MRR": 0.8722536875110405,
+      "Recall@1": 0.8125,
+      "Recall@5": 0.925,
+      "Recall@10": 0.975,
+      "MedianRank": 1.0,
+      "num_queries": 80.0,
+      "num_docs": 80.0
+    }
+  },
+  "best_finetuned": {
+    "validation": {
+      "MRR": 0.06206849098681895,
+      "Recall@1": 0.0125,
+      "Recall@5": 0.0625,
+      "Recall@10": 0.125,
+      "MedianRank": 40.5,
+      "num_queries": 80.0,
+      "num_docs": 80.0
+    },
+    "test": {
+      "MRR": 0.06206849098681895,
+      "Recall@1": 0.0125,
+      "Recall@5": 0.0625,
+      "Recall@10": 0.125,
+      "MedianRank": 40.5,
+      "num_queries": 80.0,
+      "num_docs": 80.0
+    }
+  },
+  "comparisons": {},
+  "improvement": {
+    "validation_mrr_delta": -0.8199774503282378,
+    "test_mrr_delta": -0.8101851965242215
+  }
+}
