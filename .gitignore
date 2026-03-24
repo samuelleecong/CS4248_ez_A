@@ -51,3 +51,5 @@ experiments/kai/results/*
 
 experiments/sam/knowledge-distillation/results/*
 !experiments/sam/knowledge-distillation/results/README.md
+datasets/
+experiments/kai/logs/
