@@ -105,13 +105,7 @@ uv run mbpp-kd-eval \
   --split test
 ```
 
-By default, evaluator outputs go to `eval/runs/`. These are local generated artifacts. Each run gets its own folder and any aggregate indices are rebuilt locally, but the entire run history stays git-ignored so peers only pull the evaluator code, not your machine's results.
-
-`--projection-init least_squares_queries` and `--projection-init least_squares_both` are meant for cross-family KD runs where the student must learn a new embedding dimension, such as `MiniLM -> MPNet`.
-The default evaluation mode is `symmetric`, which makes checkpoint selection and reported metrics use student-query x student-code retrieval for fair trained-student comparisons.
-`--eval-mode asymmetric` keeps the teacher-document evaluation path for explicit ablation runs.
-`--optimize-for-mps` keeps MPS selected as the device, forces high matmul precision, and clamps the run to more conservative batch sizes (`8` train, `16` eval) to avoid the worst memory-fragmentation and thrashing cases on Apple Silicon.
-For `TACO`, the suite converts each problem into one retrieval pair by using the problem statement plus starter code as the query and the first non-empty verified solution as the code target, then derives a validation split from train via `--taco-val-size`.
+Detailed evaluator usage, flag behavior, input path rules, and output layout live in [eval/README.md](eval/README.md). Keep that file as the source of truth for evaluator operations.
 
 ## Papers
 
@@ -151,26 +145,6 @@ Each training run directory contains:
 - `<method>/model/` when `--save-models` is enabled
 
 Historical runs from the earlier flat layout now live under `artifacts/legacy/`.
-
-Evaluator runs live under `eval/runs/` in this structure:
-
-```text
-eval/
-  run.py
-  reporting.py
-  tests/
-  runs/
-    README.md
-    <dataset>/
-      <split>/
-        <timestamp>_<model>/
-          summary.md
-          metrics.csv
-          profiling.csv
-          metrics.json
-          config.json
-          *.png
-```
 
 ## Repo Layout
 
