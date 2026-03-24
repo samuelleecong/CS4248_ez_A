@@ -177,3 +177,51 @@ If the cross-encoder teacher becomes stronger than the bi-encoder teacher, it be
 - future reranker-to-bi-encoder distillation variants
 
 That is why this workflow is teacher-first: it isolates the teacher quality question before folding the reranker into the KD loop.
+
+## Fine-Tuned MPNet In This Repo
+
+The repo already contains a fine-tuning pipeline for `sentence-transformers/all-mpnet-base-v2` in:
+
+- `experiments/kai/scripts/run_mbpp_experiments.py`
+
+Relevant configuration found there:
+
+- model candidate includes `sentence-transformers/all-mpnet-base-v2`
+- sweep configs:
+  - `sweep_e1_b16_lr2e5`
+  - `sweep_e2_b16_lr2e5`
+  - `sweep_e1_b32_lr1e5`
+- final standard training:
+  - train split: `train + validation + prompt`
+  - objective: `MultipleNegativesRankingLoss`
+- optional harder second stage:
+  - hard-negative triplet fine-tuning from the final standard checkpoint
+
+Expected fine-tuned checkpoint locations from that pipeline:
+
+- `experiments/kai/results/<run_id>/checkpoints/final_standard_mnr/sentence-transformers__all-mpnet-base-v2`
+- `experiments/kai/results/<run_id>/checkpoints/final_hardneg_triplet/sentence-transformers__all-mpnet-base-v2`
+
+No fine-tuned MPNet checkpoint is checked into this repo right now, so the fair comparison command expects you to point it at your own local fine-tuned checkpoint path.
+
+## Fair Comparison Command
+
+To compare a cross-encoder and a fine-tuned MPNet checkpoint fairly, use:
+
+```bash
+uv run mbpp-kd-compare-cross-vs-bi \
+  --cross-encoder-model mixedbread-ai/mxbai-rerank-base-v1 \
+  --bi-encoder-model experiments/kai/results/<run_id>/checkpoints/final_standard_mnr/sentence-transformers__all-mpnet-base-v2 \
+  --protocol heldout_test \
+  --output-dir comparisons/cross_vs_mpnet
+```
+
+This command evaluates both models on exactly the same candidate pool:
+
+- `heldout_test`: MBPP test queries against MBPP test code only
+- `full_corpus`: train + validation + test code pool, using the same aligned query/code ordering used by the Kai experiments
+
+The cross-encoder scores every query-code pair directly.
+The bi-encoder encodes all queries and all code snippets, then ranks by cosine-style inner product on normalized embeddings.
+
+That keeps the quality comparison fair, even though the cross-encoder is much slower.

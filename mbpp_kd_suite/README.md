@@ -119,6 +119,16 @@ The cross-encoder teacher now supports stronger training measures:
 
 See `docs/CROSS_ENCODER_TEACHER.md` for the detailed workflow and rationale.
 
+Compare a cross-encoder against a fine-tuned bi-encoder fairly on the same candidate pool:
+
+```bash
+uv run mbpp-kd-compare-cross-vs-bi \
+  --cross-encoder-model mixedbread-ai/mxbai-rerank-base-v1 \
+  --bi-encoder-model experiments/kai/results/<run_id>/checkpoints/final_standard_mnr/sentence-transformers__all-mpnet-base-v2 \
+  --protocol heldout_test \
+  --output-dir comparisons/cross_vs_mpnet
+```
+
 `--projection-init least_squares_queries` and `--projection-init least_squares_both` are meant for cross-family KD runs where the student must learn a new embedding dimension, such as `MiniLM -> MPNet`.
 The default evaluation mode is `symmetric`, which makes checkpoint selection and reported metrics use student-query x student-code retrieval for fair trained-student comparisons.
 `--eval-mode asymmetric` keeps the teacher-document evaluation path for explicit ablation runs.
@@ -175,6 +185,7 @@ Historical runs from the earlier flat layout now live under `artifacts/legacy/`.
 - `src/mbpp_kd_suite/runtime.py`: device selection, cache clearing, and MPS-safe runtime tuning
 - `src/mbpp_kd_suite/experiment_inventory.py`: CLI for locating saved experiment runs
 - `src/mbpp_kd_suite/cross_encoder_teacher.py`: teacher-first training and evaluation for cross-encoder rerankers
+- `src/mbpp_kd_suite/compare_cross_vs_biencoder.py`: fair full-pool comparison between a cross-encoder and a bi-encoder
 - `papers/`: paper registry and download script
 - `DISTILL_METHOD_QUICKSTART.md`: focused quickstart for the `embed_distill` / `pair_distill` workflows
 - `docs/PAPER_IMPLEMENTATIONS.md`: method notes and faithfulness/gap summary
