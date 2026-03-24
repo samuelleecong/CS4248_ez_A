@@ -1,7 +1,12 @@
 .DS_Store
 .hf_cache/
 .venv/
+.python-version
 __pycache__/
 .pytest_cache/
+*.pyc
 artifacts/
 scratch/
+eval/runs/**
+!eval/runs/.gitignore
+!eval/runs/README.md

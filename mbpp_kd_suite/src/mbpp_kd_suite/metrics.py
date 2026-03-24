@@ -16,27 +16,39 @@ from .modeling import (
 )
 
 
-def reciprocal_rank_metrics(score_matrix: np.ndarray) -> dict[str, float]:
+def paired_ranks(score_matrix: np.ndarray) -> np.ndarray:
     n = score_matrix.shape[0]
-    ranks: list[int] = []
+    ranks = np.zeros(n, dtype=np.int64)
     for i in range(n):
         order = np.argsort(-score_matrix[i])
-        rank = int(np.where(order == i)[0][0]) + 1
-        ranks.append(rank)
+        ranks[i] = int(np.where(order == i)[0][0]) + 1
+    return ranks
 
-    reciprocal = [1.0 / rank for rank in ranks]
-    return {
+
+def paired_ranking_metrics(score_matrix: np.ndarray, ks: tuple[int, ...] = (1, 5, 10)) -> dict[str, float]:
+    ranks = paired_ranks(score_matrix)
+    reciprocal = 1.0 / ranks.astype(np.float64)
+    metrics: dict[str, float] = {
         "MRR": float(np.mean(reciprocal)),
-        "Recall@1": float(np.mean([rank <= 1 for rank in ranks])),
-        "Recall@5": float(np.mean([rank <= 5 for rank in ranks])),
-        "Recall@10": float(np.mean([rank <= 10 for rank in ranks])),
         "MedianRank": float(np.median(ranks)),
     }
+    for k in sorted(set(ks)):
+        if k <= 0:
+            raise ValueError(f"k must be positive, got {k}")
+        hits = ranks <= k
+        metrics[f"Recall@{k}"] = float(np.mean(hits))
+        metrics[f"MAP@{k}"] = float(np.mean(np.where(hits, reciprocal, 0.0)))
+        metrics[f"nDCG@{k}"] = float(np.mean(np.where(hits, 1.0 / np.log2(ranks + 1.0), 0.0)))
+    return metrics
+
+
+def reciprocal_rank_metrics(score_matrix: np.ndarray) -> dict[str, float]:
+    return paired_ranking_metrics(score_matrix, ks=(1, 5, 10))
 
 
 def score_metrics_from_embeddings(query_embs: torch.Tensor, doc_embs: torch.Tensor) -> dict[str, float]:
     scores = (query_embs @ doc_embs.T).numpy()
-    return reciprocal_rank_metrics(scores)
+    return paired_ranking_metrics(scores, ks=(1, 5, 10))
 
 
 @torch.no_grad()

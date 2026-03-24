@@ -2,7 +2,7 @@
 
 `mbpp_kd_suite` is a standalone `uv` project for comparing embedding-focused knowledge distillation methods on MBPP-style code retrieval.
 
-The supported code lives under `src/mbpp_kd_suite/`. There are no legacy compatibility entrypoints in this repo; import from the concrete modules directly.
+Core training and modeling code lives under `src/mbpp_kd_suite/`. The standalone decoupled evaluator and its local run history now live entirely under `eval/`.
 
 ## What This Repo Covers
 
@@ -12,6 +12,8 @@ The supported code lives under `src/mbpp_kd_suite/`. There are no legacy compati
 - Reported metrics:
   - `MRR`
   - `Recall@1/5/10`
+  - `nDCG@k`
+  - `MAP@k`
   - `MedianRank`
 - Baselines:
   - `direct_big_teacher`
@@ -39,6 +41,8 @@ If you are new to the repo, use this reading order:
 7. `src/mbpp_kd_suite/training.py`
 8. `src/mbpp_kd_suite/modeling.py`
 9. `src/mbpp_kd_suite/data.py`
+10. `eval/run.py`
+11. `eval/README.md`
 
 ## Quick Start
 
@@ -91,6 +95,18 @@ uv run mbpp-kd-inventory
 uv run mbpp-kd-inventory --json
 ```
 
+Run the standalone evaluator against a saved checkpoint or a Hugging Face model:
+
+```bash
+uv run mbpp-kd-eval \
+  --dataset-name mbpp \
+  --model-source hf \
+  --model-name-or-path sentence-transformers/all-MiniLM-L6-v2 \
+  --split test
+```
+
+By default, evaluator outputs go to `eval/runs/`. These are local generated artifacts. Each run gets its own folder and any aggregate indices are rebuilt locally, but the entire run history stays git-ignored so peers only pull the evaluator code, not your machine's results.
+
 `--projection-init least_squares_queries` and `--projection-init least_squares_both` are meant for cross-family KD runs where the student must learn a new embedding dimension, such as `MiniLM -> MPNet`.
 The default evaluation mode is `symmetric`, which makes checkpoint selection and reported metrics use student-query x student-code retrieval for fair trained-student comparisons.
 `--eval-mode asymmetric` keeps the teacher-document evaluation path for explicit ablation runs.
@@ -109,7 +125,7 @@ Existing PDFs under `assignment_details/papers/` are reused when available; miss
 
 ## Output Layout
 
-Relative `--output-dir` values are written under `artifacts/`.
+Relative `--output-dir` values for training runs are written under `artifacts/`.
 
 Examples:
 
@@ -124,7 +140,7 @@ uv run mbpp-kd-suite --output-dir ./scratch/manual_check
 -> ./scratch/manual_check/<timestamp>/
 ```
 
-Each run directory contains:
+Each training run directory contains:
 
 - `config.json`
 - `paper_registry.json`
@@ -136,6 +152,26 @@ Each run directory contains:
 
 Historical runs from the earlier flat layout now live under `artifacts/legacy/`.
 
+Evaluator runs live under `eval/runs/` in this structure:
+
+```text
+eval/
+  run.py
+  reporting.py
+  tests/
+  runs/
+    README.md
+    <dataset>/
+      <split>/
+        <timestamp>_<model>/
+          summary.md
+          metrics.csv
+          profiling.csv
+          metrics.json
+          config.json
+          *.png
+```
+
 ## Repo Layout
 
 - `src/mbpp_kd_suite/experiment.py`: top-level run orchestration and CLI entrypoint
@@ -146,6 +182,10 @@ Historical runs from the earlier flat layout now live under `artifacts/legacy/`.
 - `src/mbpp_kd_suite/config.py`: `TrainConfig`, output-dir resolution, and CLI parsing
 - `src/mbpp_kd_suite/runtime.py`: device selection, cache clearing, and MPS-safe runtime tuning
 - `src/mbpp_kd_suite/experiment_inventory.py`: CLI for locating saved experiment runs
+- `eval/`: standalone decoupled evaluation package
+- `eval/README.md`: evaluator-focused layout and usage
+- `eval/tests/`: unit tests for eval adapters and retrieval metrics
+- `eval/runs/`: repo-local evaluator run history; generated outputs remain git-ignored
 - `papers/`: paper registry and download script
 - `DISTILL_METHOD_QUICKSTART.md`: focused quickstart for the `embed_distill` / `pair_distill` workflows
 - `docs/PAPER_IMPLEMENTATIONS.md`: method notes and faithfulness/gap summary

@@ -12,6 +12,7 @@ dependencies = [
     "datasets>=2.20.0",
     "matplotlib>=3.10.8",
     "numpy>=1.26.0",
+    "psutil>=6.1.0",
     "scikit-learn>=1.5.0",
     "sentence-transformers>=3.0.0",
     "torch>=2.5.1",
@@ -24,10 +25,11 @@ mbpp-kd-suite = "mbpp_kd_suite:main"
 mbpp-kd-inventory = "mbpp_kd_suite.experiment_inventory:main"
 mbpp-kd-baselines = "mbpp_kd_suite.baseline_comparison:main"
 mbpp-kd-finetune = "mbpp_kd_suite.finetune_comparison:main"
+mbpp-kd-eval = "eval.run:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mbpp_kd_suite"]
+packages = ["src/mbpp_kd_suite", "eval"]
