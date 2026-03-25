@@ -42,6 +42,7 @@ class TrainConfig:
     extra_baseline_models: tuple[str, ...] = ()
     run_diagnostics: bool = True
     optimize_for_mps: bool = False
+    early_stopping_patience: int = 0  # 0 = disabled
 
 
 @dataclass
