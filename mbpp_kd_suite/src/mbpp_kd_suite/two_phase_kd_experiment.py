@@ -84,11 +84,12 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
     # Build ordered list of runs to display
     display_order = [
         "zeroshot_teacher", "zeroshot_student",
-        "phase1_ft_student", "phase2_control_supervised",
+        "phase1_ft_teacher", "phase1_ft_student", "phase2_control_supervised",
     ] + [f"phase2_{m}" for m in KD_METHOD_ORDER]
     short_map = {
         "zeroshot_teacher": "zs_teacher",
         "zeroshot_student": "zs_student",
+        "phase1_ft_teacher": "ft_teacher",
         "phase1_ft_student": "ft_student",
         "phase2_control_supervised": "ctrl_sup",
     }
@@ -108,6 +109,8 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
     for k in keys:
         if k in ("zeroshot_teacher", "zeroshot_student"):
             colors.append("#bdc3c7")
+        elif k == "phase1_ft_teacher":
+            colors.append("#8e44ad")
         elif k == "phase1_ft_student":
             colors.append("#95a5a6")
         elif k == "phase2_control_supervised":
@@ -137,6 +140,7 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
     from matplotlib.patches import Patch
     legend_handles = [
         Patch(color="#bdc3c7", label="Zero-shot baseline"),
+        Patch(color="#8e44ad", label="Phase 1 finetuned teacher"),
         Patch(color="#95a5a6", label="Phase 1 finetuned student"),
         Patch(color="#3498db", label="Phase 2 control (supervised)"),
         Patch(color="#e67e22", label="Phase 2 KD methods"),
