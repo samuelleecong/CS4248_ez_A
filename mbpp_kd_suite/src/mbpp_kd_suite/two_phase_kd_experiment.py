@@ -77,6 +77,54 @@ def _write_json(path: Path, payload: Any) -> None:
         json.dump(payload, handle, indent=2)
 
 
+def _plot_phase1_training(run_dir: Path) -> None:
+    """Plot train loss and val MRR per epoch for teacher and student phase 1 runs."""
+    runs = {
+        "teacher": run_dir / "phase1" / "ft_teacher_phase1" / "history.json",
+        "student": run_dir / "phase1" / "ft_student_phase1" / "history.json",
+    }
+    histories: dict[str, list[dict]] = {}
+    for label, path in runs.items():
+        if path.exists():
+            with path.open() as f:
+                histories[label] = json.load(f)
+
+    if not histories:
+        return
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+    colors = {"teacher": "#8e44ad", "student": "#95a5a6"}
+
+    for label, history in histories.items():
+        epochs = [h["epoch"] for h in history]
+        losses = [h["loss"] for h in history]
+        val_mrrs = [h["val_MRR"] for h in history]
+        color = colors[label]
+        ax1.plot(epochs, losses, marker="o", label=label, color=color)
+        ax2.plot(epochs, val_mrrs, marker="o", label=label, color=color)
+        # Mark best val MRR
+        best_idx = int(np.argmax(val_mrrs))
+        ax2.scatter([epochs[best_idx]], [val_mrrs[best_idx]], color=color, s=120, zorder=5, marker="*")
+
+    ax1.set_title("Phase 1: Train Loss per Epoch", fontweight="bold")
+    ax1.set_xlabel("Epoch")
+    ax1.set_ylabel("Loss")
+    ax1.legend()
+    ax1.grid(alpha=0.3)
+
+    ax2.set_title("Phase 1: Val MRR per Epoch", fontweight="bold")
+    ax2.set_xlabel("Epoch")
+    ax2.set_ylabel("Val MRR")
+    ax2.legend()
+    ax2.grid(alpha=0.3)
+
+    fig.tight_layout()
+    chart_path = run_dir / "phase1_training_curves.png"
+    fig.savefig(chart_path, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Phase 1 training curves saved to: {chart_path}")
+
+
 def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> None:
     dataset_slug = dataset_name.split("/")[-1]
     metric_keys = ["MRR", "Recall@1", "Recall@5", "Recall@10"]
@@ -91,7 +139,7 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
         "zeroshot_student": "zs_student",
         "phase1_ft_teacher": "ft_teacher",
         "phase1_ft_student": "ft_student",
-        "phase2_control_supervised": "ctrl_sup",
+        "phase2_control_supervised": "ft_student_nodistill",
     }
     labels = []
     for key in display_order:
@@ -235,6 +283,7 @@ def run(
     methods: tuple[str, ...] | None = None,
     taco_val_size: int = 1000,
     resume_from_phase1: str | None = None,
+    phase1_patience: int = 3,
 ) -> dict[str, Any]:
     if methods is None:
         methods = tuple(KD_METHOD_ORDER)
@@ -255,24 +304,6 @@ def run(
         f"val: {len(data.validation.queries)}, test: {len(data.test.queries)}"
     )
 
-    # Zero-shot baselines (before any training)
-    print(f"\nEvaluating zero-shot baselines...")
-    zs_teacher = evaluate_symmetric_backbone(
-        model_name=teacher_model,
-        val_queries=data.validation.queries, val_codes=data.validation.codes,
-        test_queries=data.test.queries, test_codes=data.test.codes,
-        max_query_length=128, max_code_length=256,
-        eval_batch_size=eval_batch_size, device=device,
-    )
-    zs_student = evaluate_symmetric_backbone(
-        model_name=student_model,
-        val_queries=data.validation.queries, val_codes=data.validation.codes,
-        test_queries=data.test.queries, test_codes=data.test.codes,
-        max_query_length=128, max_code_length=256,
-        eval_batch_size=eval_batch_size, device=device,
-    )
-    maybe_empty_device_cache(device)
-
     phase1_cfg = TrainConfig(
         teacher_model=teacher_model,
         student_model=student_model,
@@ -284,6 +315,8 @@ def run(
         seed=seed,
         run_diagnostics=not skip_diagnostics,
         output_dir=output_dir,
+        early_stopping_patience=phase1_patience,
+        save_models=True,
     )
     phase2_cfg = TrainConfig(
         teacher_model=teacher_model,
@@ -316,6 +349,24 @@ def run(
         ft_teacher_targets = None
 
     if resume_from_phase1 is None:
+        # Zero-shot baselines (before any training)
+        print("\nEvaluating zero-shot baselines...")
+        zs_teacher = evaluate_symmetric_backbone(
+            model_name=teacher_model,
+            val_queries=data.validation.queries, val_codes=data.validation.codes,
+            test_queries=data.test.queries, test_codes=data.test.codes,
+            max_query_length=128, max_code_length=256,
+            eval_batch_size=eval_batch_size, device=device,
+        )
+        zs_student = evaluate_symmetric_backbone(
+            model_name=student_model,
+            val_queries=data.validation.queries, val_codes=data.validation.codes,
+            test_queries=data.test.queries, test_codes=data.test.codes,
+            max_query_length=128, max_code_length=256,
+            eval_batch_size=eval_batch_size, device=device,
+        )
+        maybe_empty_device_cache(device)
+
         # Encode raw (zero-shot) teacher targets for use during phase 1 teacher training
         print(f"\nEncoding raw teacher targets: {teacher_model}")
         raw_teacher_tokenizer = AutoTokenizer.from_pretrained(teacher_model)
@@ -391,6 +442,9 @@ def run(
         }
         del ft_student_model
         maybe_empty_device_cache(device)
+
+        # Plot phase 1 training curves (loss + val MRR per epoch)
+        _plot_phase1_training(run_dir)
 
         # Save phase 1 checkpoint so phase 2 can be resumed without re-running phase 1
         phase1_ckpt_path = run_dir / "phase1" / "checkpoint.pt"
@@ -491,7 +545,8 @@ def main() -> None:
         help="Student model (default: all-MiniLM-L6-v2)",
     )
     parser.add_argument("--dataset-name", default="code_search_net")
-    parser.add_argument("--phase1-epochs", type=int, default=3, help="Epochs for phase 1 finetuning")
+    parser.add_argument("--phase1-epochs", type=int, default=20, help="Max epochs for phase 1 (early stopping will terminate sooner)")
+    parser.add_argument("--phase1-patience", type=int, default=3, help="Early stopping patience for phase 1 (0 = disabled)")
     parser.add_argument("--phase2-epochs", type=int, default=2, help="Epochs for phase 2 KD / control")
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--eval-batch-size", type=int, default=64)
@@ -519,6 +574,7 @@ def main() -> None:
         student_model=args.student_model,
         dataset_name=args.dataset_name,
         phase1_epochs=args.phase1_epochs,
+        phase1_patience=args.phase1_patience,
         phase2_epochs=args.phase2_epochs,
         batch_size=args.batch_size,
         eval_batch_size=args.eval_batch_size,
