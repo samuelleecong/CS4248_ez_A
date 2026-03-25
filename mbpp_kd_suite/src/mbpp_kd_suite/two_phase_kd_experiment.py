@@ -284,6 +284,7 @@ def run(
     taco_val_size: int = 1000,
     resume_from_phase1: str | None = None,
     phase1_patience: int = 3,
+    phase2_patience: int = 3,
 ) -> dict[str, Any]:
     if methods is None:
         methods = tuple(KD_METHOD_ORDER)
@@ -330,6 +331,7 @@ def run(
         run_diagnostics=not skip_diagnostics,
         output_dir=output_dir,
         save_models=True,
+        early_stopping_patience=phase2_patience,
     )
     apply_device_runtime_optimizations(cfg=phase1_cfg, device=device)
     apply_device_runtime_optimizations(cfg=phase2_cfg, device=device)
@@ -548,7 +550,8 @@ def main() -> None:
     parser.add_argument("--dataset-name", default="code_search_net")
     parser.add_argument("--phase1-epochs", type=int, default=20, help="Max epochs for phase 1 (early stopping will terminate sooner)")
     parser.add_argument("--phase1-patience", type=int, default=3, help="Early stopping patience for phase 1 (0 = disabled)")
-    parser.add_argument("--phase2-epochs", type=int, default=2, help="Epochs for phase 2 KD / control")
+    parser.add_argument("--phase2-epochs", type=int, default=10, help="Max epochs for phase 2 (early stopping will terminate sooner)")
+    parser.add_argument("--phase2-patience", type=int, default=3, help="Early stopping patience for phase 2 (0 = disabled)")
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--eval-batch-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=2e-5)
@@ -577,6 +580,7 @@ def main() -> None:
         phase1_epochs=args.phase1_epochs,
         phase1_patience=args.phase1_patience,
         phase2_epochs=args.phase2_epochs,
+        phase2_patience=args.phase2_patience,
         batch_size=args.batch_size,
         eval_batch_size=args.eval_batch_size,
         lr=args.lr,
