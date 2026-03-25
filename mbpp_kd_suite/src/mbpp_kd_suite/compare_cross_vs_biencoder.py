@@ -13,7 +13,7 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
 from .config import resolve_output_root
-from .cross_encoder_teacher import evaluate_split as evaluate_cross_split
+from .cross_encoder_teacher import score_all_pairs
 from .data import dataset_dict_to_splits, load_retrieval_dataset
 from .metrics import reciprocal_rank_metrics
 from .runtime import pick_device, set_seed
@@ -32,6 +32,7 @@ class CompareConfig:
     taco_val_size: int = 1000
     seed: int = 42
     output_dir: str = "cross_vs_biencoder_compare"
+    rerank_top_k: tuple[int, ...] = (10, 25, 50)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -49,7 +50,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--taco-val-size", type=int, default=CompareConfig.taco_val_size)
     parser.add_argument("--seed", type=int, default=CompareConfig.seed)
     parser.add_argument("--output-dir", default=CompareConfig.output_dir)
+    parser.add_argument(
+        "--rerank-top-k",
+        default="10,25,50",
+        help="Comma-separated top-k values for bi-encoder retrieval followed by cross-encoder reranking.",
+    )
     return parser
+
+
+def parse_top_k(top_k_arg: str) -> tuple[int, ...]:
+    values = tuple(sorted({int(piece.strip()) for piece in top_k_arg.split(",") if piece.strip()}))
+    if not values or any(value <= 0 for value in values):
+        raise ValueError("--rerank-top-k must contain positive integers.")
+    return values
 
 
 def config_from_args(args: argparse.Namespace) -> CompareConfig:
@@ -65,6 +78,7 @@ def config_from_args(args: argparse.Namespace) -> CompareConfig:
         taco_val_size=args.taco_val_size,
         seed=args.seed,
         output_dir=args.output_dir,
+        rerank_top_k=parse_top_k(args.rerank_top_k),
     )
 
 
@@ -118,12 +132,33 @@ def maybe_truncate(queries: list[str], codes: list[str], limit: int | None) -> t
     return queries[:limit], codes[:limit]
 
 
-def evaluate_bi_encoder(
+def ranks_from_score_matrix(score_matrix: torch.Tensor | Any) -> list[int]:
+    if isinstance(score_matrix, torch.Tensor):
+        matrix = score_matrix.detach().cpu().numpy()
+    else:
+        matrix = score_matrix
+    ranks: list[int] = []
+    for idx in range(matrix.shape[0]):
+        order = matrix[idx].argsort()[::-1]
+        rank = int((order == idx).nonzero()[0][0]) + 1
+        ranks.append(rank)
+    return ranks
+
+
+def metrics_from_score_matrix(score_matrix: torch.Tensor | Any) -> dict[str, float]:
+    if isinstance(score_matrix, torch.Tensor):
+        matrix = score_matrix.detach().cpu().numpy()
+    else:
+        matrix = score_matrix
+    return reciprocal_rank_metrics(matrix)
+
+
+def bi_encoder_score_matrix(
     model_name_or_path: str,
     queries: list[str],
     codes: list[str],
     batch_size: int,
-) -> dict[str, float]:
+) -> torch.Tensor:
     model = SentenceTransformer(model_name_or_path, local_files_only=False)
     q_emb = model.encode(
         queries,
@@ -140,7 +175,33 @@ def evaluate_bi_encoder(
         show_progress_bar=True,
     )
     scores = q_emb @ c_emb.T
-    return reciprocal_rank_metrics(scores)
+    return torch.from_numpy(scores)
+
+
+def rerank_with_cross_encoder(
+    bi_score_matrix: torch.Tensor,
+    cross_score_matrix: torch.Tensor,
+    top_k: int,
+) -> torch.Tensor:
+    bi_matrix = bi_score_matrix.detach().cpu().numpy()
+    cross_matrix = cross_score_matrix.detach().cpu().numpy()
+    num_docs = bi_matrix.shape[1]
+    reranked = []
+    effective_k = min(top_k, num_docs)
+
+    for row_idx in range(bi_matrix.shape[0]):
+        base_order = bi_matrix[row_idx].argsort()[::-1]
+        top_indices = base_order[:effective_k]
+        top_cross_scores = cross_matrix[row_idx, top_indices]
+        rerank_order = top_indices[top_cross_scores.argsort()[::-1]]
+
+        row_scores = torch.full((num_docs,), fill_value=-1.0, dtype=torch.float32)
+        for pos, doc_idx in enumerate(rerank_order):
+            row_scores[int(doc_idx)] = float(num_docs - pos)
+        for offset, doc_idx in enumerate(base_order[effective_k:], start=effective_k):
+            row_scores[int(doc_idx)] = float(num_docs - offset)
+        reranked.append(row_scores)
+    return torch.stack(reranked, dim=0)
 
 
 def run(cfg: CompareConfig) -> dict[str, Any]:
@@ -165,34 +226,43 @@ def run(cfg: CompareConfig) -> dict[str, Any]:
     cross_tokenizer = AutoTokenizer.from_pretrained(cfg.cross_encoder_model)
     cross_model = AutoModelForSequenceClassification.from_pretrained(cfg.cross_encoder_model).to(device)
     cross_start = time.perf_counter()
-    cross_metrics = evaluate_cross_split(
+    cross_scores = score_all_pairs(
         model=cross_model,
         tokenizer=cross_tokenizer,
         queries=queries,
         docs=codes,
-        cfg=type(
-            "CrossEvalCfg",
-            (),
-            {
-                "max_eval_queries": None,
-                "eval_batch_size": cfg.eval_batch_size,
-                "max_length": cfg.max_length,
-            },
-        )(),
+        batch_size=cfg.eval_batch_size,
+        max_length=cfg.max_length,
         device=device,
-        split_name=f"{cfg.protocol}_cross",
+        desc=f"{cfg.protocol}_cross_full",
     )
+    cross_metrics = metrics_from_score_matrix(cross_scores)
     cross_runtime = time.perf_counter() - cross_start
 
     print(f"Loading bi-encoder: {cfg.bi_encoder_model}")
     bi_start = time.perf_counter()
-    bi_metrics = evaluate_bi_encoder(
+    bi_scores = bi_encoder_score_matrix(
         model_name_or_path=cfg.bi_encoder_model,
         queries=queries,
         codes=codes,
         batch_size=cfg.bi_encoder_batch_size,
     )
+    bi_metrics = metrics_from_score_matrix(bi_scores)
     bi_runtime = time.perf_counter() - bi_start
+
+    pipeline_results: dict[str, Any] = {}
+    for top_k in cfg.rerank_top_k:
+        start = time.perf_counter()
+        reranked_scores = rerank_with_cross_encoder(
+            bi_score_matrix=bi_scores,
+            cross_score_matrix=cross_scores,
+            top_k=top_k,
+        )
+        pipeline_results[f"top_{top_k}"] = {
+            "metrics": metrics_from_score_matrix(reranked_scores),
+            "runtime_sec": bi_runtime + cross_runtime,
+            "rerank_runtime_sec": time.perf_counter() - start,
+        }
 
     summary = {
         "dataset_name": cfg.dataset_name,
@@ -200,6 +270,7 @@ def run(cfg: CompareConfig) -> dict[str, Any]:
         "eval_split": eval_split,
         "num_queries": len(queries),
         "num_docs": len(codes),
+        "rerank_top_k": list(cfg.rerank_top_k),
         "cross_encoder": {
             "model": cfg.cross_encoder_model,
             "metrics": cross_metrics,
@@ -210,6 +281,7 @@ def run(cfg: CompareConfig) -> dict[str, Any]:
             "metrics": bi_metrics,
             "runtime_sec": bi_runtime,
         },
+        "pipeline": pipeline_results,
         "delta_cross_minus_bi": {
             "MRR": cross_metrics["MRR"] - bi_metrics["MRR"],
             "Recall@1": cross_metrics["Recall@1"] - bi_metrics["Recall@1"],
@@ -240,6 +312,14 @@ def run(cfg: CompareConfig) -> dict[str, Any]:
         f"R@1={summary['delta_cross_minus_bi']['Recall@1']:+.4f} "
         f"R@10={summary['delta_cross_minus_bi']['Recall@10']:+.4f}"
     )
+    for top_k in cfg.rerank_top_k:
+        metrics = pipeline_results[f"top_{top_k}"]["metrics"]
+        print(
+            f"Bi-encoder + rerank top-{top_k} -> "
+            f"MRR={metrics['MRR']:.4f} "
+            f"R@1={metrics['Recall@1']:.4f} "
+            f"R@10={metrics['Recall@10']:.4f}"
+        )
     print(f"Artifacts saved to: {run_dir}")
     return summary
 

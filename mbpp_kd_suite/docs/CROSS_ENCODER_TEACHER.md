@@ -206,14 +206,15 @@ No fine-tuned MPNet checkpoint is checked into this repo right now, so the fair 
 
 ## Fair Comparison Command
 
-To compare a cross-encoder and a fine-tuned MPNet checkpoint fairly, use:
+To compare a cross-encoder and a bi-encoder fairly, use:
 
 ```bash
 uv run mbpp-kd-compare-cross-vs-bi \
   --cross-encoder-model mixedbread-ai/mxbai-rerank-base-v1 \
-  --bi-encoder-model experiments/kai/results/<run_id>/checkpoints/final_standard_mnr/sentence-transformers__all-mpnet-base-v2 \
+  --bi-encoder-model sentence-transformers/all-mpnet-base-v2 \
   --protocol heldout_test \
-  --output-dir comparisons/cross_vs_mpnet
+  --rerank-top-k 10,25,50 \
+  --output-dir ../experiments/immanuel_tim/cross_vs_mpnet_pipeline
 ```
 
 This command evaluates both models on exactly the same candidate pool:
@@ -225,3 +226,10 @@ The cross-encoder scores every query-code pair directly.
 The bi-encoder encodes all queries and all code snippets, then ranks by cosine-style inner product on normalized embeddings.
 
 That keeps the quality comparison fair, even though the cross-encoder is much slower.
+
+The comparison command also reports a hybrid pipeline:
+
+- retrieve candidates with the bi-encoder
+- rerank only the bi-encoder top-k candidates with the cross-encoder
+
+This is the right tool for testing whether a `bi-encoder + reranker` architecture improves over a standalone bi-encoder on MBPP.

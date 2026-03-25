@@ -119,15 +119,22 @@ The cross-encoder teacher now supports stronger training measures:
 
 See `docs/CROSS_ENCODER_TEACHER.md` for the detailed workflow and rationale.
 
-Compare a cross-encoder against a fine-tuned bi-encoder fairly on the same candidate pool:
+Compare a cross-encoder against a bi-encoder fairly on the same candidate pool:
 
 ```bash
 uv run mbpp-kd-compare-cross-vs-bi \
   --cross-encoder-model mixedbread-ai/mxbai-rerank-base-v1 \
-  --bi-encoder-model experiments/kai/results/<run_id>/checkpoints/final_standard_mnr/sentence-transformers__all-mpnet-base-v2 \
+  --bi-encoder-model sentence-transformers/all-mpnet-base-v2 \
   --protocol heldout_test \
-  --output-dir comparisons/cross_vs_mpnet
+  --rerank-top-k 10,25,50 \
+  --output-dir ../experiments/immanuel_tim/cross_vs_mpnet_pipeline
 ```
+
+This command now reports three comparable views on the same candidate pool:
+
+- standalone cross-encoder full-pool ranking
+- standalone bi-encoder full-pool ranking
+- bi-encoder retrieval followed by cross-encoder reranking of the bi-encoder top-k candidates
 
 `--projection-init least_squares_queries` and `--projection-init least_squares_both` are meant for cross-family KD runs where the student must learn a new embedding dimension, such as `MiniLM -> MPNet`.
 The default evaluation mode is `symmetric`, which makes checkpoint selection and reported metrics use student-query x student-code retrieval for fair trained-student comparisons.
