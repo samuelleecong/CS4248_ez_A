@@ -233,3 +233,50 @@ The comparison command also reports a hybrid pipeline:
 - rerank only the bi-encoder top-k candidates with the cross-encoder
 
 This is the right tool for testing whether a `bi-encoder + reranker` architecture improves over a standalone bi-encoder on MBPP.
+
+## Fine-Tune On Bi-Encoder Top-k
+
+If the reranker is only meant to reorder the bi-encoder shortlist, you can now train it on those shortlist candidates directly instead of on mixed full-pool negatives.
+
+Example:
+
+```bash
+uv run mbpp-kd-cross-teacher \
+  --model-name mixedbread-ai/mxbai-rerank-base-v1 \
+  --dataset-name google-research-datasets/mbpp \
+  --epochs 1 \
+  --lr 1e-6 \
+  --batch-size 2 \
+  --eval-batch-size 4 \
+  --negative-strategy hard \
+  --shortlist-train-top-k 10 \
+  --shortlist-train-model sentence-transformers/all-mpnet-base-v2 \
+  --negatives-per-query 4 \
+  --train-objective combined \
+  --pair-bce-weight 0.1 \
+  --max-length 256 \
+  --output-dir ../experiments/immanuel_tim/reranker_top10_finetune
+```
+
+This mode:
+
+- retrieves the bi-encoder top-k wrong candidates for each training query
+- uses only those shortlist negatives during reranker fine-tuning
+- keeps the positive code as the first item in each training group
+
+Current constraints:
+
+- `--shortlist-train-top-k` requires `--negative-strategy hard`
+- `--negatives-per-query` must be less than or equal to `--shortlist-train-top-k`
+
+After training, evaluate the saved reranker in the actual two-stage pipeline:
+
+```bash
+uv run mbpp-kd-compare-cross-vs-bi \
+  --cross-encoder-model ../experiments/immanuel_tim/reranker_top10_finetune/<timestamp>/model \
+  --bi-encoder-model sentence-transformers/all-mpnet-base-v2 \
+  --dataset-name google-research-datasets/mbpp \
+  --protocol heldout_test \
+  --rerank-top-k 10 \
+  --output-dir ../experiments/immanuel_tim/reranker_top10_eval
+```

@@ -53,6 +53,8 @@ class CrossEncoderTrainConfig:
     miner_max_query_length: int = 160
     miner_max_code_length: int = 256
     baseline_bi_encoder_model: str = "sentence-transformers/all-mpnet-base-v2"
+    shortlist_train_top_k: int | None = None
+    shortlist_train_model: str | None = None
     seed: int = 42
     output_dir: str = "cross_encoder_teacher"
     taco_val_size: int = 1000
@@ -112,6 +114,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--miner-max-query-length", type=int, default=CrossEncoderTrainConfig.miner_max_query_length)
     parser.add_argument("--miner-max-code-length", type=int, default=CrossEncoderTrainConfig.miner_max_code_length)
     parser.add_argument("--baseline-bi-encoder-model", default=CrossEncoderTrainConfig.baseline_bi_encoder_model)
+    parser.add_argument(
+        "--shortlist-train-top-k",
+        type=int,
+        default=None,
+        help="If set, build reranker training negatives only from the bi-encoder top-k shortlist.",
+    )
+    parser.add_argument(
+        "--shortlist-train-model",
+        default=None,
+        help="Bi-encoder used to build shortlist negatives. Defaults to --baseline-bi-encoder-model.",
+    )
     parser.add_argument("--seed", type=int, default=CrossEncoderTrainConfig.seed)
     parser.add_argument("--output-dir", default=CrossEncoderTrainConfig.output_dir)
     parser.add_argument("--taco-val-size", type=int, default=CrossEncoderTrainConfig.taco_val_size)
@@ -144,6 +157,8 @@ def config_from_args(args: argparse.Namespace) -> CrossEncoderTrainConfig:
         miner_max_query_length=args.miner_max_query_length,
         miner_max_code_length=args.miner_max_code_length,
         baseline_bi_encoder_model=args.baseline_bi_encoder_model,
+        shortlist_train_top_k=args.shortlist_train_top_k,
+        shortlist_train_model=args.shortlist_train_model,
         seed=args.seed,
         output_dir=args.output_dir,
         taco_val_size=args.taco_val_size,
@@ -188,23 +203,30 @@ def _dedupe_preserve_order(values: list[int]) -> list[int]:
     return ordered
 
 
+def _resolve_negative_miner_model(cfg: CrossEncoderTrainConfig) -> str:
+    return cfg.shortlist_train_model or cfg.baseline_bi_encoder_model
+
+
 @torch.no_grad()
 def mine_hard_negative_indices(
     queries: list[str],
     codes: list[str],
     cfg: CrossEncoderTrainConfig,
     device: torch.device,
+    model_name: str | None = None,
+    pool_size: int | None = None,
 ) -> list[list[int]]:
     if len(queries) != len(codes):
         raise ValueError("Queries and codes must be aligned for hard negative mining.")
     if len(queries) < 2:
         return [[] for _ in queries]
 
-    print(f"Mining hard negatives with bi-encoder: {cfg.negative_miner_model}")
-    tokenizer = AutoTokenizer.from_pretrained(cfg.negative_miner_model)
-    model = AutoModel.from_pretrained(cfg.negative_miner_model).to(device)
+    miner_model_name = model_name or cfg.negative_miner_model
+    print(f"Mining hard negatives with bi-encoder: {miner_model_name}")
+    tokenizer = AutoTokenizer.from_pretrained(miner_model_name)
+    model = AutoModel.from_pretrained(miner_model_name).to(device)
     encoding_spec = infer_model_encoding_spec(
-        cfg.negative_miner_model,
+        miner_model_name,
         getattr(model.config, "_name_or_path", None),
         getattr(tokenizer, "name_or_path", None),
     )
@@ -235,7 +257,8 @@ def mine_hard_negative_indices(
     del model
     maybe_empty_device_cache(device)
 
-    top_k = min(cfg.hard_negative_pool_size, len(codes) - 1)
+    requested_pool_size = pool_size if pool_size is not None else cfg.hard_negative_pool_size
+    top_k = min(requested_pool_size, len(codes) - 1)
     if top_k <= 0:
         return [[] for _ in queries]
 
@@ -499,6 +522,13 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
         f"train: {len(train_queries)}, val: {len(data.validation.queries)}, test: {len(data.test.queries)}"
     )
 
+    if cfg.shortlist_train_top_k is not None and cfg.shortlist_train_top_k <= 0:
+        raise ValueError("--shortlist-train-top-k must be positive when provided.")
+    if cfg.shortlist_train_top_k is not None and cfg.negative_strategy != "hard":
+        raise ValueError("--shortlist-train-top-k currently requires --negative-strategy hard.")
+    if cfg.shortlist_train_top_k is not None and cfg.negatives_per_query > cfg.shortlist_train_top_k:
+        raise ValueError("--negatives-per-query cannot exceed --shortlist-train-top-k.")
+
     baseline_metrics: dict[str, Any] | None = None
     if cfg.compare_to_baseline:
         print(f"Evaluating bi-encoder baseline teacher: {cfg.baseline_bi_encoder_model}")
@@ -546,7 +576,21 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
     )
 
     hard_negative_pools: list[list[int]] | None = None
-    if cfg.negative_strategy in {"hard", "mixed"}:
+    if cfg.shortlist_train_top_k is not None:
+        shortlist_model = _resolve_negative_miner_model(cfg)
+        print(
+            "Building training negatives from bi-encoder shortlist -> "
+            f"model={shortlist_model} top_k={cfg.shortlist_train_top_k}"
+        )
+        hard_negative_pools = mine_hard_negative_indices(
+            queries=train_queries,
+            codes=train_codes,
+            cfg=cfg,
+            device=device,
+            model_name=shortlist_model,
+            pool_size=cfg.shortlist_train_top_k,
+        )
+    elif cfg.negative_strategy in {"hard", "mixed"}:
         hard_negative_pools = mine_hard_negative_indices(
             queries=train_queries,
             codes=train_codes,
@@ -685,6 +729,8 @@ def run(cfg: CrossEncoderTrainConfig) -> dict[str, Any]:
             "hard_negative_pool_size": cfg.hard_negative_pool_size,
             "negatives_per_query": cfg.negatives_per_query,
             "max_length": cfg.max_length,
+            "shortlist_train_top_k": cfg.shortlist_train_top_k,
+            "shortlist_train_model": _resolve_negative_miner_model(cfg) if cfg.shortlist_train_top_k is not None else None,
         },
         "negative_sampling": negative_sampling,
         "baseline_bi_encoder": baseline_metrics,

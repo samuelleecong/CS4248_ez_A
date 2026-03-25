@@ -116,8 +116,29 @@ The cross-encoder teacher now supports stronger training measures:
 - mixed hard+random negative groups
 - per-query grouped softmax ranking loss, optionally combined with pairwise BCE
 - side-by-side comparison against a chosen bi-encoder baseline teacher
+- explicit training on bi-encoder top-k shortlist candidates for two-stage reranking experiments
 
 See `docs/CROSS_ENCODER_TEACHER.md` for the detailed workflow and rationale.
+
+To fine-tune a reranker only on the bi-encoder shortlist it will actually see at inference time:
+
+```bash
+uv run mbpp-kd-cross-teacher \
+  --model-name mixedbread-ai/mxbai-rerank-base-v1 \
+  --dataset-name google-research-datasets/mbpp \
+  --epochs 1 \
+  --lr 1e-6 \
+  --batch-size 2 \
+  --eval-batch-size 4 \
+  --negative-strategy hard \
+  --shortlist-train-top-k 10 \
+  --shortlist-train-model sentence-transformers/all-mpnet-base-v2 \
+  --negatives-per-query 4 \
+  --train-objective combined \
+  --pair-bce-weight 0.1 \
+  --max-length 256 \
+  --output-dir ../experiments/immanuel_tim/reranker_top10_finetune
+```
 
 Compare a cross-encoder against a bi-encoder fairly on the same candidate pool:
 
