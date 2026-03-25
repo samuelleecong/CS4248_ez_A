@@ -255,24 +255,6 @@ def run(
         f"val: {len(data.validation.queries)}, test: {len(data.test.queries)}"
     )
 
-    # Zero-shot baselines (before any training)
-    print(f"\nEvaluating zero-shot baselines...")
-    zs_teacher = evaluate_symmetric_backbone(
-        model_name=teacher_model,
-        val_queries=data.validation.queries, val_codes=data.validation.codes,
-        test_queries=data.test.queries, test_codes=data.test.codes,
-        max_query_length=128, max_code_length=256,
-        eval_batch_size=eval_batch_size, device=device,
-    )
-    zs_student = evaluate_symmetric_backbone(
-        model_name=student_model,
-        val_queries=data.validation.queries, val_codes=data.validation.codes,
-        test_queries=data.test.queries, test_codes=data.test.codes,
-        max_query_length=128, max_code_length=256,
-        eval_batch_size=eval_batch_size, device=device,
-    )
-    maybe_empty_device_cache(device)
-
     phase1_cfg = TrainConfig(
         teacher_model=teacher_model,
         student_model=student_model,
@@ -316,6 +298,24 @@ def run(
         ft_teacher_targets = None
 
     if resume_from_phase1 is None:
+        # Zero-shot baselines (before any training)
+        print("\nEvaluating zero-shot baselines...")
+        zs_teacher = evaluate_symmetric_backbone(
+            model_name=teacher_model,
+            val_queries=data.validation.queries, val_codes=data.validation.codes,
+            test_queries=data.test.queries, test_codes=data.test.codes,
+            max_query_length=128, max_code_length=256,
+            eval_batch_size=eval_batch_size, device=device,
+        )
+        zs_student = evaluate_symmetric_backbone(
+            model_name=student_model,
+            val_queries=data.validation.queries, val_codes=data.validation.codes,
+            test_queries=data.test.queries, test_codes=data.test.codes,
+            max_query_length=128, max_code_length=256,
+            eval_batch_size=eval_batch_size, device=device,
+        )
+        maybe_empty_device_cache(device)
+
         # Encode raw (zero-shot) teacher targets for use during phase 1 teacher training
         print(f"\nEncoding raw teacher targets: {teacher_model}")
         raw_teacher_tokenizer = AutoTokenizer.from_pretrained(teacher_model)
