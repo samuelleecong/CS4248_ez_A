@@ -572,6 +572,8 @@ def train_student(
     best_val_mrr = -math.inf
     best_state_dict: dict[str, torch.Tensor] | None = None
     history: list[dict[str, float]] = []
+    no_improve = 0
+    stopped_epoch = cfg.epochs
 
     for epoch in range(1, cfg.epochs + 1):
         student_model.train()
@@ -638,6 +640,13 @@ def train_student(
             best_state_dict = {
                 key: value.detach().cpu().clone() for key, value in student_model.state_dict().items()
             }
+            no_improve = 0
+        else:
+            no_improve += 1
+            if cfg.early_stopping_patience > 0 and no_improve >= cfg.early_stopping_patience:
+                print(f"  Early stopping at epoch {epoch} (no val MRR improvement for {cfg.early_stopping_patience} epochs)")
+                stopped_epoch = epoch
+                break
 
     assert best_state_dict is not None
     student_model.load_state_dict(best_state_dict)
@@ -655,6 +664,7 @@ def train_student(
         "model_name": effective_model,
         "target_space": "student_native" if is_supervised else targets.name,
         "evaluation_mode": cfg.eval_mode,
+        "stopped_epoch": stopped_epoch,
         "train": final_metrics["train"],
         "validation": final_metrics["validation"],
         "test": final_metrics["test"],
