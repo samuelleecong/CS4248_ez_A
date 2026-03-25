@@ -26,7 +26,7 @@ from mbpp_kd_suite.training import train_student
 from transformers import AutoModel, AutoTokenizer
 
 MODELS = [
-    # Large models listed first so OOM shows up early if batch is too big for hardware.
+    # Large models first (most likely to OOM — fail fast)
     "BAAI/bge-large-en-v1.5",
     "intfloat/e5-large-v2",
     # Base models
@@ -40,8 +40,8 @@ MODELS = [
 
 SEED = 42
 CFG = TrainConfig(
-    epochs=2,
-    batch_size=64,
+    epochs=8,
+    batch_size=32,
     eval_batch_size=64,
     lr=2e-5,
     seed=SEED,
@@ -49,6 +49,20 @@ CFG = TrainConfig(
     run_diagnostics=False,
     save_models=False,
 )
+
+# Reduced batch config for large models that OOM on MPS
+CFG_LARGE = TrainConfig(
+    epochs=8,
+    batch_size=4,
+    eval_batch_size=8,
+    lr=2e-5,
+    seed=SEED,
+    eval_mode="symmetric",
+    run_diagnostics=False,
+    save_models=False,
+)
+
+LARGE_MODELS = {"BAAI/bge-large-en-v1.5", "intfloat/e5-large-v2"}
 
 
 def short_name(model: str) -> str:
@@ -129,12 +143,15 @@ def main() -> None:
         f"val: {len(data.validation.queries)}, test: {len(data.test.queries)}"
     )
 
-    # Apply overrides to config
+    # Apply overrides to configs
     if args.epochs:
         CFG.epochs = args.epochs
+        CFG_LARGE.epochs = args.epochs
     if args.batch_size:
         CFG.batch_size = args.batch_size
         CFG.eval_batch_size = args.batch_size * 2
+        CFG_LARGE.batch_size = args.batch_size
+        CFG_LARGE.eval_batch_size = args.batch_size * 2
 
     # Load zero-shot results from previous run
     zs_path = Path(f"artifacts/baseline_comparison_{dataset_slug}/results.json")
@@ -191,14 +208,15 @@ def main() -> None:
             print(f"Skipping {model_name} (already have results)")
             continue
 
+        model_cfg = CFG_LARGE if model_name in LARGE_MODELS else CFG
         print(f"\n{'='*60}")
-        print(f"Fine-tuning: {model_name} (batch_size={CFG.batch_size})")
+        print(f"Fine-tuning: {model_name} (batch_size={model_cfg.batch_size})")
         print(f"{'='*60}")
         t0 = time.time()
 
         metrics, _, _ = train_student(
             name=f"finetuned_{slug}",
-            cfg=CFG,
+            cfg=model_cfg,
             run_dir=run_dir,
             device=device,
             data=data,

@@ -110,53 +110,6 @@ def make_pair_dataloader(
     )
 
 
-def make_indexed_pair_dataloader(
-    queries: list[str],
-    codes: list[str],
-    tokenizer: AutoTokenizer,
-    encoding_spec: ModelEncodingSpec,
-    batch_size: int,
-    max_query_length: int,
-    max_code_length: int,
-    shuffle: bool,
-) -> DataLoader:
-    """Like make_pair_dataloader but also returns batch indices for teacher target lookup."""
-    class _IndexedPaired(TorchDataset):
-        def __len__(self) -> int:
-            return len(queries)
-
-        def __getitem__(self, idx: int) -> tuple[int, str, str]:
-            return idx, queries[idx], codes[idx]
-
-    def _collate(
-        batch: list[tuple[int, str, str]],
-    ) -> tuple[torch.Tensor, dict[str, torch.Tensor], dict[str, torch.Tensor]]:
-        idxs, query_texts, code_texts = zip(*batch)
-        query_tokens = tokenizer(
-            format_texts_for_role(list(query_texts), text_role="query", encoding_spec=encoding_spec),
-            max_length=max_query_length,
-            truncation=True,
-            padding=True,
-            return_tensors="pt",
-        )
-        code_tokens = tokenizer(
-            format_texts_for_role(list(code_texts), text_role="document", encoding_spec=encoding_spec),
-            max_length=max_code_length,
-            truncation=True,
-            padding=True,
-            return_tensors="pt",
-        )
-        return torch.tensor(idxs, dtype=torch.long), query_tokens, code_tokens
-
-    return DataLoader(
-        _IndexedPaired(),
-        batch_size=batch_size,
-        shuffle=shuffle,
-        drop_last=shuffle,
-        collate_fn=_collate,
-    )
-
-
 def extract_split_fields(split: Any) -> RetrievalSplit:
     return RetrievalSplit(
         queries=[row["text"] for row in split],
