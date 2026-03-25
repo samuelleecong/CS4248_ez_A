@@ -1,0 +1,1097 @@
+{"source_id": 0, "original_prompt": "Write a function to find the shared elements from the given two lists.", "query": "find common elements"}
+{"source_id": 0, "original_prompt": "Write a function to find the shared elements from the given two lists.", "query": "lists compared"}
+{"source_id": 0, "original_prompt": "Write a function to find the shared elements from the given two lists.", "query": "shared array values"}
+{"source_id": 1, "original_prompt": "Write a python function to identify non-prime numbers.", "query": "check_non_primes"}
+{"source_id": 1, "original_prompt": "Write a python function to identify non-prime numbers.", "query": "is_number_prime"}
+{"source_id": 1, "original_prompt": "Write a python function to identify non-prime numbers.", "query": "find_non_primes_range"}
+{"source_id": 3, "original_prompt": "Write a python function to check whether the two numbers differ at one bit position only or not.", "query": "check_one_bit_difference"}
+{"source_id": 3, "original_prompt": "Write a python function to check whether the two numbers differ at one bit position only or not.", "query": "python_function_for_check"}
+{"source_id": 4, "original_prompt": "Write a function to find all words which are at least 4 characters long in a string.", "query": "words length greater than 3"}
+{"source_id": 4, "original_prompt": "Write a function to find all words which are at least 4 characters long in a string.", "query": "word_length gt 3"}
+{"source_id": 5, "original_prompt": "Write a function to find squares of individual elements in a list.", "query": "square values in list"}
+{"source_id": 5, "original_prompt": "Write a function to find squares of individual elements in a list.", "query": "multiply each element by itself"}
+{"source_id": 7, "original_prompt": "Write a python function to remove first and last occurrence of a given character from the string.", "query": "remove_first_last_char"}
+{"source_id": 7, "original_prompt": "Write a python function to remove first and last occurrence of a given character from the string.", "query": "function_with_given_char"}
+{"source_id": 8, "original_prompt": "Write a function to sort a given matrix in ascending order according to the sum of its rows.", "query": "Sort Matrix by Row Sum Asc"}
+{"source_id": 8, "original_prompt": "Write a function to sort a given matrix in ascending order according to the sum of its rows.", "query": "Calculate Matrix Row Sums"}
+{"source_id": 8, "original_prompt": "Write a function to sort a given matrix in ascending order according to the sum of its rows.", "query": "Sort List by Sum Ascending"}
+{"source_id": 8, "original_prompt": "Write a function to sort a given matrix in ascending order according to the sum of its rows.", "query": "Merge Sorted Row Sum Lists"}
+{"source_id": 9, "original_prompt": "Write a python function to find the volume of a triangular prism.", "query": "Define base_area"}
+{"source_id": 9, "original_prompt": "Write a python function to find the volume of a triangular prism.", "query": "Calculate height"}
+{"source_id": 9, "original_prompt": "Write a python function to find the volume of a triangular prism.", "query": "Multiply base_area by height"}
+{"source_id": 9, "original_prompt": "Write a python function to find the volume of a triangular prism.", "query": "Assign result to volume"}
+{"source_id": 11, "original_prompt": "Write a function that returns the perimeter of a square given its side length as input.", "query": "square perimeter with side"}
+{"source_id": 11, "original_prompt": "Write a function that returns the perimeter of a square given its side length as input.", "query": "side times four"}
+{"source_id": 12, "original_prompt": "Write a function to remove characters from the first string which are present in the second string.", "query": "remove chars from str1 str2"}
+{"source_id": 12, "original_prompt": "Write a function to remove characters from the first string which are present in the second string.", "query": "str1 without chars in str2"}
+{"source_id": 12, "original_prompt": "Write a function to remove characters from the first string which are present in the second string.", "query": "delete chars shared by strs"}
+{"source_id": 12, "original_prompt": "Write a function to remove characters from the first string which are present in the second string.", "query": "clean str1 from chars in str2"}
+{"source_id": 12, "original_prompt": "Write a function to remove characters from the first string which are present in the second string.", "query": "str1 with unique chars from str2"}
+{"source_id": 13, "original_prompt": "Write a function to find whether a given array of integers contains any duplicate element.", "query": "containsDuplicate"}
+{"source_id": 13, "original_prompt": "Write a function to find whether a given array of integers contains any duplicate element.", "query": "arrayOfIntegers"}
+{"source_id": 14, "original_prompt": "Write a function to check if the given number is woodball or not.", "query": "check number as woodball"}
+{"source_id": 16, "original_prompt": "Write a python function to find the largest number that can be formed with the given list of digits.", "query": "largest number from digits"}
+{"source_id": 16, "original_prompt": "Write a python function to find the largest number that can be formed with the given list of digits.", "query": "find max number from list"}
+{"source_id": 17, "original_prompt": "Write a python function to check whether the given two integers have opposite sign or not.", "query": "check_sign_opposite"}
+{"source_id": 17, "original_prompt": "Write a python function to check whether the given two integers have opposite sign or not.", "query": "two_ints"}
+{"source_id": 17, "original_prompt": "Write a python function to check whether the given two integers have opposite sign or not.", "query": "have_opposite_sign"}
+{"source_id": 18, "original_prompt": "Write a function to find the nth octagonal number.", "query": "nth Octagonal Number"}
+{"source_id": 18, "original_prompt": "Write a function to find the nth octagonal number.", "query": "octagon formula"}
+{"source_id": 18, "original_prompt": "Write a function to find the nth octagonal number.", "query": "first term of octagon sequence"}
+{"source_id": 18, "original_prompt": "Write a function to find the nth octagonal number.", "query": "recurence relation for octagons"}
+{"source_id": 18, "original_prompt": "Write a function to find the nth octagonal number.", "query": "nth term calculation"}
+{"source_id": 19, "original_prompt": "Write a python function to count the number of substrings with the sum of digits equal to their length.", "query": "count_substrings_with_sum_of_digits_equal_to_length"}
+{"source_id": 19, "original_prompt": "Write a python function to count the number of substrings with the sum of digits equal to their length.", "query": "python_function_for_counting_substrings"}
+{"source_id": 20, "original_prompt": "Write a python function to find smallest number in a list.", "query": "Find smallest list element"}
+{"source_id": 20, "original_prompt": "Write a python function to find smallest number in a list.", "query": "Create list"}
+{"source_id": 20, "original_prompt": "Write a python function to find smallest number in a list.", "query": "Sort list"}
+{"source_id": 20, "original_prompt": "Write a python function to find smallest number in a list.", "query": "Get first element"}
+{"source_id": 20, "original_prompt": "Write a python function to find smallest number in a list.", "query": "Comparing elements"}
+{"source_id": 21, "original_prompt": "Write a function to find the maximum difference between available pairs in the given tuple list.", "query": "Find max diff from tuples"}
+{"source_id": 21, "original_prompt": "Write a function to find the maximum difference between available pairs in the given tuple list.", "query": "Max difference of tuples"}
+{"source_id": 21, "original_prompt": "Write a function to find the maximum difference between available pairs in the given tuple list.", "query": "Tuples max pair diff"}
+{"source_id": 22, "original_prompt": "Write a function to sort a list of tuples using the second value of each tuple.", "query": "sort_by_second_value"}
+{"source_id": 22, "original_prompt": "Write a function to sort a list of tuples using the second value of each tuple.", "query": "ascending_order"}
+{"source_id": 22, "original_prompt": "Write a function to sort a list of tuples using the second value of each tuple.", "query": "descending_order"}
+{"source_id": 22, "original_prompt": "Write a function to sort a list of tuples using the second value of each tuple.", "query": "tuples_with_odd_second"}
+{"source_id": 22, "original_prompt": "Write a function to sort a list of tuples using the second value of each tuple.", "query": "tuples_with_even_second"}
+{"source_id": 23, "original_prompt": "Write a function to flatten a list and sum all of its elements.", "query": "flatten list"}
+{"source_id": 23, "original_prompt": "Write a function to flatten a list and sum all of its elements.", "query": "list to array"}
+{"source_id": 23, "original_prompt": "Write a function to flatten a list and sum all of its elements.", "query": "array concat"}
+{"source_id": 23, "original_prompt": "Write a function to flatten a list and sum all of its elements.", "query": "remove duplicates"}
+{"source_id": 23, "original_prompt": "Write a function to flatten a list and sum all of its elements.", "query": "sum array elements"}
+{"source_id": 24, "original_prompt": "Write a python function to count the number of positive numbers in a list.", "query": "count positives"}
+{"source_id": 24, "original_prompt": "Write a python function to count the number of positive numbers in a list.", "query": "filter positives"}
+{"source_id": 25, "original_prompt": "Write a function to find the number of ways to partition a set of Bell numbers.", "query": "Find function for Bell number partition"}
+{"source_id": 25, "original_prompt": "Write a function to find the number of ways to partition a set of Bell numbers.", "query": "Define Bell number sequence"}
+{"source_id": 25, "original_prompt": "Write a function to find the number of ways to partition a set of Bell numbers.", "query": "Determine recursive formula for Bell number"}
+{"source_id": 25, "original_prompt": "Write a function to find the number of ways to partition a set of Bell numbers.", "query": "Create function to generate Bell number sequence"}
+{"source_id": 25, "original_prompt": "Write a function to find the number of ways to partition a set of Bell numbers.", "query": "Write recursive algorithm for counting partitions of Bell numbers"}
+{"source_id": 27, "original_prompt": "Write a function to check whether a list contains the given sublist or not.", "query": "contains sublist"}
+{"source_id": 27, "original_prompt": "Write a function to check whether a list contains the given sublist or not.", "query": "list includes"}
+{"source_id": 27, "original_prompt": "Write a function to check whether a list contains the given sublist or not.", "query": "sublist in list"}
+{"source_id": 28, "original_prompt": "Write a function to find whether all the given tuples have equal length or not.", "query": "length-of-tuple1"}
+{"source_id": 28, "original_prompt": "Write a function to find whether all the given tuples have equal length or not.", "query": "length-of-tuple2"}
+{"source_id": 28, "original_prompt": "Write a function to find whether all the given tuples have equal length or not.", "query": "length-of-tuple3"}
+{"source_id": 28, "original_prompt": "Write a function to find whether all the given tuples have equal length or not.", "query": "compare-lengths"}
+{"source_id": 28, "original_prompt": "Write a function to find whether all the given tuples have equal length or not.", "query": "result-equal"}
+{"source_id": 29, "original_prompt": "Write a function to sort a list of elements.", "query": "sort ascending"}
+{"source_id": 29, "original_prompt": "Write a function to sort a list of elements.", "query": "list of elements"}
+{"source_id": 32, "original_prompt": "Write a function to find tuples which have all elements divisible by k from the given list of tuples.", "query": "tuples_divisible_by_k"}
+{"source_id": 32, "original_prompt": "Write a function to find tuples which have all elements divisible by k from the given list of tuples.", "query": "find_tuples_with_all_elements_divisible_by_k"}
+{"source_id": 33, "original_prompt": "Write a python function to find whether a number is divisible by 11.", "query": "Is number divisible by 11?"}
+{"source_id": 34, "original_prompt": "Write a python function to check whether the length of the word is odd or not.", "query": "Is word length odd?"}
+{"source_id": 34, "original_prompt": "Write a python function to check whether the length of the word is odd or not.", "query": "SELECT LENGTH(%%word%) MOD 2"}
+{"source_id": 34, "original_prompt": "Write a python function to check whether the length of the word is odd or not.", "query": "WHERE length IS ?"}
+{"source_id": 34, "original_prompt": "Write a python function to check whether the length of the word is odd or not.", "query": "SET @odd = %s"}
+{"source_id": 34, "original_prompt": "Write a python function to check whether the length of the word is odd or not.", "query": "IF (@odd = 1, TRUE, FALSE)"}
+{"source_id": 35, "original_prompt": "Write a function to find the nth tetrahedral number.", "query": "def tetra(n): sum([1 if i*4 <= n and n <= (i+1)*4-1 else 0 for i in range(n)])"}
+{"source_id": 35, "original_prompt": "Write a function to find the nth tetrahedral number.", "query": "print(tetra(n))"}
+{"source_id": 36, "original_prompt": "Write a function to find the volume of a sphere.", "query": "sphere volume formula"}
+{"source_id": 36, "original_prompt": "Write a function to find the volume of a sphere.", "query": "radius cubed multiplied by pi"}
+{"source_id": 37, "original_prompt": "Write a python function to find the character made by adding the ASCII value of all the characters of the given string modulo 26.", "query": "ascii_mod26(s)"}
+{"source_id": 37, "original_prompt": "Write a python function to find the character made by adding the ASCII value of all the characters of the given string modulo 26.", "query": "ascii_mod26('a')"}
+{"source_id": 37, "original_prompt": "Write a python function to find the character made by adding the ASCII value of all the characters of the given string modulo 26.", "query": "ascii_mod26('z')"}
+{"source_id": 37, "original_prompt": "Write a python function to find the character made by adding the ASCII value of all the characters of the given string modulo 26.", "query": "ascii_mod26('A')"}
+{"source_id": 37, "original_prompt": "Write a python function to find the character made by adding the ASCII value of all the characters of the given string modulo 26.", "query": "ascii_mod26('Z')"}
+{"source_id": 38, "original_prompt": "Write a function to find the nth number in the newman conway sequence.", "query": "def newman_conway(n)"}
+{"source_id": 38, "original_prompt": "Write a function to find the nth number in the newman conway sequence.", "query": "return [0, 1] if n <= 1"}
+{"source_id": 38, "original_prompt": "Write a function to find the nth number in the newman conway sequence.", "query": "a[n-2] + a[n-1] for a in newman_conway(n-1) if 2 <= n"}
+{"source_id": 38, "original_prompt": "Write a function to find the nth number in the newman conway sequence.", "query": "list(newman_conway(n))"}
+{"source_id": 39, "original_prompt": "Write a function to find the surface area of a sphere.", "query": "sphere radius area"}
+{"source_id": 39, "original_prompt": "Write a function to find the surface area of a sphere.", "query": "formula for sphere area"}
+{"source_id": 39, "original_prompt": "Write a function to find the surface area of a sphere.", "query": "4 * pi * r^2"}
+{"source_id": 40, "original_prompt": "Write a function to find nth centered hexagonal number.", "query": "function for nth centered hexagonal number"}
+{"source_id": 40, "original_prompt": "Write a function to find nth centered hexagonal number.", "query": "input: integer n"}
+{"source_id": 40, "original_prompt": "Write a function to find nth centered hexagonal number.", "query": "output: integer"}
+{"source_id": 40, "original_prompt": "Write a function to find nth centered hexagonal number.", "query": "formula: (n*(2*n-1))/6 + floor((n-1)/2)"}
+{"source_id": 40, "original_prompt": "Write a function to find nth centered hexagonal number.", "query": "edge case: n=0, return 0"}
+{"source_id": 41, "original_prompt": "Write a function to merge three dictionaries into a single dictionary.", "query": "merge three dicts"}
+{"source_id": 41, "original_prompt": "Write a function to merge three dictionaries into a single dictionary.", "query": "function required"}
+{"source_id": 41, "original_prompt": "Write a function to merge three dictionaries into a single dictionary.", "query": "single dictionary"}
+{"source_id": 42, "original_prompt": "Write a function to get the frequency of all the elements in a list, returned as a dictionary.", "query": "frequency of list elements"}
+{"source_id": 42, "original_prompt": "Write a function to get the frequency of all the elements in a list, returned as a dictionary.", "query": "list frequency"}
+{"source_id": 42, "original_prompt": "Write a function to get the frequency of all the elements in a list, returned as a dictionary.", "query": "count unique list items"}
+{"source_id": 43, "original_prompt": "Write a function to find the closest smaller number than n.", "query": "Find closest smaller than n"}
+{"source_id": 43, "original_prompt": "Write a function to find the closest smaller number than n.", "query": "Closest smaller in array"}
+{"source_id": 46, "original_prompt": "Write a function to check whether the given number is undulating or not.", "query": "is_undulating_number"}
+{"source_id": 46, "original_prompt": "Write a function to check whether the given number is undulating or not.", "query": "check_undulation"}
+{"source_id": 47, "original_prompt": "Write a function to calculate the value of 'a' to the power 'b'.", "query": "Define base as a"}
+{"source_id": 47, "original_prompt": "Write a function to calculate the value of 'a' to the power 'b'.", "query": "Define exponent as b"}
+{"source_id": 47, "original_prompt": "Write a function to calculate the value of 'a' to the power 'b'.", "query": "Declare result as 1"}
+{"source_id": 47, "original_prompt": "Write a function to calculate the value of 'a' to the power 'b'.", "query": "For i from 1 to exponent do"}
+{"source_id": 47, "original_prompt": "Write a function to calculate the value of 'a' to the power 'b'.", "query": "result *= base"}
+{"source_id": 47, "original_prompt": "Write a function to calculate the value of 'a' to the power 'b'.", "query": "Print result"}
+{"source_id": 48, "original_prompt": "Given a list of tuples, write a function that returns the first value of the tuple with the smallest second value.", "query": "min(tupleList)[0]"}
+{"source_id": 48, "original_prompt": "Given a list of tuples, write a function that returns the first value of the tuple with the smallest second value.", "query": "tupleList.sortBy(2).head[0]"}
+{"source_id": 48, "original_prompt": "Given a list of tuples, write a function that returns the first value of the tuple with the smallest second value.", "query": "findMin(tupleList)._1"}
+{"source_id": 48, "original_prompt": "Given a list of tuples, write a function that returns the first value of the tuple with the smallest second value.", "query": "argMin(tupleList, x => x[1])[0]"}
+{"source_id": 48, "original_prompt": "Given a list of tuples, write a function that returns the first value of the tuple with the smallest second value.", "query": "first((sortedTupleList)[0])"}
+{"source_id": 48, "original_prompt": "Given a list of tuples, write a function that returns the first value of the tuple with the smallest second value.", "query": "where(tupleList, x => !exists(y WHERE y < x AND y.second), 0).head"}
+{"source_id": 50, "original_prompt": "Write a python function to find the number of divisors of a given integer.", "query": "def divisor_count(n)"}
+{"source_id": 50, "original_prompt": "Write a python function to find the number of divisors of a given integer.", "query": "return sum([1 for i in range(1, n+1) if n % i == 0])"}
+{"source_id": 51, "original_prompt": "Write a function to find frequency of each element in a flattened list of lists, returned in a dictionary.", "query": "frequency of elements list"}
+{"source_id": 51, "original_prompt": "Write a function to find frequency of each element in a flattened list of lists, returned in a dictionary.", "query": "flatten list of lists"}
+{"source_id": 51, "original_prompt": "Write a function to find frequency of each element in a flattened list of lists, returned in a dictionary.", "query": "dictionary frequency"}
+{"source_id": 51, "original_prompt": "Write a function to find frequency of each element in a flattened list of lists, returned in a dictionary.", "query": "dictionary keys are elements"}
+{"source_id": 52, "original_prompt": "Write a function to multiply all the numbers in a list and divide with the length of the list.", "query": "multiply_numbers_list"}
+{"source_id": 52, "original_prompt": "Write a function to multiply all the numbers in a list and divide with the length of the list.", "query": "divide_result_by_length"}
+{"source_id": 53, "original_prompt": "Write a function to convert the given decimal number to its binary equivalent, represented as a string with no leading zeros.", "query": "convert_decimal_to_binary"}
+{"source_id": 53, "original_prompt": "Write a function to convert the given decimal number to its binary equivalent, represented as a string with no leading zeros.", "query": "binary_string_no_leading_zeros"}
+{"source_id": 54, "original_prompt": "Write a function to find the next smallest palindrome of a specified integer, returned as an integer.", "query": "function_for_next_smallest_palindrome"}
+{"source_id": 54, "original_prompt": "Write a function to find the next smallest palindrome of a specified integer, returned as an integer.", "query": "function_return_type"}
+{"source_id": 61, "original_prompt": "Write a function to merge three lists into a single sorted list.", "query": "merge three lists"}
+{"source_id": 61, "original_prompt": "Write a function to merge three lists into a single sorted list.", "query": "sorted list"}
+{"source_id": 61, "original_prompt": "Write a function to merge three lists into a single sorted list.", "query": "single list"}
+{"source_id": 63, "original_prompt": "Write a function to find the common elements in given nested lists.", "query": "common elements in lists"}
+{"source_id": 63, "original_prompt": "Write a function to find the common elements in given nested lists.", "query": "find common elements"}
+{"source_id": 63, "original_prompt": "Write a function to find the common elements in given nested lists.", "query": "nested list common"}
+{"source_id": 63, "original_prompt": "Write a function to find the common elements in given nested lists.", "query": "lists common elements"}
+{"source_id": 63, "original_prompt": "Write a function to find the common elements in given nested lists.", "query": "common in nested lists"}
+{"source_id": 64, "original_prompt": "Write a function to check if a string represents an integer or not.", "query": "isInt('3')"}
+{"source_id": 64, "original_prompt": "Write a function to check if a string represents an integer or not.", "query": "isInt('12345')"}
+{"source_id": 64, "original_prompt": "Write a function to check if a string represents an integer or not.", "query": "isInt('-7')"}
+{"source_id": 64, "original_prompt": "Write a function to check if a string represents an integer or not.", "query": "isInt('0')"}
+{"source_id": 64, "original_prompt": "Write a function to check if a string represents an integer or not.", "query": "isInt('abc')"}
+{"source_id": 65, "original_prompt": "Write a function to check whether all dictionaries in a list are empty or not.", "query": "is_empty_dict"}
+{"source_id": 65, "original_prompt": "Write a function to check whether all dictionaries in a list are empty or not.", "query": "contains_keys"}
+{"source_id": 66, "original_prompt": "Write a function to convert a given tuple of positive integers into a single integer.", "query": "Convert tuple to single int"}
+{"source_id": 66, "original_prompt": "Write a function to convert a given tuple of positive integers into a single integer.", "query": "Join tuple elements with addition"}
+{"source_id": 67, "original_prompt": "Write a function to convert all possible convertible elements in a list of lists to floats.", "query": "Convert list elements to float"}
+{"source_id": 67, "original_prompt": "Write a function to convert all possible convertible elements in a list of lists to floats.", "query": "Check if element is convertible to float"}
+{"source_id": 70, "original_prompt": "Write a function to find the maximum absolute product between numbers in pairs of tuples within a given list.", "query": "abs_product_pair"}
+{"source_id": 70, "original_prompt": "Write a function to find the maximum absolute product between numbers in pairs of tuples within a given list.", "query": "max_abs_product"}
+{"source_id": 71, "original_prompt": "Write a function to sum all amicable numbers from 1 to a specified number.", "query": "Define amicable pairs"}
+{"source_id": 71, "original_prompt": "Write a function to sum all amicable numbers from 1 to a specified number.", "query": "Find amicable numbers up to n"}
+{"source_id": 71, "original_prompt": "Write a function to sum all amicable numbers from 1 to a specified number.", "query": "Sum amicable numbers"}
+{"source_id": 72, "original_prompt": "Write a function to get the angle of a complex number.", "query": "func angleComplex"}
+{"source_id": 72, "original_prompt": "Write a function to get the angle of a complex number.", "query": "input num a, b"}
+{"source_id": 72, "original_prompt": "Write a function to get the angle of a complex number.", "query": "real part - a"}
+{"source_id": 72, "original_prompt": "Write a function to get the angle of a complex number.", "query": "imag part - b"}
+{"source_id": 72, "original_prompt": "Write a function to get the angle of a complex number.", "query": "atan2 (b) (a)"}
+{"source_id": 73, "original_prompt": "Write a function to find the maximum difference between the number of 0s and number of 1s in any sub-string of the given binary string.", "query": "max-diff-binary"}
+{"source_id": 73, "original_prompt": "Write a function to find the maximum difference between the number of 0s and number of 1s in any sub-string of the given binary string.", "query": "max-diff-string"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "Define common_divisors_sum"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "common_divisors_sum = function(a, b)"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "If a % b == 0"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "Return b"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "Else if b % a == 0"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "Return a"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "Else Find gcd(a, b) and recursively call common_divisors_sum with the gcd result"}
+{"source_id": 74, "original_prompt": "Write a python function to find the sum of common divisors of two given numbers.", "query": "Sum all divisors from 1 to the greatest common divisor"}
+{"source_id": 75, "original_prompt": "Write a function to multiply two integers.", "query": "function createMultiply(a, b)"}
+{"source_id": 75, "original_prompt": "Write a function to multiply two integers.", "query": "return a * b"}
+{"source_id": 75, "original_prompt": "Write a function to multiply two integers.", "query": "example createMultiply(5, 7)"}
+{"source_id": 76, "original_prompt": "Write a function to find words that are longer than n characters from a given list of words.", "query": "words_length_gt_n"}
+{"source_id": 76, "original_prompt": "Write a function to find words that are longer than n characters from a given list of words.", "query": "list_of_words"}
+{"source_id": 77, "original_prompt": "Write a function to calculate whether the matrix is a magic square.", "query": "is_matrix"}
+{"source_id": 77, "original_prompt": "Write a function to calculate whether the matrix is a magic square.", "query": "square"}
+{"source_id": 77, "original_prompt": "Write a function to calculate whether the matrix is a magic square.", "query": "magic_constant"}
+{"source_id": 77, "original_prompt": "Write a function to calculate whether the matrix is a magic square.", "query": "all_rows_sum"}
+{"source_id": 77, "original_prompt": "Write a function to calculate whether the matrix is a magic square.", "query": "diagonal_sums_equal"}
+{"source_id": 77, "original_prompt": "Write a function to calculate whether the matrix is a magic square.", "query": "check_row_sums"}
+{"source_id": 77, "original_prompt": "Write a function to calculate whether the matrix is a magic square.", "query": "check_diagonals"}
+{"source_id": 78, "original_prompt": "Write a function to find the item with maximum frequency in a given list.", "query": "Find max frequency"}
+{"source_id": 78, "original_prompt": "Write a function to find the item with maximum frequency in a given list.", "query": "Get list of items"}
+{"source_id": 78, "original_prompt": "Write a function to find the item with maximum frequency in a given list.", "query": "Count occurrences"}
+{"source_id": 78, "original_prompt": "Write a function to find the item with maximum frequency in a given list.", "query": "Max frequency item"}
+{"source_id": 80, "original_prompt": "Write a function to convert a tuple to a string.", "query": "tuple_to_string"}
+{"source_id": 81, "original_prompt": "Write a function to calculate the sum of the negative numbers of a given list of numbers.", "query": "Find negative numbers in list"}
+{"source_id": 81, "original_prompt": "Write a function to calculate the sum of the negative numbers of a given list of numbers.", "query": "Filter out negative values"}
+{"source_id": 81, "original_prompt": "Write a function to calculate the sum of the negative numbers of a given list of numbers.", "query": "Sum up filtered negatives"}
+{"source_id": 81, "original_prompt": "Write a function to calculate the sum of the negative numbers of a given list of numbers.", "query": "Calculate total of negative numbers"}
+{"source_id": 82, "original_prompt": "Write a function to find the nth hexagonal number.", "query": "Define hexagon sides as 'h'"}
+{"source_id": 82, "original_prompt": "Write a function to find the nth hexagonal number.", "query": "Find recursive formula for nth hexagonal number"}
+{"source_id": 82, "original_prompt": "Write a function to find the nth hexagonal number.", "query": "Apply formula to calculate nth hexagonal number"}
+{"source_id": 83, "original_prompt": "Write a function to find the ratio of zeroes to non-zeroes in an array of integers.", "query": "count zeros in array"}
+{"source_id": 83, "original_prompt": "Write a function to find the ratio of zeroes to non-zeroes in an array of integers.", "query": "count non-zeros in array"}
+{"source_id": 83, "original_prompt": "Write a function to find the ratio of zeroes to non-zeroes in an array of integers.", "query": "divide non-zeros by zeros"}
+{"source_id": 85, "original_prompt": "Write a function to find the circumference of a circle.", "query": "circle circumference"}
+{"source_id": 85, "original_prompt": "Write a function to find the circumference of a circle.", "query": "pi times diameter"}
+{"source_id": 85, "original_prompt": "Write a function to find the circumference of a circle.", "query": "diameter times 2"}
+{"source_id": 85, "original_prompt": "Write a function to find the circumference of a circle.", "query": "multiply pi and diameter"}
+{"source_id": 85, "original_prompt": "Write a function to find the circumference of a circle.", "query": "calculate circle perimeter"}
+{"source_id": 86, "original_prompt": "Write a function to flatten the list of lists into a single set of numbers.", "query": "flatten list"}
+{"source_id": 86, "original_prompt": "Write a function to flatten the list of lists into a single set of numbers.", "query": "of lists"}
+{"source_id": 86, "original_prompt": "Write a function to flatten the list of lists into a single set of numbers.", "query": "into single"}
+{"source_id": 86, "original_prompt": "Write a function to flatten the list of lists into a single set of numbers.", "query": "set of numbers"}
+{"source_id": 87, "original_prompt": "Write a function to sort a list of elements.", "query": "sort array"}
+{"source_id": 87, "original_prompt": "Write a function to sort a list of elements.", "query": "ascending order"}
+{"source_id": 87, "original_prompt": "Write a function to sort a list of elements.", "query": "descending order"}
+{"source_id": 88, "original_prompt": "Write a function to count number items that are identical in the same position of three given lists.", "query": "count_identical_positions"}
+{"source_id": 88, "original_prompt": "Write a function to count number items that are identical in the same position of three given lists.", "query": "in_three_lists"}
+{"source_id": 89, "original_prompt": "Write a function to find number of lists present in the given tuple.", "query": "number_of_lists_in_tuple"}
+{"source_id": 89, "original_prompt": "Write a function to find number of lists present in the given tuple.", "query": "valid_tuple"}
+{"source_id": 90, "original_prompt": "Write a python function to find the maximum difference between any two elements in a given array.", "query": "Define array"}
+{"source_id": 90, "original_prompt": "Write a python function to find the maximum difference between any two elements in a given array.", "query": "Find max value"}
+{"source_id": 90, "original_prompt": "Write a python function to find the maximum difference between any two elements in a given array.", "query": "Find min value"}
+{"source_id": 90, "original_prompt": "Write a python function to find the maximum difference between any two elements in a given array.", "query": "Subtract min from max"}
+{"source_id": 92, "original_prompt": "Write a function to remove all elements from a given list present in another list.", "query": "remove elements"}
+{"source_id": 92, "original_prompt": "Write a function to remove all elements from a given list present in another list.", "query": "from a list"}
+{"source_id": 92, "original_prompt": "Write a function to remove all elements from a given list present in another list.", "query": "present in another"}
+{"source_id": 92, "original_prompt": "Write a function to remove all elements from a given list present in another list.", "query": "list using function"}
+{"source_id": 93, "original_prompt": "Write a function to calculate the sum (n - 2*i) from i=0 to n // 2, for instance n + (n-2) + (n-4)... (until n-x =< 0).", "query": "sum from i=0 to n/2 of n - 2*i"}
+{"source_id": 93, "original_prompt": "Write a function to calculate the sum (n - 2*i) from i=0 to n // 2, for instance n + (n-2) + (n-4)... (until n-x =< 0).", "query": "iterative solution for sum(n - 2*i)"}
+{"source_id": 93, "original_prompt": "Write a function to calculate the sum (n - 2*i) from i=0 to n // 2, for instance n + (n-2) + (n-4)... (until n-x =< 0).", "query": "algorithm for sum(n - 2*i) from i=0 to n/2"}
+{"source_id": 94, "original_prompt": "Write a function to calculate the area of a regular polygon given the length and number of its sides.", "query": "import math"}
+{"source_id": 94, "original_prompt": "Write a function to calculate the area of a regular polygon given the length and number of its sides.", "query": "def polygon_area(length, num_sides):"}
+{"source_id": 94, "original_prompt": "Write a function to calculate the area of a regular polygon given the length and number of its sides.", "query": "    return (num_sides * length ** 2) / (4 * tan(math.pi / (2 * num_sides)))"}
+{"source_id": 94, "original_prompt": "Write a function to calculate the area of a regular polygon given the length and number of its sides.", "query": "print(polygon_area(10, 5))"}
+{"source_id": 95, "original_prompt": "Write a function to determine if the sum of the divisors of two integers are the same.", "query": "is_divisor_sum_equal"}
+{"source_id": 95, "original_prompt": "Write a function to determine if the sum of the divisors of two integers are the same.", "query": "sum_of_divisors_two_integers"}
+{"source_id": 96, "original_prompt": "Write a function to count the number of characters in a string that occur at the same position in the string as in the English alphabet (case insensitive).", "query": "countSamePosAlphChars"}
+{"source_id": 96, "original_prompt": "Write a function to count the number of characters in a string that occur at the same position in the string as in the English alphabet (case insensitive).", "query": "functionNameShort"}
+{"source_id": 97, "original_prompt": "Write a function that counts the number of pairs of integers in a list that xor to an even number.", "query": "count pairs with even xor"}
+{"source_id": 97, "original_prompt": "Write a function that counts the number of pairs of integers in a list that xor to an even number.", "query": "filter pairs with odd xor length"}
+{"source_id": 97, "original_prompt": "Write a function that counts the number of pairs of integers in a list that xor to an even number.", "query": "map numbers to their binary representation"}
+{"source_id": 97, "original_prompt": "Write a function that counts the number of pairs of integers in a list that xor to an even number.", "query": "split each binary string into pairs"}
+{"source_id": 97, "original_prompt": "Write a function that counts the number of pairs of integers in a list that xor to an even number.", "query": "convert each pair of bits to integer and xor"}
+{"source_id": 97, "original_prompt": "Write a function that counts the number of pairs of integers in a list that xor to an even number.", "query": "count the pairs with even xor result"}
+{"source_id": 99, "original_prompt": "Write a function to count the number of occurrences of a number in a given list.", "query": "count occurrences number list"}
+{"source_id": 99, "original_prompt": "Write a function to count the number of occurrences of a number in a given list.", "query": "create function countNumbersInList"}
+{"source_id": 100, "original_prompt": "Write a function to find the sum of numbers in a list within a range specified by two indices.", "query": "sum of list elements"}
+{"source_id": 100, "original_prompt": "Write a function to find the sum of numbers in a list within a range specified by two indices.", "query": "from index to index"}
+{"source_id": 100, "original_prompt": "Write a function to find the sum of numbers in a list within a range specified by two indices.", "query": "within a given list"}
+{"source_id": 101, "original_prompt": "Write a function to find the perimeter of a regular pentagon from the length of its sides.", "query": "import math"}
+{"source_id": 101, "original_prompt": "Write a function to find the perimeter of a regular pentagon from the length of its sides.", "query": "sides_length = float(input())"}
+{"source_id": 101, "original_prompt": "Write a function to find the perimeter of a regular pentagon from the length of its sides.", "query": "perimeter = 5 * sides_length"}
+{"source_id": 101, "original_prompt": "Write a function to find the perimeter of a regular pentagon from the length of its sides.", "query": "print(perimeter)"}
+{"source_id": 102, "original_prompt": "Write a function to count the number of occurence of the string 'std' in a given string.", "query": "count std occurrences in string"}
+{"source_id": 103, "original_prompt": "Write a function to check if all the elements in tuple have same data type or not.", "query": "type(tuple)"}
+{"source_id": 103, "original_prompt": "Write a function to check if all the elements in tuple have same data type or not.", "query": "type(tuple[0])"}
+{"source_id": 103, "original_prompt": "Write a function to check if all the elements in tuple have same data type or not.", "query": "len(tuple) > 1"}
+{"source_id": 103, "original_prompt": "Write a function to check if all the elements in tuple have same data type or not.", "query": "all(isinstance(x, type(tuple[0])) for x in tuple)"}
+{"source_id": 105, "original_prompt": "Write a python function to count the number of set bits (binary digits with value 1) in a given number.", "query": "Count Set Bits"}
+{"source_id": 105, "original_prompt": "Write a python function to count the number of set bits (binary digits with value 1) in a given number.", "query": "Binary Count Set Bits"}
+{"source_id": 105, "original_prompt": "Write a python function to count the number of set bits (binary digits with value 1) in a given number.", "query": "Number of Set Bits"}
+{"source_id": 105, "original_prompt": "Write a python function to count the number of set bits (binary digits with value 1) in a given number.", "query": "Count 1's in Binary"}
+{"source_id": 105, "original_prompt": "Write a python function to count the number of set bits (binary digits with value 1) in a given number.", "query": "Population Count"}
+{"source_id": 106, "original_prompt": "Write a python function to remove the characters which have odd index values of a given string.", "query": "remove_even_chars"}
+{"source_id": 106, "original_prompt": "Write a python function to remove the characters which have odd index values of a given string.", "query": "get_all_even_indices"}
+{"source_id": 106, "original_prompt": "Write a python function to remove the characters which have odd index values of a given string.", "query": "combine_pair_characters"}
+{"source_id": 106, "original_prompt": "Write a python function to remove the characters which have odd index values of a given string.", "query": "join_resulting_list"}
+{"source_id": 106, "original_prompt": "Write a python function to remove the characters which have odd index values of a given string.", "query": "format_final_string"}
+{"source_id": 107, "original_prompt": "Write a function to find minimum of three numbers.", "query": "Define three numbers"}
+{"source_id": 107, "original_prompt": "Write a function to find minimum of three numbers.", "query": "Assign first number"}
+{"source_id": 107, "original_prompt": "Write a function to find minimum of three numbers.", "query": "Assign second number"}
+{"source_id": 107, "original_prompt": "Write a function to find minimum of three numbers.", "query": "Assign third number"}
+{"source_id": 107, "original_prompt": "Write a function to find minimum of three numbers.", "query": "Find min among numbers"}
+{"source_id": 111, "original_prompt": "Write a function that takes in a list and an integer n and returns a list containing the n largest items from the list.", "query": "def get_n_largest(lst, n):"}
+{"source_id": 111, "original_prompt": "Write a function that takes in a list and an integer n and returns a list containing the n largest items from the list.", "query": "return sorted(lst)[-n:]"}
+{"source_id": 111, "original_prompt": "Write a function that takes in a list and an integer n and returns a list containing the n largest items from the list.", "query": "print(get_n_largest([1, 2, 3, 4, 5, 6, 7, 8, 9], 3))"}
+{"source_id": 112, "original_prompt": "Write a function to find the lateral surface area of a cylinder.", "query": "Calculate cylinder lateral surface area"}
+{"source_id": 112, "original_prompt": "Write a function to find the lateral surface area of a cylinder.", "query": "Get cylinder radius and height"}
+{"source_id": 112, "original_prompt": "Write a function to find the lateral surface area of a cylinder.", "query": "Apply formula for cylinder lateral surface area"}
+{"source_id": 112, "original_prompt": "Write a function to find the lateral surface area of a cylinder.", "query": "Multiply by 2 to account for two semi-circles"}
+{"source_id": 113, "original_prompt": "Write a function to find the volume of a cube given its side length.", "query": "function createCubeVolume"}
+{"source_id": 113, "original_prompt": "Write a function to find the volume of a cube given its side length.", "query": "input side as number"}
+{"source_id": 113, "original_prompt": "Write a function to find the volume of a cube given its side length.", "query": "calculate side^3"}
+{"source_id": 113, "original_prompt": "Write a function to find the volume of a cube given its side length.", "query": "output result"}
+{"source_id": 114, "original_prompt": "Write a python function to set all even bits of a given number.", "query": "set_even_bits(5) => 0b1010"}
+{"source_id": 114, "original_prompt": "Write a python function to set all even bits of a given number.", "query": "set_odd_bits(5) => 0b0101"}
+{"source_id": 114, "original_prompt": "Write a python function to set all even bits of a given number.", "query": "toggle_first_bit(5) => 0b1011"}
+{"source_id": 114, "original_prompt": "Write a python function to set all even bits of a given number.", "query": "clear_second_bit(5) => 0b1001"}
+{"source_id": 114, "original_prompt": "Write a python function to set all even bits of a given number.", "query": "flip_last_two_bits(5) => 0b0110"}
+{"source_id": 116, "original_prompt": "Write a python function to count the number of non-empty substrings of a given string.", "query": "count_substrings"}
+{"source_id": 116, "original_prompt": "Write a python function to count the number of non-empty substrings of a given string.", "query": "non_empty_substrings"}
+{"source_id": 116, "original_prompt": "Write a python function to count the number of non-empty substrings of a given string.", "query": "string_func"}
+{"source_id": 117, "original_prompt": "Write a function that takes in positive integers m and n and finds the number of possible sequences of length n, such that each element is a positive integer and is greater than or equal to twice the previous element but less than or equal to m.", "query": "sequence with elements >= 2 * prev and <= m"}
+{"source_id": 117, "original_prompt": "Write a function that takes in positive integers m and n and finds the number of possible sequences of length n, such that each element is a positive integer and is greater than or equal to twice the previous element but less than or equal to m.", "query": "find number of sequences of length n"}
+{"source_id": 117, "original_prompt": "Write a function that takes in positive integers m and n and finds the number of possible sequences of length n, such that each element is a positive integer and is greater than or equal to twice the previous element but less than or equal to m.", "query": "where n is positive integer and n > 0"}
+{"source_id": 117, "original_prompt": "Write a function that takes in positive integers m and n and finds the number of possible sequences of length n, such that each element is a positive integer and is greater than or equal to twice the previous element but less than or equal to m.", "query": "each element must be positive integer"}
+{"source_id": 117, "original_prompt": "Write a function that takes in positive integers m and n and finds the number of possible sequences of length n, such that each element is a positive integer and is greater than or equal to twice the previous element but less than or equal to m.", "query": "first element can be any positive integer"}
+{"source_id": 119, "original_prompt": "Write a function to count the total number of characters in a string.", "query": "strlen function"}
+{"source_id": 119, "original_prompt": "Write a function to count the total number of characters in a string.", "query": "charCount function"}
+{"source_id": 121, "original_prompt": "Write a function that takes an array and finds the maximum sum of a bitonic subsequence for the given array, where a sequence is bitonic if it is first increasing and then decreasing.", "query": "Find Max Sum Bitonic Subsequence"}
+{"source_id": 121, "original_prompt": "Write a function that takes an array and finds the maximum sum of a bitonic subsequence for the given array, where a sequence is bitonic if it is first increasing and then decreasing.", "query": "Increasing then Decreasing Sequence"}
+{"source_id": 122, "original_prompt": "Write a function for computing square roots using the babylonian method.", "query": "x xsqrt"}
+{"source_id": 122, "original_prompt": "Write a function for computing square roots using the babylonian method.", "query": "x2 - x1 x/2 + x1"}
+{"source_id": 122, "original_prompt": "Write a function for computing square roots using the babylonian method.", "query": "repeating until convergence"}
+{"source_id": 122, "original_prompt": "Write a function for computing square roots using the babylonian method.", "query": "abs difference less than epsilon"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "function longest_palindrome"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "input string s"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "initialize dp with len(s) x len(s)"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "for i from 0 to len(s)-1:"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "  for j from i to len(s)-1:"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "    if s[i] == s[j]:"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "      if i+1 == j or dp[i+1][j-1] == 1:"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "        dp[i][j] = 1 + dp[i+1][j-1]"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "    else:"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "      dp[i][j] = max(dp[i][j-1], dp[i+1][j])"}
+{"source_id": 123, "original_prompt": "Write a function to find the length of the longest palindromic subsequence in the given string.", "query": "return dp[0][len(s)-1]"}
+{"source_id": 124, "original_prompt": "Write a function that takes in an integer n and calculates the harmonic sum of n-1.", "query": "Harmonic Sum Calculation"}
+{"source_id": 124, "original_prompt": "Write a function that takes in an integer n and calculates the harmonic sum of n-1.", "query": "n-1 Harmonic Sum"}
+{"source_id": 124, "original_prompt": "Write a function that takes in an integer n and calculates the harmonic sum of n-1.", "query": "Sum of 1/i from 1 to n-1"}
+{"source_id": 125, "original_prompt": "Write a function to find the intersection of two arrays.", "query": "intersectArrays"}
+{"source_id": 125, "original_prompt": "Write a function to find the intersection of two arrays.", "query": "findCommonElements"}
+{"source_id": 128, "original_prompt": "Write a python function to convert complex numbers to polar coordinates.", "query": "complex_to_polar"}
+{"source_id": 128, "original_prompt": "Write a python function to convert complex numbers to polar coordinates.", "query": "def polar(x, y)"}
+{"source_id": 128, "original_prompt": "Write a python function to convert complex numbers to polar coordinates.", "query": "x = abs(x)"}
+{"source_id": 128, "original_prompt": "Write a python function to convert complex numbers to polar coordinates.", "query": "y = abs(y)"}
+{"source_id": 128, "original_prompt": "Write a python function to convert complex numbers to polar coordinates.", "query": "angle = atan2(y, x)"}
+{"source_id": 131, "original_prompt": "Write a python function that takes in a non-negative number and returns the number of prime numbers less than the given non-negative number.", "query": "isprime range(2, n)"}
+{"source_id": 131, "original_prompt": "Write a python function that takes in a non-negative number and returns the number of prime numbers less than the given non-negative number.", "query": "len(filter(lambda x: x, map(lambda y: y, isprime(range(2, n)))))"}
+{"source_id": 132, "original_prompt": "Write a function that takes in two numbers and returns a tuple with the second number and then the first number.", "query": "second_number_first"}
+{"source_id": 132, "original_prompt": "Write a function that takes in two numbers and returns a tuple with the second number and then the first number.", "query": "reverse_numbers"}
+{"source_id": 133, "original_prompt": "Write a function to maximize the given two tuples.", "query": "maximize_two_tuples"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "defines nth_nsw_prime"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "imports math functions"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "sets n = input()"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "initializes p1, p2, p3 as 6, 13, and 0 respectively"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "for i from 2 to infinity"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "  sets temp = floor((p1 + p2) / 2)"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "  if is_prime(temp)"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "    sets p1 = p2"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "    sets p2 = temp"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "    sets p3 = temp"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "    increments i by 1"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "if i equals n"}
+{"source_id": 134, "original_prompt": "Write a function to find the nth newman\u2013shanks\u2013williams prime number.", "query": "  returns p3"}
+{"source_id": 135, "original_prompt": "Write a function that takes in two tuples and performs mathematical division operation element-wise across the given tuples.", "query": "tuple1 divide tuple2"}
+{"source_id": 135, "original_prompt": "Write a function that takes in two tuples and performs mathematical division operation element-wise across the given tuples.", "query": "divide first of tuple1 by first of tuple2"}
+{"source_id": 135, "original_prompt": "Write a function that takes in two tuples and performs mathematical division operation element-wise across the given tuples.", "query": "divide second of tuple1 by second of tuple2"}
+{"source_id": 135, "original_prompt": "Write a function that takes in two tuples and performs mathematical division operation element-wise across the given tuples.", "query": "divide third of tuple1 by third of tuple2"}
+{"source_id": 137, "original_prompt": "Write a function to calculate a dog's age in dog's years.", "query": "function for calculating dog's age"}
+{"source_id": 137, "original_prompt": "Write a function to calculate a dog's age in dog's years.", "query": "input: human_years"}
+{"source_id": 137, "original_prompt": "Write a function to calculate a dog's age in dog's years.", "query": "output: dog_years"}
+{"source_id": 139, "original_prompt": "Write a function to find the lateral surface area of a cube given its side length.", "query": "function for cube lateral surface area"}
+{"source_id": 139, "original_prompt": "Write a function to find the lateral surface area of a cube given its side length.", "query": "input: sideLength"}
+{"source_id": 139, "original_prompt": "Write a function to find the lateral surface area of a cube given its side length.", "query": "calculate: 6 * sideLength^2"}
+{"source_id": 139, "original_prompt": "Write a function to find the lateral surface area of a cube given its side length.", "query": "output: numeric"}
+{"source_id": 141, "original_prompt": "Write a function to find the n'th star number.", "query": "def nth_star(n)"}
+{"source_id": 141, "original_prompt": "Write a function to find the n'th star number.", "query": "return sum([ord(c) for c in '*'[0:n+1]])"}
+{"source_id": 141, "original_prompt": "Write a function to find the n'th star number.", "query": "if __name__ == '__main__':"}
+{"source_id": 141, "original_prompt": "Write a function to find the n'th star number.", "query": "print(nth_star(input()))"}
+{"source_id": 142, "original_prompt": "Write a function to find the ascii value of a character.", "query": "ASCII char"}
+{"source_id": 142, "original_prompt": "Write a function to find the ascii value of a character.", "query": "ASCII value"}
+{"source_id": 143, "original_prompt": "Write a python function to find the sum of even numbers at even positions of a list.", "query": "list"}
+{"source_id": 143, "original_prompt": "Write a python function to find the sum of even numbers at even positions of a list.", "query": "even position"}
+{"source_id": 143, "original_prompt": "Write a python function to find the sum of even numbers at even positions of a list.", "query": "filter by even"}
+{"source_id": 143, "original_prompt": "Write a python function to find the sum of even numbers at even positions of a list.", "query": "list"}
+{"source_id": 143, "original_prompt": "Write a python function to find the sum of even numbers at even positions of a list.", "query": "sum"}
+{"source_id": 146, "original_prompt": "Write a function that takes in two tuples and subtracts the elements of the first tuple by the elements of the second tuple with the same index.", "query": "subtract_tuple_elements"}
+{"source_id": 146, "original_prompt": "Write a function that takes in two tuples and subtracts the elements of the first tuple by the elements of the second tuple with the same index.", "query": "first_tuple_and_second_tuple"}
+{"source_id": 146, "original_prompt": "Write a function that takes in two tuples and subtracts the elements of the first tuple by the elements of the second tuple with the same index.", "query": "same_index_element_operation"}
+{"source_id": 146, "original_prompt": "Write a function that takes in two tuples and subtracts the elements of the first tuple by the elements of the second tuple with the same index.", "query": "matching_indices_arithmetic"}
+{"source_id": 146, "original_prompt": "Write a function that takes in two tuples and subtracts the elements of the first tuple by the elements of the second tuple with the same index.", "query": "generate_result_list"}
+{"source_id": 148, "original_prompt": "Write a function that takes in the radius and height of a cylinder and returns the the volume.", "query": "Math.PI * radius^2 * height"}
+{"source_id": 149, "original_prompt": "Write a function that takes in a dictionary and integer n and filters the dictionary to only include entries with values greater than or equal to n.", "query": "filter_greater_than_or_equal_n"}
+{"source_id": 149, "original_prompt": "Write a function that takes in a dictionary and integer n and filters the dictionary to only include entries with values greater than or equal to n.", "query": "dict"}
+{"source_id": 149, "original_prompt": "Write a function that takes in a dictionary and integer n and filters the dictionary to only include entries with values greater than or equal to n.", "query": "n"}
+{"source_id": 150, "original_prompt": "Write a function to find the number of elements that occurs before the tuple element in the given tuple.", "query": "count_elements_before_tuple"}
+{"source_id": 150, "original_prompt": "Write a function to find the number of elements that occurs before the tuple element in the given tuple.", "query": "in_list_before_tuple"}
+{"source_id": 151, "original_prompt": "Write a function to find the nth decagonal number.", "query": "def decagon(n): return sum([1 for i in range(0, 10*n, 10)])"}
+{"source_id": 151, "original_prompt": "Write a function to find the nth decagonal number.", "query": "print(decagon(n))"}
+{"source_id": 154, "original_prompt": "Write a function to subtract two lists element-wise.", "query": "subtract-lists"}
+{"source_id": 154, "original_prompt": "Write a function to subtract two lists element-wise.", "query": "element-wise"}
+{"source_id": 154, "original_prompt": "Write a function to subtract two lists element-wise.", "query": "list1 minus list2"}
+{"source_id": 156, "original_prompt": "Write a function that takes in a list and element and checks whether all items in the list are equal to the given element.", "query": "list equals element"}
+{"source_id": 156, "original_prompt": "Write a function that takes in a list and element and checks whether all items in the list are equal to the given element.", "query": "all items equal given"}
+{"source_id": 156, "original_prompt": "Write a function that takes in a list and element and checks whether all items in the list are equal to the given element.", "query": "same for all elements"}
+{"source_id": 156, "original_prompt": "Write a function that takes in a list and element and checks whether all items in the list are equal to the given element.", "query": "every item matches"}
+{"source_id": 156, "original_prompt": "Write a function that takes in a list and element and checks whether all items in the list are equal to the given element.", "query": "all are identical to"}
+{"source_id": 157, "original_prompt": "Write a function that checks whether a string contains the 'a' character followed by two or three 'b' characters.", "query": "contains_abba"}
+{"source_id": 157, "original_prompt": "Write a function that checks whether a string contains the 'a' character followed by two or three 'b' characters.", "query": "contains_abbb"}
+{"source_id": 158, "original_prompt": "Write a function to find the largest sum of a contiguous array in the modified array which is formed by repeating the given array k times.", "query": "largestContiguousSumRepeatedArray"}
+{"source_id": 158, "original_prompt": "Write a function to find the largest sum of a contiguous array in the modified array which is formed by repeating the given array k times.", "query": "findLargestSumModifiedArray"}
+{"source_id": 158, "original_prompt": "Write a function to find the largest sum of a contiguous array in the modified array which is formed by repeating the given array k times.", "query": "maxContiguousSubarrayRepeat"}
+{"source_id": 159, "original_prompt": "Write a python function takes in an integer n and returns the sum of squares of first n even natural numbers.", "query": "Sum of squares of first n even numbers"}
+{"source_id": 160, "original_prompt": "Write a function to find the list of maximum length in a list of lists.", "query": "find max length list"}
+{"source_id": 160, "original_prompt": "Write a function to find the list of maximum length in a list of lists.", "query": "max by length of sublists"}
+{"source_id": 161, "original_prompt": "Write a function to find out the number of ways of painting the fence such that at most 2 adjacent posts have the same color for the given fence with n posts and k colors.", "query": "ways-to-paint-fence-k-colors"}
+{"source_id": 161, "original_prompt": "Write a function to find out the number of ways of painting the fence such that at most 2 adjacent posts have the same color for the given fence with n posts and k colors.", "query": "at-most-two-adjacent-same-color"}
+{"source_id": 161, "original_prompt": "Write a function to find out the number of ways of painting the fence such that at most 2 adjacent posts have the same color for the given fence with n posts and k colors.", "query": "recursive-solution"}
+{"source_id": 162, "original_prompt": "Write a python function to find quotient of two numbers (rounded down to the nearest integer).", "query": "Define dividend"}
+{"source_id": 162, "original_prompt": "Write a python function to find quotient of two numbers (rounded down to the nearest integer).", "query": "Define divisor"}
+{"source_id": 162, "original_prompt": "Write a python function to find quotient of two numbers (rounded down to the nearest integer).", "query": "Calculate quotient"}
+{"source_id": 162, "original_prompt": "Write a python function to find quotient of two numbers (rounded down to the nearest integer).", "query": "Round down to nearest integer"}
+{"source_id": 163, "original_prompt": "Write a function to find the third side of a right angled triangle.", "query": "Pythagorean theorem"}
+{"source_id": 163, "original_prompt": "Write a function to find the third side of a right angled triangle.", "query": "a^2 + b^2 = c^2"}
+{"source_id": 163, "original_prompt": "Write a function to find the third side of a right angled triangle.", "query": "Find unknown side 'c'"}
+{"source_id": 163, "original_prompt": "Write a function to find the third side of a right angled triangle.", "query": "Given sides 'a' and 'b'"}
+{"source_id": 164, "original_prompt": "Write a function to find the maximum value in a given heterogeneous list.", "query": "Find max in list"}
+{"source_id": 164, "original_prompt": "Write a function to find the maximum value in a given heterogeneous list.", "query": "Heterogeneous list max"}
+{"source_id": 164, "original_prompt": "Write a function to find the maximum value in a given heterogeneous list.", "query": "Maximum value in list"}
+{"source_id": 165, "original_prompt": "Write a function to return the sum of all divisors of a number.", "query": "function divisorSum"}
+{"source_id": 165, "original_prompt": "Write a function to return the sum of all divisors of a number.", "query": "parameter n as integer"}
+{"source_id": 165, "original_prompt": "Write a function to return the sum of all divisors of a number.", "query": "initialize total as zero"}
+{"source_id": 165, "original_prompt": "Write a function to return the sum of all divisors of a number.", "query": "for i from 1 to n-1"}
+{"source_id": 165, "original_prompt": "Write a function to return the sum of all divisors of a number.", "query": "if n mod i equals zero"}
+{"source_id": 165, "original_prompt": "Write a function to return the sum of all divisors of a number.", "query": "total += i"}
+{"source_id": 165, "original_prompt": "Write a function to return the sum of all divisors of a number.", "query": "return total"}
+{"source_id": 166, "original_prompt": "Write a python function to count inversions in an array.", "query": "def count_inversions(arr)"}
+{"source_id": 166, "original_prompt": "Write a python function to count inversions in an array.", "query": "for i in range(len(arr) - 1):"}
+{"source_id": 166, "original_prompt": "Write a python function to count inversions in an array.", "query": "  for j in range(i + 1, len(arr)):"}
+{"source_id": 166, "original_prompt": "Write a python function to count inversions in an array.", "query": "    if arr[i] > arr[j]:"}
+{"source_id": 166, "original_prompt": "Write a python function to count inversions in an array.", "query": "      count += 1"}
+{"source_id": 166, "original_prompt": "Write a python function to count inversions in an array.", "query": "return count"}
+{"source_id": 167, "original_prompt": "Write a function to flatten a given nested list structure.", "query": "list to flatten"}
+{"source_id": 167, "original_prompt": "Write a function to flatten a given nested list structure.", "query": "expected result"}
+{"source_id": 168, "original_prompt": "Write a function to calculate the maximum aggregate from the list of tuples.", "query": "max aggregate"}
+{"source_id": 168, "original_prompt": "Write a function to calculate the maximum aggregate from the list of tuples.", "query": "list of tuples"}
+{"source_id": 168, "original_prompt": "Write a function to calculate the maximum aggregate from the list of tuples.", "query": "calculate max"}
+{"source_id": 169, "original_prompt": "Write a function to find the count of all binary sequences of length 2n such that sum of first n bits is same as sum of last n bits.", "query": "count_binary_sequences_2n_equal_sum_first_last_n"}
+{"source_id": 169, "original_prompt": "Write a function to find the count of all binary sequences of length 2n such that sum of first n bits is same as sum of last n bits.", "query": "find_binary_sequences_length_2n_same_first_n_last_n"}
+{"source_id": 170, "original_prompt": "Write a function to find the depth of a dictionary.", "query": "depth of dict"}
+{"source_id": 170, "original_prompt": "Write a function to find the depth of a dictionary.", "query": "len of keys"}
+{"source_id": 170, "original_prompt": "Write a function to find the depth of a dictionary.", "query": "keys exist in value"}
+{"source_id": 170, "original_prompt": "Write a function to find the depth of a dictionary.", "query": "value exist in key"}
+{"source_id": 170, "original_prompt": "Write a function to find the depth of a dictionary.", "query": "find deepest key"}
+{"source_id": 171, "original_prompt": "Write a python function to find element at a given index after number of rotations.", "query": "find_element_index"}
+{"source_id": 171, "original_prompt": "Write a python function to find element at a given index after number of rotations.", "query": "given_index"}
+{"source_id": 171, "original_prompt": "Write a python function to find element at a given index after number of rotations.", "query": "after_rotations"}
+{"source_id": 171, "original_prompt": "Write a python function to find element at a given index after number of rotations.", "query": "array_element"}
+{"source_id": 171, "original_prompt": "Write a python function to find element at a given index after number of rotations.", "query": "expected_result"}
+{"source_id": 173, "original_prompt": "Write a function to find the maximum sum of increasing subsequence from prefix until ith index and also including a given kth element which is after i, i.e., k > i .", "query": "Find max sum of incr subseq till i"}
+{"source_id": 173, "original_prompt": "Write a function to find the maximum sum of increasing subsequence from prefix until ith index and also including a given kth element which is after i, i.e., k > i .", "query": "Consider kth element post-i"}
+{"source_id": 173, "original_prompt": "Write a function to find the maximum sum of increasing subsequence from prefix until ith index and also including a given kth element which is after i, i.e., k > i .", "query": "Find max sum including kth element"}
+{"source_id": 173, "original_prompt": "Write a function to find the maximum sum of increasing subsequence from prefix until ith index and also including a given kth element which is after i, i.e., k > i .", "query": "Iterative solution for given problem"}
+{"source_id": 174, "original_prompt": "Write a function to get a colon of a tuple.", "query": "get_colon_of_tuple"}
+{"source_id": 174, "original_prompt": "Write a function to get a colon of a tuple.", "query": "function_to_access_first_element"}
+{"source_id": 174, "original_prompt": "Write a function to get a colon of a tuple.", "query": "tuple_index_by_colon"}
+{"source_id": 174, "original_prompt": "Write a function to get a colon of a tuple.", "query": "accessing_element_with_colon_notation"}
+{"source_id": 175, "original_prompt": "Write a function to find the specified number of largest products from two given lists, selecting one factor from each list.", "query": "Largest product from lists"}
+{"source_id": 175, "original_prompt": "Write a function to find the specified number of largest products from two given lists, selecting one factor from each list.", "query": "Find n largest products"}
+{"source_id": 176, "original_prompt": "Write a python function to find the maximum of two numbers.", "query": "find max number"}
+{"source_id": 176, "original_prompt": "Write a python function to find the maximum of two numbers.", "query": "define compare function"}
+{"source_id": 176, "original_prompt": "Write a python function to find the maximum of two numbers.", "query": "compare two numbers"}
+{"source_id": 176, "original_prompt": "Write a python function to find the maximum of two numbers.", "query": "assign max value"}
+{"source_id": 176, "original_prompt": "Write a python function to find the maximum of two numbers.", "query": "return max value"}
+{"source_id": 179, "original_prompt": "Write a function to find the volume of a cone.", "query": "function coneVolume"}
+{"source_id": 179, "original_prompt": "Write a function to find the volume of a cone.", "query": "with baseRadius, height, pi"}
+{"source_id": 179, "original_prompt": "Write a function to find the volume of a cone.", "query": "return 1/3 * pi * baseRadius^2 * height"}
+{"source_id": 181, "original_prompt": "Write a function to find the n'th lucas number.", "query": "def lucas(n)"}
+{"source_id": 181, "original_prompt": "Write a function to find the n'th lucas number.", "query": "if n <= 1:"}
+{"source_id": 181, "original_prompt": "Write a function to find the n'th lucas number.", "query": "return n"}
+{"source_id": 181, "original_prompt": "Write a function to find the n'th lucas number.", "query": "l = lucas(n - 2) + lucas(n - 1)"}
+{"source_id": 181, "original_prompt": "Write a function to find the n'th lucas number.", "query": "return l"}
+{"source_id": 184, "original_prompt": "Write a function to find the maximum sum possible by using the given equation f(n) = max( (f(n/2) + f(n/3) + f(n/4) + f(n/5)), n).", "query": "Find maximum sum using equation"}
+{"source_id": 184, "original_prompt": "Write a function to find the maximum sum possible by using the given equation f(n) = max( (f(n/2) + f(n/3) + f(n/4) + f(n/5)), n).", "query": "f(n) = max((f(n/2) + f(n/3) + f(n/4) + f(n/5)), n)"}
+{"source_id": 184, "original_prompt": "Write a function to find the maximum sum possible by using the given equation f(n) = max( (f(n/2) + f(n/3) + f(n/4) + f(n/5)), n).", "query": "Recursive solution for the given equation"}
+{"source_id": 185, "original_prompt": "Write a function to find the list with maximum length.", "query": "longest_list"}
+{"source_id": 185, "original_prompt": "Write a function to find the list with maximum length.", "query": "find_max_len"}
+{"source_id": 185, "original_prompt": "Write a function to find the list with maximum length.", "query": "get_longest"}
+{"source_id": 185, "original_prompt": "Write a function to find the list with maximum length.", "query": "max_length_of_list"}
+{"source_id": 187, "original_prompt": "Write a python function to find the first non-repeated character in a given string.", "query": "First Non-Repeated Character"}
+{"source_id": 187, "original_prompt": "Write a python function to find the first non-repeated character in a given string.", "query": "Find First Unique Char"}
+{"source_id": 187, "original_prompt": "Write a python function to find the first non-repeated character in a given string.", "query": "Single Occurrence Char"}
+{"source_id": 187, "original_prompt": "Write a python function to find the first non-repeated character in a given string.", "query": "First OneOffCharacter"}
+{"source_id": 187, "original_prompt": "Write a python function to find the first non-repeated character in a given string.", "query": "UniqueCharInString"}
+{"source_id": 188, "original_prompt": "Write a function to check whether the given string starts and ends with the same character or not.", "query": "sameStartEndChar"}
+{"source_id": 188, "original_prompt": "Write a function to check whether the given string starts and ends with the same character or not.", "query": "checkSameStartEnd"}
+{"source_id": 189, "original_prompt": "Write a function to find the median of three numbers.", "query": "Create function med3(a, b, c)"}
+{"source_id": 189, "original_prompt": "Write a function to find the median of three numbers.", "query": "Calculate a + b + c"}
+{"source_id": 189, "original_prompt": "Write a function to find the median of three numbers.", "query": "Divide result by 3"}
+{"source_id": 189, "original_prompt": "Write a function to find the median of three numbers.", "query": "Find integer part using floor function"}
+{"source_id": 189, "original_prompt": "Write a function to find the median of three numbers.", "query": "Store result in variable m"}
+{"source_id": 190, "original_prompt": "Write a function to compute the sum of digits of each number of a given list.", "query": "sum digits numbers list"}
+{"source_id": 190, "original_prompt": "Write a function to compute the sum of digits of each number of a given list.", "query": "list map sum digits"}
+{"source_id": 190, "original_prompt": "Write a function to compute the sum of digits of each number of a given list.", "query": "list sum digitwise"}
+{"source_id": 191, "original_prompt": "Write a function to perform the mathematical bitwise xor operation across the given tuples.", "query": "xor_tuples"}
+{"source_id": 191, "original_prompt": "Write a function to perform the mathematical bitwise xor operation across the given tuples.", "query": "tuple1"}
+{"source_id": 191, "original_prompt": "Write a function to perform the mathematical bitwise xor operation across the given tuples.", "query": "tuple2"}
+{"source_id": 193, "original_prompt": "Write a function to perform index wise addition of tuple elements in the given two nested tuples.", "query": "tuples_addition"}
+{"source_id": 193, "original_prompt": "Write a function to perform index wise addition of tuple elements in the given two nested tuples.", "query": "first_tuple"}
+{"source_id": 193, "original_prompt": "Write a function to perform index wise addition of tuple elements in the given two nested tuples.", "query": "second_tuple"}
+{"source_id": 194, "original_prompt": "Write a python function to find the minimum of two numbers.", "query": "Find min of two nums"}
+{"source_id": 194, "original_prompt": "Write a python function to find the minimum of two numbers.", "query": "Python min function"}
+{"source_id": 195, "original_prompt": "Write a function to check whether an element exists within a tuple.", "query": "element_in_tuple"}
+{"source_id": 195, "original_prompt": "Write a function to check whether an element exists within a tuple.", "query": "list_contains_value"}
+{"source_id": 196, "original_prompt": "Write a python function to find whether the parity of a given number is odd.", "query": "def odd_parity(n)"}
+{"source_id": 196, "original_prompt": "Write a python function to find whether the parity of a given number is odd.", "query": "if n % 2 != 0:"}
+{"source_id": 196, "original_prompt": "Write a python function to find whether the parity of a given number is odd.", "query": "return True"}
+{"source_id": 196, "original_prompt": "Write a python function to find whether the parity of a given number is odd.", "query": "else:"}
+{"source_id": 196, "original_prompt": "Write a python function to find whether the parity of a given number is odd.", "query": "return False"}
+{"source_id": 197, "original_prompt": "Write a function to create the next bigger number by rearranging the digits of a given number.", "query": "next_bigger_number"}
+{"source_id": 197, "original_prompt": "Write a function to create the next bigger number by rearranging the digits of a given number.", "query": "rearrange_digits"}
+{"source_id": 198, "original_prompt": "Write a function to find k number of smallest pairs which consist of one element from the first array and one element from the second array.", "query": "findSmallestPair"}
+{"source_id": 198, "original_prompt": "Write a function to find k number of smallest pairs which consist of one element from the first array and one element from the second array.", "query": "findNextSmallestPair"}
+{"source_id": 198, "original_prompt": "Write a function to find k number of smallest pairs which consist of one element from the first array and one element from the second array.", "query": "findThirdSmallestPair"}
+{"source_id": 198, "original_prompt": "Write a function to find k number of smallest pairs which consist of one element from the first array and one element from the second array.", "query": "findFourthSmallestPair"}
+{"source_id": 198, "original_prompt": "Write a function to find k number of smallest pairs which consist of one element from the first array and one element from the second array.", "query": "findKthSmallestPair"}
+{"source_id": 199, "original_prompt": "Write a function to find the minimum product from the pairs of tuples within a given list.", "query": "min_product_from_pairs"}
+{"source_id": 199, "original_prompt": "Write a function to find the minimum product from the pairs of tuples within a given list.", "query": "list_given"}
+{"source_id": 199, "original_prompt": "Write a function to find the minimum product from the pairs of tuples within a given list.", "query": "tuple_pairing"}
+{"source_id": 200, "original_prompt": "Write a function to find the minimum value in a given heterogeneous list.", "query": "Find min in heterogeneous list"}
+{"source_id": 200, "original_prompt": "Write a function to find the minimum value in a given heterogeneous list.", "query": "Minimum value of het list"}
+{"source_id": 202, "original_prompt": "Write a python function to remove odd numbers from a given list.", "query": "Remove odd numbers from list"}
+{"source_id": 202, "original_prompt": "Write a python function to remove odd numbers from a given list.", "query": "Python function for removing odd numbers"}
+{"source_id": 204, "original_prompt": "Write a python function to check whether any value in a sequence exists in a sequence or not.", "query": "seq1 in seq2"}
+{"source_id": 204, "original_prompt": "Write a python function to check whether any value in a sequence exists in a sequence or not.", "query": "any(seq1 == seq2)"}
+{"source_id": 204, "original_prompt": "Write a python function to check whether any value in a sequence exists in a sequence or not.", "query": "all(x in seq2 for x in seq1)"}
+{"source_id": 205, "original_prompt": "Write a python function to find a pair with highest product from a given array of integers.", "query": "maximum_number"}
+{"source_id": 205, "original_prompt": "Write a python function to find a pair with highest product from a given array of integers.", "query": "another_number"}
+{"source_id": 206, "original_prompt": "Write a function to find common first element in given list of tuple.", "query": "find_common_first_element"}
+{"source_id": 206, "original_prompt": "Write a function to find common first element in given list of tuple.", "query": "in_list_of_tuples"}
+{"source_id": 207, "original_prompt": "Write a python function to find the element of a list having maximum length.", "query": "max_length_list"}
+{"source_id": 207, "original_prompt": "Write a python function to find the element of a list having maximum length.", "query": "find_max_len"}
+{"source_id": 208, "original_prompt": "Write a function to round every number of a given list of numbers and print the total sum multiplied by the length of the list.", "query": "list of numbers"}
+{"source_id": 208, "original_prompt": "Write a function to round every number of a given list of numbers and print the total sum multiplied by the length of the list.", "query": "round each number"}
+{"source_id": 208, "original_prompt": "Write a function to round every number of a given list of numbers and print the total sum multiplied by the length of the list.", "query": "list after rounding"}
+{"source_id": 208, "original_prompt": "Write a function to round every number of a given list of numbers and print the total sum multiplied by the length of the list.", "query": "sum of rounded numbers"}
+{"source_id": 208, "original_prompt": "Write a function to round every number of a given list of numbers and print the total sum multiplied by the length of the list.", "query": "total sum multiplied by list length"}
+{"source_id": 209, "original_prompt": "Write a python function to find the cube sum of first n even natural numbers.", "query": "cube_sum_even"}
+{"source_id": 209, "original_prompt": "Write a python function to find the cube sum of first n even natural numbers.", "query": "n_even"}
+{"source_id": 209, "original_prompt": "Write a python function to find the cube sum of first n even natural numbers.", "query": "calc_cube"}
+{"source_id": 209, "original_prompt": "Write a python function to find the cube sum of first n even natural numbers.", "query": "iterate_even"}
+{"source_id": 209, "original_prompt": "Write a python function to find the cube sum of first n even natural numbers.", "query": "summation"}
+{"source_id": 211, "original_prompt": "Write a python function to find the average of cubes of first n natural numbers.", "query": "average_of_cubes_first_n_numbers"}
+{"source_id": 213, "original_prompt": "Write a function to count the number of sublists containing a particular element.", "query": "count-even"}
+{"source_id": 213, "original_prompt": "Write a function to count the number of sublists containing a particular element.", "query": "count-odds"}
+{"source_id": 213, "original_prompt": "Write a function to count the number of sublists containing a particular element.", "query": "count-positives"}
+{"source_id": 213, "original_prompt": "Write a function to count the number of sublists containing a particular element.", "query": "count-negatives"}
+{"source_id": 213, "original_prompt": "Write a function to count the number of sublists containing a particular element.", "query": "count-zeros"}
+{"source_id": 214, "original_prompt": "Write a function to filter odd numbers.", "query": "filter odd numbers"}
+{"source_id": 214, "original_prompt": "Write a function to filter odd numbers.", "query": "is number odd"}
+{"source_id": 214, "original_prompt": "Write a function to filter odd numbers.", "query": "number modulo 2"}
+{"source_id": 214, "original_prompt": "Write a function to filter odd numbers.", "query": "divide by 2 with remainder"}
+{"source_id": 215, "original_prompt": "Write a function to convert a date of yyyy-mm-dd format to dd-mm-yyyy format.", "query": "Convert date from yyyy-mm-dd to dd-mm-yyyy"}
+{"source_id": 216, "original_prompt": "Write a function to sort the given array by using shell sort.", "query": "Sort array with shell"}
+{"source_id": 216, "original_prompt": "Write a function to sort the given array by using shell sort.", "query": "Using shellsort function"}
+{"source_id": 217, "original_prompt": "Write a function to extract the elementwise and tuples from the given two tuples.", "query": "zip(tuple1, tuple2)"}
+{"source_id": 217, "original_prompt": "Write a function to extract the elementwise and tuples from the given two tuples.", "query": "unzip(zip(tuple1, tuple2))"}
+{"source_id": 217, "original_prompt": "Write a function to extract the elementwise and tuples from the given two tuples.", "query": "map(fn, tuple1)"}
+{"source_id": 217, "original_prompt": "Write a function to extract the elementwise and tuples from the given two tuples.", "query": "tuple_from_list([h for t in (zip(tuple1, tuple2)) for h in t]"}
+{"source_id": 217, "original_prompt": "Write a function to extract the elementwise and tuples from the given two tuples.", "query": "list_of_tuples(zip(tuple1, tuple2))"}
+{"source_id": 218, "original_prompt": "Write a function to find the directrix of a parabola.", "query": "Find parabola's directrix"}
+{"source_id": 218, "original_prompt": "Write a function to find the directrix of a parabola.", "query": "Determine horizontal line for parabola"}
+{"source_id": 219, "original_prompt": "Write a function that takes two lists and returns true if they have at least one common element.", "query": "contains_common_element"}
+{"source_id": 219, "original_prompt": "Write a function that takes two lists and returns true if they have at least one common element.", "query": "list1_intersect_list2"}
+{"source_id": 220, "original_prompt": "Write a function to find the median length of a trapezium.", "query": "find-trapezium-median-length"}
+{"source_id": 221, "original_prompt": "Write a function to check whether the entered number is greater than the elements of the given array.", "query": "number > array"}
+{"source_id": 221, "original_prompt": "Write a function to check whether the entered number is greater than the elements of the given array.", "query": "compare number and array"}
+{"source_id": 221, "original_prompt": "Write a function to check whether the entered number is greater than the elements of the given array.", "query": "is number greater than array"}
+{"source_id": 221, "original_prompt": "Write a function to check whether the entered number is greater than the elements of the given array.", "query": "array vs number comparison"}
+{"source_id": 221, "original_prompt": "Write a function to check whether the entered number is greater than the elements of the given array.", "query": "check if number passes array test"}
+{"source_id": 222, "original_prompt": "Write a function that matches a string that has an a followed by one or more b's.", "query": "a.*b"}
+{"source_id": 222, "original_prompt": "Write a function that matches a string that has an a followed by one or more b's.", "query": "a+b"}
+{"source_id": 222, "original_prompt": "Write a function that matches a string that has an a followed by one or more b's.", "query": "a?b"}
+{"source_id": 223, "original_prompt": "Write a python function to find the last digit of a given number.", "query": "last_digit_of_number"}
+{"source_id": 223, "original_prompt": "Write a python function to find the last digit of a given number.", "query": "function_for_finding_last_digit"}
+{"source_id": 224, "original_prompt": "Write a python function to return the negative numbers in a list.", "query": "Find negative numbers"}
+{"source_id": 224, "original_prompt": "Write a python function to return the negative numbers in a list.", "query": "List of negative values"}
+{"source_id": 225, "original_prompt": "Write a function to remove odd characters in a string.", "query": "remove-odd-characters"}
+{"source_id": 225, "original_prompt": "Write a function to remove odd characters in a string.", "query": "function-for-string"}
+{"source_id": 226, "original_prompt": "Write a function to count bidirectional tuple pairs.", "query": "countTuplePairs"}
+{"source_id": 226, "original_prompt": "Write a function to count bidirectional tuple pairs.", "query": "bidirectionalTuples"}
+{"source_id": 227, "original_prompt": "Write a function to join a list of multiple integers into a single integer.", "query": "join array of integers"}
+{"source_id": 227, "original_prompt": "Write a function to join a list of multiple integers into a single integer.", "query": "concatenate numbers"}
+{"source_id": 229, "original_prompt": "Write a function to find the surface area of a cube of a given size.", "query": "function cubeSurfaceArea"}
+{"source_id": 229, "original_prompt": "Write a function to find the surface area of a cube of a given size.", "query": "input sideLength as number"}
+{"source_id": 229, "original_prompt": "Write a function to find the surface area of a cube of a given size.", "query": "calculate 6 * sideLength^2"}
+{"source_id": 229, "original_prompt": "Write a function to find the surface area of a cube of a given size.", "query": "return result"}
+{"source_id": 230, "original_prompt": "Write a function to find the ration of positive numbers in an array of integers.", "query": "find positives"}
+{"source_id": 230, "original_prompt": "Write a function to find the ration of positive numbers in an array of integers.", "query": "count positives"}
+{"source_id": 230, "original_prompt": "Write a function to find the ration of positive numbers in an array of integers.", "query": "divide by length"}
+{"source_id": 231, "original_prompt": "Write a python function to find the largest negative number from the given list.", "query": "Find largest negative num"}
+{"source_id": 231, "original_prompt": "Write a python function to find the largest negative number from the given list.", "query": "In list given find"}
+{"source_id": 231, "original_prompt": "Write a python function to find the largest negative number from the given list.", "query": "Negative numbers max"}
+{"source_id": 233, "original_prompt": "Write a function to perform index wise multiplication of tuple elements in the given two tuples.", "query": "Tuple Multiplication"}
+{"source_id": 233, "original_prompt": "Write a function to perform index wise multiplication of tuple elements in the given two tuples.", "query": "Index Wise Multiply"}
+{"source_id": 233, "original_prompt": "Write a function to perform index wise multiplication of tuple elements in the given two tuples.", "query": "Given Two Tuples"}
+{"source_id": 233, "original_prompt": "Write a function to perform index wise multiplication of tuple elements in the given two tuples.", "query": "Element Level Product"}
+{"source_id": 233, "original_prompt": "Write a function to perform index wise multiplication of tuple elements in the given two tuples.", "query": "Tuple Element Product"}
+{"source_id": 234, "original_prompt": "Write a python function to count the occurence of all elements of list in a tuple.", "query": "count_elements_in_tuple"}
+{"source_id": 234, "original_prompt": "Write a python function to count the occurence of all elements of list in a tuple.", "query": "list_in_tuple"}
+{"source_id": 235, "original_prompt": "Write a function to find cubes of individual elements in a list.", "query": "cubeListElements"}
+{"source_id": 236, "original_prompt": "Write a function to calculate the sum of perrin numbers.", "query": "define Perrin sequence"}
+{"source_id": 236, "original_prompt": "Write a function to calculate the sum of perrin numbers.", "query": "find recurrence relation for Perrin sequence"}
+{"source_id": 236, "original_prompt": "Write a function to calculate the sum of perrin numbers.", "query": "implement recurrence relation in code"}
+{"source_id": 236, "original_prompt": "Write a function to calculate the sum of perrin numbers.", "query": "calculate nth term for various values of n"}
+{"source_id": 236, "original_prompt": "Write a function to calculate the sum of perrin numbers.", "query": "sum up calculated terms to get sum of Perrin numbers"}
+{"source_id": 237, "original_prompt": "Write a function to extract specified size of strings from a given list of string values.", "query": "get_short_strings"}
+{"source_id": 237, "original_prompt": "Write a function to extract specified size of strings from a given list of string values.", "query": "get_string_length"}
+{"source_id": 237, "original_prompt": "Write a function to extract specified size of strings from a given list of string values.", "query": "filter_strings_by_length"}
+{"source_id": 237, "original_prompt": "Write a function to extract specified size of strings from a given list of string values.", "query": "extract_strings_of_size"}
+{"source_id": 237, "original_prompt": "Write a function to extract specified size of strings from a given list of string values.", "query": "generate_short_queries"}
+{"source_id": 238, "original_prompt": "Write a function to remove all whitespaces from the given string.", "query": "remove whitespace"}
+{"source_id": 238, "original_prompt": "Write a function to remove all whitespaces from the given string.", "query": "function defined"}
+{"source_id": 238, "original_prompt": "Write a function to remove all whitespaces from the given string.", "query": "string input"}
+{"source_id": 238, "original_prompt": "Write a function to remove all whitespaces from the given string.", "query": "replace all spaces"}
+{"source_id": 238, "original_prompt": "Write a function to remove all whitespaces from the given string.", "query": "return result"}
+{"source_id": 240, "original_prompt": "Write a python function to find the sum of even factors of a number.", "query": "Find even factors"}
+{"source_id": 240, "original_prompt": "Write a python function to find the sum of even factors of a number.", "query": "Sum even factors"}
+{"source_id": 240, "original_prompt": "Write a python function to find the sum of even factors of a number.", "query": "Even factor sum for number"}
+{"source_id": 241, "original_prompt": "Write a function that matches a word containing 'z'.", "query": "word contains z"}
+{"source_id": 241, "original_prompt": "Write a function that matches a word containing 'z'.", "query": "word ends with z"}
+{"source_id": 241, "original_prompt": "Write a function that matches a word containing 'z'.", "query": "contains letter z"}
+{"source_id": 241, "original_prompt": "Write a function that matches a word containing 'z'.", "query": "word starts with z"}
+{"source_id": 241, "original_prompt": "Write a function that matches a word containing 'z'.", "query": "letter occurs twice in z"}
+{"source_id": 242, "original_prompt": "Write a function to check whether the given month number contains 31 days or not.", "query": "month_length_check"}
+{"source_id": 242, "original_prompt": "Write a function to check whether the given month number contains 31 days or not.", "query": "if month equals 2"}
+{"source_id": 242, "original_prompt": "Write a function to check whether the given month number contains 31 days or not.", "query": "return false"}
+{"source_id": 242, "original_prompt": "Write a function to check whether the given month number contains 31 days or not.", "query": "else if is_leap_year"}
+{"source_id": 242, "original_prompt": "Write a function to check whether the given month number contains 31 days or not.", "query": "then return true"}
+{"source_id": 242, "original_prompt": "Write a function to check whether the given month number contains 31 days or not.", "query": "else return 31"}
+{"source_id": 243, "original_prompt": "Write a function to reverse each string in a given list of string values.", "query": "reverseEachString"}
+{"source_id": 243, "original_prompt": "Write a function to reverse each string in a given list of string values.", "query": "reverseFirstListItem"}
+{"source_id": 243, "original_prompt": "Write a function to reverse each string in a given list of string values.", "query": "reverseSecondListItem"}
+{"source_id": 243, "original_prompt": "Write a function to reverse each string in a given list of string values.", "query": "reverseThirdListItem"}
+{"source_id": 243, "original_prompt": "Write a function to reverse each string in a given list of string values.", "query": "reverseFourthListItem"}
+{"source_id": 245, "original_prompt": "Write a function to find the area of a rectangle.", "query": "rectangle area calculator"}
+{"source_id": 245, "original_prompt": "Write a function to find the area of a rectangle.", "query": "get rectangle dimensions"}
+{"source_id": 245, "original_prompt": "Write a function to find the area of a rectangle.", "query": "multiply lengths by width"}
+{"source_id": 246, "original_prompt": "Write a function to remove uppercase substrings from a given string.", "query": "remove uppercase"}
+{"source_id": 246, "original_prompt": "Write a function to remove uppercase substrings from a given string.", "query": "lowercase all"}
+{"source_id": 246, "original_prompt": "Write a function to remove uppercase substrings from a given string.", "query": "string provided"}
+{"source_id": 249, "original_prompt": "Write a function to find all possible combinations of the elements of a given list.", "query": "combine list"}
+{"source_id": 249, "original_prompt": "Write a function to find all possible combinations of the elements of a given list.", "query": "find all combos"}
+{"source_id": 249, "original_prompt": "Write a function to find all possible combinations of the elements of a given list.", "query": "list combo all"}
+{"source_id": 249, "original_prompt": "Write a function to find all possible combinations of the elements of a given list.", "query": "all combos list"}
+{"source_id": 249, "original_prompt": "Write a function to find all possible combinations of the elements of a given list.", "query": "combinations of list"}
+{"source_id": 250, "original_prompt": "Write a function to find the maximum product subarray of the given array.", "query": "Find max product subarray"}
+{"source_id": 250, "original_prompt": "Write a function to find the maximum product subarray of the given array.", "query": "Define product as multiplication"}
+{"source_id": 250, "original_prompt": "Write a function to find the maximum product subarray of the given array.", "query": "Initialise maxProduct and currentProduct"}
+{"source_id": 250, "original_prompt": "Write a function to find the maximum product subarray of the given array.", "query": "Iterate through array"}
+{"source_id": 250, "original_prompt": "Write a function to find the maximum product subarray of the given array.", "query": "If currentProduct is less than zero, set currentProduct to -1 * currentProduct"}
+{"source_id": 250, "original_prompt": "Write a function to find the maximum product subarray of the given array.", "query": "Update maxProduct if (currentProduct * array[i]) > maxProduct"}
+{"source_id": 250, "original_prompt": "Write a function to find the maximum product subarray of the given array.", "query": "Return maxProduct"}
+{"source_id": 251, "original_prompt": "Write a function to check if all values are same in a dictionary.", "query": " identical_in_dict"}
+{"source_id": 251, "original_prompt": "Write a function to check if all values are same in a dictionary.", "query": "values_same_dict"}
+{"source_id": 253, "original_prompt": "Write a function to find the maximum product formed by multiplying numbers of an increasing subsequence of that array.", "query": "Find max product in increasing subsequence"}
+{"source_id": 253, "original_prompt": "Write a function to find the maximum product formed by multiplying numbers of an increasing subsequence of that array.", "query": "Max product of increasing subsequence"}
+{"source_id": 254, "original_prompt": "Write a function to find the pairwise addition of the neighboring elements of the given tuple.", "query": "tuple neighborhood addition"}
+{"source_id": 254, "original_prompt": "Write a function to find the pairwise addition of the neighboring elements of the given tuple.", "query": "neighbor pairwise sum tuple"}
+{"source_id": 254, "original_prompt": "Write a function to find the pairwise addition of the neighboring elements of the given tuple.", "query": "add neighboring tuple elements"}
+{"source_id": 255, "original_prompt": "Write a python function to find the product of the array multiplication modulo n.", "query": "product_of_array"}
+{"source_id": 255, "original_prompt": "Write a python function to find the product of the array multiplication modulo n.", "query": "modulo_operation"}
+{"source_id": 255, "original_prompt": "Write a python function to find the product of the array multiplication modulo n.", "query": "array_multiplication"}
+{"source_id": 256, "original_prompt": "Write a python function to check whether the given list contains consecutive numbers or not.", "query": "is_consecutive"}
+{"source_id": 256, "original_prompt": "Write a python function to check whether the given list contains consecutive numbers or not.", "query": "check_list"}
+{"source_id": 257, "original_prompt": "Write a function to find the tuple intersection of elements in the given tuple list irrespective of their order.", "query": "intersect Tuples"}
+{"source_id": 257, "original_prompt": "Write a function to find the tuple intersection of elements in the given tuple list irrespective of their order.", "query": "tuple Intersection"}
+{"source_id": 257, "original_prompt": "Write a function to find the tuple intersection of elements in the given tuple list irrespective of their order.", "query": "common Elements tuples"}
+{"source_id": 257, "original_prompt": "Write a function to find the tuple intersection of elements in the given tuple list irrespective of their order.", "query": "find intersecting tuples"}
+{"source_id": 257, "original_prompt": "Write a function to find the tuple intersection of elements in the given tuple list irrespective of their order.", "query": "tuples common elements"}
+{"source_id": 258, "original_prompt": "Write a function to replace characters in a string.", "query": "replace-characters-in-string"}
+{"source_id": 258, "original_prompt": "Write a function to replace characters in a string.", "query": "function-for-replacing"}
+{"source_id": 258, "original_prompt": "Write a function to replace characters in a string.", "query": "string-character-substitution"}
+{"source_id": 258, "original_prompt": "Write a function to replace characters in a string.", "query": "function-to-swap-chars"}
+{"source_id": 258, "original_prompt": "Write a function to replace characters in a string.", "query": "string-alteration-task"}
+{"source_id": 259, "original_prompt": "Write a function to sort a dictionary by value.", "query": "sort_dict_by_value"}
+{"source_id": 260, "original_prompt": "Write a python function to find the sum of the largest and smallest value in a given array.", "query": "import sys"}
+{"source_id": 260, "original_prompt": "Write a python function to find the sum of the largest and smallest value in a given array.", "query": "nums = list(map(int, input('Enter numbers separated by space: ').split()))"}
+{"source_id": 260, "original_prompt": "Write a python function to find the sum of the largest and smallest value in a given array.", "query": "largest = max(nums)"}
+{"source_id": 260, "original_prompt": "Write a python function to find the sum of the largest and smallest value in a given array.", "query": "smallest = min(nums)"}
+{"source_id": 260, "original_prompt": "Write a python function to find the sum of the largest and smallest value in a given array.", "query": "print('The sum of largest and smallest is', largest + smallest)"}
+{"source_id": 261, "original_prompt": "Write a python function to convert the given string to lower case.", "query": "convert_string_to_lowercase"}
+{"source_id": 262, "original_prompt": "Write a function to remove lowercase substrings from a given string.", "query": "removeLowercaseSubstrings"}
+{"source_id": 262, "original_prompt": "Write a function to remove lowercase substrings from a given string.", "query": "fromGivenString"}
+{"source_id": 263, "original_prompt": "Write a python function to find the first digit of a given number.", "query": "def find_first_digit(num)"}
+{"source_id": 263, "original_prompt": "Write a python function to find the first digit of a given number.", "query": "return str(num)[0]"}
+{"source_id": 263, "original_prompt": "Write a python function to find the first digit of a given number.", "query": "is digit"}
+{"source_id": 265, "original_prompt": "Write a python function to find the difference between the sum of cubes of the first n natural numbers and the sum of the first n natural numbers.", "query": "sum_of_cubes_n"}
+{"source_id": 265, "original_prompt": "Write a python function to find the difference between the sum of cubes of the first n natural numbers and the sum of the first n natural numbers.", "query": "sum_of_natural_numbers_n"}
+{"source_id": 267, "original_prompt": "Write a function to toggle the case of all characters in a string.", "query": "charCaseToggle"}
+{"source_id": 267, "original_prompt": "Write a function to toggle the case of all characters in a string.", "query": "toggleUpper"}
+{"source_id": 267, "original_prompt": "Write a function to toggle the case of all characters in a string.", "query": "toggleLower"}
+{"source_id": 268, "original_prompt": "Write a python function to find the sum of the per-digit difference between two integers.", "query": "Define function sum_diff"}
+{"source_id": 268, "original_prompt": "Write a python function to find the sum of the per-digit difference between two integers.", "query": "Accept two integers as parameters"}
+{"source_id": 268, "original_prompt": "Write a python function to find the sum of the per-digit difference between two integers.", "query": "Return sum of per-digit differences"}
+{"source_id": 268, "original_prompt": "Write a python function to find the sum of the per-digit difference between two integers.", "query": "Iterate digits from left to right"}
+{"source_id": 268, "original_prompt": "Write a python function to find the sum of the per-digit difference between two integers.", "query": "Example usage: sum_diff(123, 456)"}
+{"source_id": 269, "original_prompt": "Write a function to find the sum of the largest contiguous sublist in the given list.", "query": "find largest contiguous sublist"}
+{"source_id": 269, "original_prompt": "Write a function to find the sum of the largest contiguous sublist in the given list.", "query": "sum of largest sublist"}
+{"source_id": 270, "original_prompt": "Write a function to find the union of the elements of two given tuples and output them in sorted order.", "query": "union of elements"}
+{"source_id": 270, "original_prompt": "Write a function to find the union of the elements of two given tuples and output them in sorted order.", "query": "two given tuples"}
+{"source_id": 270, "original_prompt": "Write a function to find the union of the elements of two given tuples and output them in sorted order.", "query": "sorted order"}
+{"source_id": 271, "original_prompt": "Write a python function to find the length of the longest sublists.", "query": "query1"}
+{"source_id": 271, "original_prompt": "Write a python function to find the length of the longest sublists.", "query": "query2"}
+{"source_id": 271, "original_prompt": "Write a python function to find the length of the longest sublists.", "query": "query3"}
+{"source_id": 271, "original_prompt": "Write a python function to find the length of the longest sublists.", "query": "query4"}
+{"source_id": 271, "original_prompt": "Write a python function to find the length of the longest sublists.", "query": "query5"}
+{"source_id": 274, "original_prompt": "Write a python function to split a string into characters.", "query": "split string by character"}
+{"source_id": 274, "original_prompt": "Write a python function to split a string into characters.", "query": "function to split string"}
+{"source_id": 275, "original_prompt": "Write a function to get the sum of the digits of a non-negative integer.", "query": "def sum_digits(n)"}
+{"source_id": 275, "original_prompt": "Write a function to get the sum of the digits of a non-negative integer.", "query": "return sum(int(d) for d in str(n))"}
+{"source_id": 275, "original_prompt": "Write a function to get the sum of the digits of a non-negative integer.", "query": "if n == 0:"}
+{"source_id": 275, "original_prompt": "Write a function to get the sum of the digits of a non-negative integer.", "query": "return 0"}
+{"source_id": 276, "original_prompt": "Write a function to check whether a specified list is sorted or not.", "query": "is_sorted_list"}
+{"source_id": 276, "original_prompt": "Write a function to check whether a specified list is sorted or not.", "query": "check_sorted_array"}
+{"source_id": 279, "original_prompt": "Write a python function to remove duplicate numbers from a given number of lists.", "query": "remove duplicates"}
+{"source_id": 279, "original_prompt": "Write a python function to remove duplicate numbers from a given number of lists.", "query": "lists of numbers"}
+{"source_id": 279, "original_prompt": "Write a python function to remove duplicate numbers from a given number of lists.", "query": "unique values"}
+{"source_id": 281, "original_prompt": "Write a function to find the surface area of a cylinder.", "query": "radius*PI*2+height*PI*circleArea"}
+{"source_id": 281, "original_prompt": "Write a function to find the surface area of a cylinder.", "query": "PI*r^2*h for cylinder's area"}
+{"source_id": 281, "original_prompt": "Write a function to find the surface area of a cylinder.", "query": "PI*r*h for cylinder's volume"}
+{"source_id": 282, "original_prompt": "Write a python function to check whether a list is sublist of another or not.", "query": "is_sublist"}
+{"source_id": 282, "original_prompt": "Write a python function to check whether a list is sublist of another or not.", "query": "check_sublist"}
+{"source_id": 283, "original_prompt": "Write a python function to find the last digit in factorial of a given number.", "query": "Define factorial function"}
+{"source_id": 283, "original_prompt": "Write a python function to find the last digit in factorial of a given number.", "query": "Calculate factorial of a given number"}
+{"source_id": 283, "original_prompt": "Write a python function to find the last digit in factorial of a given number.", "query": "Find last digit in factorial"}
+{"source_id": 283, "original_prompt": "Write a python function to find the last digit in factorial of a given number.", "query": "Implement recursive solution for factorial"}
+{"source_id": 283, "original_prompt": "Write a python function to find the last digit in factorial of a given number.", "query": "Implement iterative solution for factorial"}
+{"source_id": 285, "original_prompt": "Write a function to find the dissimilar elements in the given two tuples.", "query": "find dissimilar tuple"}
+{"source_id": 285, "original_prompt": "Write a function to find the dissimilar elements in the given two tuples.", "query": "tuple element difference"}
+{"source_id": 286, "original_prompt": "Write a function to remove uneven elements in the nested mixed tuple.", "query": "remove_uneven"}
+{"source_id": 286, "original_prompt": "Write a function to remove uneven elements in the nested mixed tuple.", "query": "nested_tuple"}
+{"source_id": 286, "original_prompt": "Write a function to remove uneven elements in the nested mixed tuple.", "query": "mixed_elements"}
+{"source_id": 287, "original_prompt": "Write a python function to find the surface area of a square pyramid with a given base edge and height.", "query": "import math"}
+{"source_id": 287, "original_prompt": "Write a python function to find the surface area of a square pyramid with a given base edge and height.", "query": "base_edge = float(input())"}
+{"source_id": 287, "original_prompt": "Write a python function to find the surface area of a square pyramid with a given base edge and height.", "query": "height = float(input())"}
+{"source_id": 287, "original_prompt": "Write a python function to find the surface area of a square pyramid with a given base edge and height.", "query": "area = math.sqrt((base_edge/2)**4 + base_edge**2 * height**2)"}
+{"source_id": 287, "original_prompt": "Write a python function to find the surface area of a square pyramid with a given base edge and height.", "query": "print('Surface Area:', area)"}
+{"source_id": 289, "original_prompt": "Write a function which returns nth catalan number.", "query": "def catalan(n)"}
+{"source_id": 289, "original_prompt": "Write a function which returns nth catalan number.", "query": "return sum([catalan(i)*catalan(n - i - 1) for i in range(n)], [0])"}
+{"source_id": 289, "original_prompt": "Write a function which returns nth catalan number.", "query": "if n <= 1:"}
+{"source_id": 289, "original_prompt": "Write a function which returns nth catalan number.", "query": " return 1"}
+{"source_id": 289, "original_prompt": "Write a function which returns nth catalan number.", "query": ""}
+{"source_id": 291, "original_prompt": "Write a function to find the n most expensive items in a given dataset.", "query": "Find top n expensive items"}
+{"source_id": 291, "original_prompt": "Write a function to find the n most expensive items in a given dataset.", "query": "Sort items by price descending"}
+{"source_id": 291, "original_prompt": "Write a function to find the n most expensive items in a given dataset.", "query": "Select top n from sorted items"}
+{"source_id": 293, "original_prompt": "Write a function to convert a list to a tuple.", "query": "Convert list to tuple"}
+{"source_id": 293, "original_prompt": "Write a function to convert a list to a tuple.", "query": "list_to_tuple"}
+{"source_id": 294, "original_prompt": "Write a python function to find the difference between largest and smallest value in a given list.", "query": "find max value"}
+{"source_id": 294, "original_prompt": "Write a python function to find the difference between largest and smallest value in a given list.", "query": "store max value"}
+{"source_id": 294, "original_prompt": "Write a python function to find the difference between largest and smallest value in a given list.", "query": "find min value"}
+{"source_id": 294, "original_prompt": "Write a python function to find the difference between largest and smallest value in a given list.", "query": "store min value"}
+{"source_id": 294, "original_prompt": "Write a python function to find the difference between largest and smallest value in a given list.", "query": "subtract min from max"}
+{"source_id": 295, "original_prompt": "Write a function to find perfect squares between two given numbers.", "query": "sqrt(a, b)"}
+{"source_id": 295, "original_prompt": "Write a function to find perfect squares between two given numbers.", "query": "'a mod b == 0'"}
+{"source_id": 295, "original_prompt": "Write a function to find perfect squares between two given numbers.", "query": "'b - a >= a'"}
+{"source_id": 295, "original_prompt": "Write a function to find perfect squares between two given numbers.", "query": "'is_perfect_square(r)', r = sqrt(a)"}
+{"source_id": 296, "original_prompt": "Write a function to convert polar coordinates to rectangular coordinates.", "query": "cos(theta) x r"}
+{"source_id": 296, "original_prompt": "Write a function to convert polar coordinates to rectangular coordinates.", "query": "sin(theta) x r"}
+{"source_id": 296, "original_prompt": "Write a function to convert polar coordinates to rectangular coordinates.", "query": "cos(theta) y"}
+{"source_id": 296, "original_prompt": "Write a function to convert polar coordinates to rectangular coordinates.", "query": "r^2"}
+{"source_id": 298, "original_prompt": "Write a python function to find the sum of the product of consecutive binomial co-efficients.", "query": "product_of_binomial_coefficients_sum"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "remove_leading_zeros_from_ip"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "function_definition"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "input_validation"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "string_to_integer_conversion"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "octet_split"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "forEach_loop"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "conditional_statement"}
+{"source_id": 299, "original_prompt": "Write a function to remove leading zeroes from an ip address.", "query": "rejoining_octets"}
+{"source_id": 300, "original_prompt": "Write a function to find the difference of the first even and first odd number of a given list.", "query": "first even - first odd from list"}
+{"source_id": 300, "original_prompt": "Write a function to find the difference of the first even and first odd number of a given list.", "query": "find_first_even(list) - find_first_odd(list)"}
+{"source_id": 300, "original_prompt": "Write a function to find the difference of the first even and first odd number of a given list.", "query": "diff(find_first_even(list), find_first_odd(list))"}
+{"source_id": 301, "original_prompt": "Write a python function to count minimum number of swaps required to convert one binary number represented as a string to another.", "query": "count_swaps_binary"}
+{"source_id": 301, "original_prompt": "Write a python function to count minimum number of swaps required to convert one binary number represented as a string to another.", "query": "min_swaps_convert"}
+{"source_id": 302, "original_prompt": "Write a function to find the size in bytes of the given tuple.", "query": "Function for size in bytes"}
+{"source_id": 302, "original_prompt": "Write a function to find the size in bytes of the given tuple.", "query": "Takes tuple as argument"}
+{"source_id": 302, "original_prompt": "Write a function to find the size in bytes of the given tuple.", "query": "Returns byte count"}
+{"source_id": 302, "original_prompt": "Write a function to find the size in bytes of the given tuple.", "query": "Example: size(tuple(\"a\", \"b\"))"}
+{"source_id": 303, "original_prompt": "Write a function to find kth element from the given two sorted arrays.", "query": "merge_sorted_arrays"}
+{"source_id": 303, "original_prompt": "Write a function to find kth element from the given two sorted arrays.", "query": "find_kth_element_index"}
+{"source_id": 303, "original_prompt": "Write a function to find kth element from the given two sorted arrays.", "query": "slice_array_by_index"}
+{"source_id": 304, "original_prompt": "Write a function to check whether the given number is armstrong or not.", "query": "is_armstrong"}
+{"source_id": 304, "original_prompt": "Write a function to check whether the given number is armstrong or not.", "query": "check_number"}
+{"source_id": 304, "original_prompt": "Write a function to check whether the given number is armstrong or not.", "query": "get_number_digits"}
+{"source_id": 304, "original_prompt": "Write a function to check whether the given number is armstrong or not.", "query": "raise_to_power"}
+{"source_id": 304, "original_prompt": "Write a function to check whether the given number is armstrong or not.", "query": "sum_of_powers"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "function define sum_average"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "init sum as 0"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "init count as 0"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "loop from 1 to n"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "add current number to sum"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "increment count"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "divide sum by count"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "output result as average"}
+{"source_id": 305, "original_prompt": "Write a function to find sum and average of first n natural numbers.", "query": "output result as sum"}
+{"source_id": 306, "original_prompt": "Write a python function to check whether the given number is even or not.", "query": "is_even_number"}
+{"source_id": 307, "original_prompt": "Write a python function to find the first repeated character in a given string.", "query": "First repeated char in str"}
+{"source_id": 307, "original_prompt": "Write a python function to find the first repeated character in a given string.", "query": "Python find repeat char"}
+{"source_id": 308, "original_prompt": "Write a function to get all lucid numbers smaller than or equal to a given integer.", "query": "lucids smaller than n"}
+{"source_id": 308, "original_prompt": "Write a function to get all lucid numbers smaller than or equal to a given integer.", "query": "filter lucids under n"}
+{"source_id": 308, "original_prompt": "Write a function to get all lucid numbers smaller than or equal to a given integer.", "query": "find lucids <= n"}
+{"source_id": 308, "original_prompt": "Write a function to get all lucid numbers smaller than or equal to a given integer.", "query": "where lucid is <= n"}
+{"source_id": 310, "original_prompt": "Write a function to check if the given integer is a prime number.", "query": "isPrime number"}
+{"source_id": 310, "original_prompt": "Write a function to check if the given integer is a prime number.", "query": "checkPrimes upTo number"}
+{"source_id": 310, "original_prompt": "Write a function to check if the given integer is a prime number.", "query": "primeFactors of number"}
+{"source_id": 313, "original_prompt": "Write a python function to find nth bell number.", "query": "import bell"}
+{"source_id": 313, "original_prompt": "Write a python function to find nth bell number.", "query": "define nth_bell(n)"}
+{"source_id": 313, "original_prompt": "Write a python function to find nth bell number.", "query": "nth_bell = bell.BellNumber(n)"}
+{"source_id": 313, "original_prompt": "Write a python function to find nth bell number.", "query": "print(nth_bell(5))"}
+{"source_id": 314, "original_prompt": "Write a python function which takes a list and returns a list with the same elements, but the k'th element removed.", "query": "remove_kth_element([1,2,3,4], 1)"}
+{"source_id": 314, "original_prompt": "Write a python function which takes a list and returns a list with the same elements, but the k'th element removed.", "query": "remove_kth_element([5,6,7,8], 2)"}
+{"source_id": 314, "original_prompt": "Write a python function which takes a list and returns a list with the same elements, but the k'th element removed.", "query": "remove_kth_element([9,0,1,2], 1)"}
+{"source_id": 314, "original_prompt": "Write a python function which takes a list and returns a list with the same elements, but the k'th element removed.", "query": "remove_kth_element([a,b,c,d], 2)"}
+{"source_id": 314, "original_prompt": "Write a python function which takes a list and returns a list with the same elements, but the k'th element removed.", "query": "remove_kth_element([e,f,g,h], 3)"}
+{"source_id": 315, "original_prompt": "Write a function which given a matrix represented as a list of lists returns the max of the n'th column.", "query": "Find max of nth column in matrix"}
+{"source_id": 315, "original_prompt": "Write a function which given a matrix represented as a list of lists returns the max of the n'th column.", "query": "Max value in nth column of matrix"}
+{"source_id": 317, "original_prompt": "Write a function to find the cumulative sum of all the values that are present in the given tuple list.", "query": "cumulative sum"}
+{"source_id": 317, "original_prompt": "Write a function to find the cumulative sum of all the values that are present in the given tuple list.", "query": "tuple list"}
+{"source_id": 317, "original_prompt": "Write a function to find the cumulative sum of all the values that are present in the given tuple list.", "query": "values present"}
+{"source_id": 318, "original_prompt": "Write a function which takes a tuple of tuples and returns the average value for each tuple as a list.", "query": "tuple_of_tuples"}
+{"source_id": 318, "original_prompt": "Write a function which takes a tuple of tuples and returns the average value for each tuple as a list.", "query": "len_tuple_of_tuples"}
+{"source_id": 318, "original_prompt": "Write a function which takes a tuple of tuples and returns the average value for each tuple as a list.", "query": "sum_of_elements_in_each_tuple"}
+{"source_id": 318, "original_prompt": "Write a function which takes a tuple of tuples and returns the average value for each tuple as a list.", "query": "divide_by_length_of_each_tuple"}
+{"source_id": 319, "original_prompt": "Write a function which takes two tuples of the same length and performs the element wise modulo.", "query": "modulo_tuples"}
+{"source_id": 319, "original_prompt": "Write a function which takes two tuples of the same length and performs the element wise modulo.", "query": "same_length_tuples"}
+{"source_id": 319, "original_prompt": "Write a function which takes two tuples of the same length and performs the element wise modulo.", "query": "element_wise_operation"}
+{"source_id": 320, "original_prompt": "Write a function to check for the number of jumps required of given length to reach a point of form (d, 0) from origin in a 2d plane.", "query": "checkJumps neededForReach"}
+{"source_id": 320, "original_prompt": "Write a function to check for the number of jumps required of given length to reach a point of form (d, 0) from origin in a 2d plane.", "query": "checkJumps length"}
+{"source_id": 320, "original_prompt": "Write a function to check for the number of jumps required of given length to reach a point of form (d, 0) from origin in a 2d plane.", "query": "checkJumps startingPoint"}
+{"source_id": 320, "original_prompt": "Write a function to check for the number of jumps required of given length to reach a point of form (d, 0) from origin in a 2d plane.", "query": "checkJumps targetPoint"}
+{"source_id": 321, "original_prompt": "Write a function to divide two lists element wise.", "query": "list divide function"}
+{"source_id": 321, "original_prompt": "Write a function to divide two lists element wise.", "query": "list elementwise division"}
+{"source_id": 322, "original_prompt": "Write a function to move all the numbers to the end of the given string.", "query": "move numbers end"}
+{"source_id": 322, "original_prompt": "Write a function to move all the numbers to the end of the given string.", "query": "string numbers end"}
+{"source_id": 322, "original_prompt": "Write a function to move all the numbers to the end of the given string.", "query": "end numbers string"}
+{"source_id": 323, "original_prompt": "Write a function to find the size of the largest subset of a list of numbers so that every pair is divisible.", "query": "largest-divisible-subset-size"}
+{"source_id": 323, "original_prompt": "Write a function to find the size of the largest subset of a list of numbers so that every pair is divisible.", "query": "find-divisible-pair-subset"}
+{"source_id": 324, "original_prompt": "Write a function to find the median of two sorted lists of same size.", "query": "findMedianTwoSortedLists"}
+{"source_id": 324, "original_prompt": "Write a function to find the median of two sorted lists of same size.", "query": "sameSizeLists"}
+{"source_id": 325, "original_prompt": "Write a function to compute the n-th power of each number in a list.", "query": "list n"}
+{"source_id": 325, "original_prompt": "Write a function to compute the n-th power of each number in a list.", "query": "map square"}
+{"source_id": 325, "original_prompt": "Write a function to compute the n-th power of each number in a list.", "query": "reduce multiply"}
+{"source_id": 326, "original_prompt": "Write a python function to convert a given string to uppercase.", "query": "UPPERCASE_STRING"}
+{"source_id": 326, "original_prompt": "Write a python function to convert a given string to uppercase.", "query": "FUNCTION_PYTHON"}
+{"source_id": 326, "original_prompt": "Write a python function to convert a given string to uppercase.", "query": "TO_CONVERT"}
+{"source_id": 326, "original_prompt": "Write a python function to convert a given string to uppercase.", "query": "GIVEN_STRING"}
+{"source_id": 326, "original_prompt": "Write a python function to convert a given string to uppercase.", "query": "RETURN_RESULT"}
+{"source_id": 328, "original_prompt": "Write a python function to find the area of the largest triangle that can be inscribed in a semicircle with a given radius.", "query": "Area of largest triangle inscribed in semicircle"}
+{"source_id": 328, "original_prompt": "Write a python function to find the area of the largest triangle that can be inscribed in a semicircle with a given radius.", "query": "Python function to find area"}
+{"source_id": 328, "original_prompt": "Write a python function to find the area of the largest triangle that can be inscribed in a semicircle with a given radius.", "query": "Given radius"}
+{"source_id": 328, "original_prompt": "Write a python function to find the area of the largest triangle that can be inscribed in a semicircle with a given radius.", "query": "Largest triangle area calculation"}
+{"source_id": 329, "original_prompt": "Write a python function to find the smallest missing number from a sorted list of natural numbers.", "query": "def find_smallest_missing(nums)"}
+{"source_id": 329, "original_prompt": "Write a python function to find the smallest missing number from a sorted list of natural numbers.", "query": "nums = sorted(nums)"}
+{"source_id": 329, "original_prompt": "Write a python function to find the smallest missing number from a sorted list of natural numbers.", "query": "for i in range(len(nums)):"}
+{"source_id": 329, "original_prompt": "Write a python function to find the smallest missing number from a sorted list of natural numbers.", "query": "if nums[i] != i + 1:"}
+{"source_id": 329, "original_prompt": "Write a python function to find the smallest missing number from a sorted list of natural numbers.", "query": "return nums[i] - 1"}
+{"source_id": 329, "original_prompt": "Write a python function to find the smallest missing number from a sorted list of natural numbers.", "query": "return nums[-1] + 1"}
+{"source_id": 330, "original_prompt": "Write a function to replace all spaces in the given string with '%20'.", "query": "replace space with %20"}
+{"source_id": 331, "original_prompt": "Write a python function to find even numbers from a list of numbers.", "query": "get_even_numbers"}
+{"source_id": 331, "original_prompt": "Write a python function to find even numbers from a list of numbers.", "query": "from_list"}
+{"source_id": 331, "original_prompt": "Write a python function to find even numbers from a list of numbers.", "query": "numbers"}
+{"source_id": 332, "original_prompt": "Write a function to extract all the adjacent coordinates of the given coordinate tuple.", "query": "adjacent north"}
+{"source_id": 332, "original_prompt": "Write a function to extract all the adjacent coordinates of the given coordinate tuple.", "query": "adjacent south"}
+{"source_id": 332, "original_prompt": "Write a function to extract all the adjacent coordinates of the given coordinate tuple.", "query": "adjacent east"}
+{"source_id": 332, "original_prompt": "Write a function to extract all the adjacent coordinates of the given coordinate tuple.", "query": "adjacent west"}
+{"source_id": 332, "original_prompt": "Write a function to extract all the adjacent coordinates of the given coordinate tuple.", "query": "adjacent diagonals"}
+{"source_id": 333, "original_prompt": "Write a function to replace whitespaces with an underscore and vice versa in a given string.", "query": "replace spaces with underscores"}
+{"source_id": 333, "original_prompt": "Write a function to replace whitespaces with an underscore and vice versa in a given string.", "query": "underscores to spaces reverse"}
+{"source_id": 333, "original_prompt": "Write a function to replace whitespaces with an underscore and vice versa in a given string.", "query": "replace spaces regex"}
+{"source_id": 333, "original_prompt": "Write a function to replace whitespaces with an underscore and vice versa in a given string.", "query": "regex replace underscores"}
+{"source_id": 333, "original_prompt": "Write a function to replace whitespaces with an underscore and vice versa in a given string.", "query": "spaces to underscores function"}
+{"source_id": 334, "original_prompt": "Write a python function to move all zeroes to the end of the given list.", "query": "move zeros"}
+{"source_id": 334, "original_prompt": "Write a python function to move all zeroes to the end of the given list.", "query": "to end"}
+{"source_id": 335, "original_prompt": "Write a python function to find the sum of xor of all pairs of numbers in the given list.", "query": "sum_xor_list"}
+{"source_id": 336, "original_prompt": "Write a function to sort the given list.", "query": "sort list"}
+{"source_id": 336, "original_prompt": "Write a function to sort the given list.", "query": "ascending order"}
+{"source_id": 337, "original_prompt": "Write a function to check whether the given amount has no profit and no loss", "query": "amount > initial_cost"}
+{"source_id": 337, "original_prompt": "Write a function to check whether the given amount has no profit and no loss", "query": "initial_cost - amount > 0"}
+{"source_id": 337, "original_prompt": "Write a function to check whether the given amount has no profit and no loss", "query": "profit = amount - initial_cost"}
+{"source_id": 337, "original_prompt": "Write a function to check whether the given amount has no profit and no loss", "query": "if (profit > 0) then print 'Profit'"}
+{"source_id": 337, "original_prompt": "Write a function to check whether the given amount has no profit and no loss", "query": "if (initial_cost - amount > 0) then print 'Loss'"}
+{"source_id": 338, "original_prompt": "Write a function to calculate the wind chill index rounded to the next integer given the wind velocity in km/h and a temperature in celsius.", "query": "wind_chill_index(velocity, temperature)"}
+{"source_id": 338, "original_prompt": "Write a function to calculate the wind chill index rounded to the next integer given the wind velocity in km/h and a temperature in celsius.", "query": "round_wind_chill_index(result)"}
+{"source_id": 338, "original_prompt": "Write a function to calculate the wind chill index rounded to the next integer given the wind velocity in km/h and a temperature in celsius.", "query": "is_valid_wind_velocity(velocity)"}
+{"source_id": 338, "original_prompt": "Write a function to calculate the wind chill index rounded to the next integer given the wind velocity in km/h and a temperature in celsius.", "query": "is_valid_temperature(temperature)"}
+{"source_id": 338, "original_prompt": "Write a function to calculate the wind chill index rounded to the next integer given the wind velocity in km/h and a temperature in celsius.", "query": "wind_chill_chart_range"}
+{"source_id": 339, "original_prompt": "Write a function to sum the length of the names of a given list of names after removing the names that start with a lowercase letter.", "query": "filter names by capitalized first letter"}
+{"source_id": 339, "original_prompt": "Write a function to sum the length of the names of a given list of names after removing the names that start with a lowercase letter.", "query": "map names to length"}
+{"source_id": 339, "original_prompt": "Write a function to sum the length of the names of a given list of names after removing the names that start with a lowercase letter.", "query": "sum lengths of remaining names"}
+{"source_id": 340, "original_prompt": "Write a function to remove the parenthesis and what is inbetween them from a string.", "query": "remove_parentheses(\"(hello world)\")"}
+{"source_id": 340, "original_prompt": "Write a function to remove the parenthesis and what is inbetween them from a string.", "query": "remove_parentheses(\"(1 + 2 * 3)\")"}
+{"source_id": 340, "original_prompt": "Write a function to remove the parenthesis and what is inbetween them from a string.", "query": "remove_parentheses(\"((a + b) * c)\")"}
+{"source_id": 340, "original_prompt": "Write a function to remove the parenthesis and what is inbetween them from a string.", "query": "remove_parentheses(\"(!false)\")"}
+{"source_id": 340, "original_prompt": "Write a function to remove the parenthesis and what is inbetween them from a string.", "query": "remove_parentheses(\"(not (even number))\")"}
+{"source_id": 341, "original_prompt": "Write a function to find the nth nonagonal number.", "query": "define nonagonal number"}
+{"source_id": 341, "original_prompt": "Write a function to find the nth nonagonal number.", "query": "find formula for n-th nonagonal number"}
+{"source_id": 341, "original_prompt": "Write a function to find the nth nonagonal number.", "query": "derive recurrence relation for nonagonal numbers"}
+{"source_id": 341, "original_prompt": "Write a function to find the nth nonagonal number.", "query": "solve recurrence relation using iterative method (up to n=100)"}
+{"source_id": 341, "original_prompt": "Write a function to find the nth nonagonal number.", "query": "format and return the result"}
+{"source_id": 342, "original_prompt": "Write a function that checks if a strings contains 'z', except at the start and end of the word.", "query": "contains z not at start and end"}
+{"source_id": 342, "original_prompt": "Write a function that checks if a strings contains 'z', except at the start and end of the word.", "query": "word-z-not-start-end"}
+{"source_id": 343, "original_prompt": "Write a python function to reverse an array upto a given position.", "query": "reverse_array_upto"}
+{"source_id": 343, "original_prompt": "Write a python function to reverse an array upto a given position.", "query": "given_position"}
+{"source_id": 343, "original_prompt": "Write a python function to reverse an array upto a given position.", "query": "python_function"}
+{"source_id": 345, "original_prompt": "Given a square matrix of size N*N given as a list of lists, where each cell is associated with a specific cost. A path is defined as a specific sequence of cells that starts from the top-left cell move only right or down and ends on bottom right cell. We want to find a path with the maximum average over all existing paths. Average is computed as total cost divided by the number of cells visited in the path.", "query": "Find max avg cost path"}
+{"source_id": 345, "original_prompt": "Given a square matrix of size N*N given as a list of lists, where each cell is associated with a specific cost. A path is defined as a specific sequence of cells that starts from the top-left cell move only right or down and ends on bottom right cell. We want to find a path with the maximum average over all existing paths. Average is computed as total cost divided by the number of cells visited in the path.", "query": "From top-left, move right or down"}
+{"source_id": 345, "original_prompt": "Given a square matrix of size N*N given as a list of lists, where each cell is associated with a specific cost. A path is defined as a specific sequence of cells that starts from the top-left cell move only right or down and ends on bottom right cell. We want to find a path with the maximum average over all existing paths. Average is computed as total cost divided by the number of cells visited in the path.", "query": "End at bottom right cell"}
+{"source_id": 345, "original_prompt": "Given a square matrix of size N*N given as a list of lists, where each cell is associated with a specific cost. A path is defined as a specific sequence of cells that starts from the top-left cell move only right or down and ends on bottom right cell. We want to find a path with the maximum average over all existing paths. Average is computed as total cost divided by the number of cells visited in the path.", "query": "Divide total cost by visited cells"}
+{"source_id": 345, "original_prompt": "Given a square matrix of size N*N given as a list of lists, where each cell is associated with a specific cost. A path is defined as a specific sequence of cells that starts from the top-left cell move only right or down and ends on bottom right cell. We want to find a path with the maximum average over all existing paths. Average is computed as total cost divided by the number of cells visited in the path.", "query": "Return maximum average"}
+{"source_id": 347, "original_prompt": "The input is defined as two lists of the same length. Write a function to count indices where the lists have the same values.", "query": "sameValueAtEqualIndices"}
+{"source_id": 347, "original_prompt": "The input is defined as two lists of the same length. Write a function to count indices where the lists have the same values.", "query": "equalLengthLists"}
+{"source_id": 348, "original_prompt": "Write a function that takes base and power as arguments and calculate the sum of all digits of the base to the specified power.", "query": "Define BASE"}
+{"source_id": 348, "original_prompt": "Write a function that takes base and power as arguments and calculate the sum of all digits of the base to the specified power.", "query": "Define POWER"}
+{"source_id": 348, "original_prompt": "Write a function that takes base and power as arguments and calculate the sum of all digits of the base to the specified power.", "query": "Initialize SUM to 0"}
+{"source_id": 348, "original_prompt": "Write a function that takes base and power as arguments and calculate the sum of all digits of the base to the specified power.", "query": "Iterate through each digit D in BASE"}
+{"source_id": 348, "original_prompt": "Write a function that takes base and power as arguments and calculate the sum of all digits of the base to the specified power.", "query": "Calculate D^POWER and add it to SUM"}
+{"source_id": 348, "original_prompt": "Write a function that takes base and power as arguments and calculate the sum of all digits of the base to the specified power.", "query": "Return SUM"}
+{"source_id": 350, "original_prompt": "Write a function that takes as input a tuple of numbers (t_1,...,t_{N+1}) and returns a tuple of length N where the i-th element of the tuple is equal to t_i * t_{i+1}.", "query": "productOfConsecutivePairs"}
+{"source_id": 350, "original_prompt": "Write a function that takes as input a tuple of numbers (t_1,...,t_{N+1}) and returns a tuple of length N where the i-th element of the tuple is equal to t_i * t_{i+1}.", "query": "t_1*t_2"}
+{"source_id": 350, "original_prompt": "Write a function that takes as input a tuple of numbers (t_1,...,t_{N+1}) and returns a tuple of length N where the i-th element of the tuple is equal to t_i * t_{i+1}.", "query": "t_2*t_3"}
+{"source_id": 350, "original_prompt": "Write a function that takes as input a tuple of numbers (t_1,...,t_{N+1}) and returns a tuple of length N where the i-th element of the tuple is equal to t_i * t_{i+1}.", "query": "(untilN) * (t_{N} * t_{N+1})"}
+{"source_id": 352, "original_prompt": "Write a function to remove consecutive duplicates of a given list.", "query": "Remove duplicates"}
+{"source_id": 352, "original_prompt": "Write a function to remove consecutive duplicates of a given list.", "query": "Consecutive duplicates"}
+{"source_id": 352, "original_prompt": "Write a function to remove consecutive duplicates of a given list.", "query": "List function"}
+{"source_id": 352, "original_prompt": "Write a function to remove consecutive duplicates of a given list.", "query": "No extra elements"}
+{"source_id": 353, "original_prompt": "Write a function to find the lateral surface area of a cone given radius r and the height h.", "query": "PI * r * sqrt(r^2 + h^2)"}
+{"source_id": 353, "original_prompt": "Write a function to find the lateral surface area of a cone given radius r and the height h.", "query": "3.14 * r * Math.sqrt(r*r + h*h)"}
+{"source_id": 354, "original_prompt": "Write a function to replace all occurrences of spaces, commas, or dots with a colon.", "query": "replace spaces colons"}
+{"source_id": 354, "original_prompt": "Write a function to replace all occurrences of spaces, commas, or dots with a colon.", "query": "replace commas colons"}
+{"source_id": 354, "original_prompt": "Write a function to replace all occurrences of spaces, commas, or dots with a colon.", "query": "replace dots colons"}
+{"source_id": 355, "original_prompt": "Write a function to find the index of the first occurrence of a given number in a sorted array.", "query": "Find index of number in sorted array"}
+{"source_id": 355, "original_prompt": "Write a function to find the index of the first occurrence of a given number in a sorted array.", "query": "Sort array and iterate"}
+{"source_id": 355, "original_prompt": "Write a function to find the index of the first occurrence of a given number in a sorted array.", "query": "Compare current and target numbers"}
+{"source_id": 355, "original_prompt": "Write a function to find the index of the first occurrence of a given number in a sorted array.", "query": "Return index if found"}
+{"source_id": 355, "original_prompt": "Write a function to find the index of the first occurrence of a given number in a sorted array.", "query": "Return -1 if not found"}
+{"source_id": 356, "original_prompt": "Write a python function to find sum of products of all possible sublists of a given list. https://www.geeksforgeeks.org/sum-of-products-of-all-possible-subarrays/", "query": "sublist_product"}
+{"source_id": 356, "original_prompt": "Write a python function to find sum of products of all possible sublists of a given list. https://www.geeksforgeeks.org/sum-of-products-of-all-possible-subarrays/", "query": "sum_sublist_products"}
+{"source_id": 356, "original_prompt": "Write a python function to find sum of products of all possible sublists of a given list. https://www.geeksforgeeks.org/sum-of-products-of-all-possible-subarrays/", "query": "list_len"}
+{"source_id": 356, "original_prompt": "Write a python function to find sum of products of all possible sublists of a given list. https://www.geeksforgeeks.org/sum-of-products-of-all-possible-subarrays/", "query": "pow"}
+{"source_id": 356, "original_prompt": "Write a python function to find sum of products of all possible sublists of a given list. https://www.geeksforgeeks.org/sum-of-products-of-all-possible-subarrays/", "query": "itertools_combinations"}
+{"source_id": 358, "original_prompt": "Write a function to locate the left insertion point for a specified value in sorted order. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-data-structure-exercise-24.php", "query": "find_left_insertion([1, 3, 5], 2)"}
+{"source_id": 358, "original_prompt": "Write a function to locate the left insertion point for a specified value in sorted order. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-data-structure-exercise-24.php", "query": "find_left_insertion([1, 3, 5], 1)"}
+{"source_id": 358, "original_prompt": "Write a function to locate the left insertion point for a specified value in sorted order. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-data-structure-exercise-24.php", "query": "find_left_insertion([1, 3, 5], 4)"}
+{"source_id": 358, "original_prompt": "Write a function to locate the left insertion point for a specified value in sorted order. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-data-structure-exercise-24.php", "query": "find_left_insertion([6, 8, 10], 1)"}
+{"source_id": 358, "original_prompt": "Write a function to locate the left insertion point for a specified value in sorted order. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-data-structure-exercise-24.php", "query": "find_left_insertion([6, 8, 10], 7)"}
+{"source_id": 360, "original_prompt": "Write a function to calculate the geometric sum of n-1. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-recursion-exercise-9.php", "query": "Define geometric_sum"}
+{"source_id": 360, "original_prompt": "Write a function to calculate the geometric sum of n-1. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-recursion-exercise-9.php", "query": "function geometric_sum(n)"}
+{"source_id": 360, "original_prompt": "Write a function to calculate the geometric sum of n-1. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-recursion-exercise-9.php", "query": "base case n=1"}
+{"source_id": 360, "original_prompt": "Write a function to calculate the geometric sum of n-1. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-recursion-exercise-9.php", "query": "recursive call geometric_sum(n-1)"}
+{"source_id": 360, "original_prompt": "Write a function to calculate the geometric sum of n-1. https://www.w3resource.com/python-exercises/data-structures-and-algorithms/python-recursion-exercise-9.php", "query": "return sum + term"}
+{"source_id": 363, "original_prompt": "Write a python function to check whether all the characters are same or not.", "query": "characters_same_check"}
+{"source_id": 363, "original_prompt": "Write a python function to check whether all the characters are same or not.", "query": "all_chars_equal"}
+{"source_id": 363, "original_prompt": "Write a python function to check whether all the characters are same or not.", "query": "same_character_sequence"}
+{"source_id": 363, "original_prompt": "Write a python function to check whether all the characters are same or not.", "query": "check_identical_chars"}
+{"source_id": 363, "original_prompt": "Write a python function to check whether all the characters are same or not.", "query": "is_uniform_string"}
+{"source_id": 364, "original_prompt": "Write a function to caluclate the area of a tetrahedron.", "query": "pi/4 sqrt(3) side^4"}
+{"source_id": 364, "original_prompt": "Write a function to caluclate the area of a tetrahedron.", "query": "side * side * base / 2"}
+{"source_id": 364, "original_prompt": "Write a function to caluclate the area of a tetrahedron.", "query": "4 * (edge1 * edge2 * edge3)"}
+{"source_id": 364, "original_prompt": "Write a function to caluclate the area of a tetrahedron.", "query": "sqrt((side1 + side2 + side3)^2 - (4 * (side1 * side2 * side3)) / pi/3)"}
+{"source_id": 366, "original_prompt": "Write a function to check if the given tuple has any none value or not.", "query": "is_valid_tuple"}
+{"source_id": 366, "original_prompt": "Write a function to check if the given tuple has any none value or not.", "query": "has_none_element"}
+{"source_id": 367, "original_prompt": "Write a function to find numbers within a given range from startnum ti endnum where every number is divisible by every digit it contains. https://www.w3resource.com/python-exercises/lambda/python-lambda-exercise-24.php", "query": "filter(x for x in range(startnum, endnum+1) if all(d % x == 0 for d in str(x)))"}
+{"source_id": 367, "original_prompt": "Write a function to find numbers within a given range from startnum ti endnum where every number is divisible by every digit it contains. https://www.w3resource.com/python-exercises/lambda/python-lambda-exercise-24.php", "query": "lambda startnum, endnum: list(filter(lambda x: all(d % x == 0 for d in str(x)), range(startnum, endnum+1)))"}
+{"source_id": 370, "original_prompt": "Write a function to put spaces between words starting with capital letters in a given string.", "query": "CapitalizeFirstWordOfEachWord"}
+{"source_id": 370, "original_prompt": "Write a function to put spaces between words starting with capital letters in a given string.", "query": "AddSpacesBetweenWordsStartingWithCapitalLetters"}
+{"source_id": 371, "original_prompt": "Write a function to sort a given list of strings of numbers numerically. https://www.geeksforgeeks.org/python-sort-numeric-strings-in-a-list/", "query": "sort(numbers, key=int)"}
+{"source_id": 371, "original_prompt": "Write a function to sort a given list of strings of numbers numerically. https://www.geeksforgeeks.org/python-sort-numeric-strings-in-a-list/", "query": "sorted(numbers, key=int)"}
+{"source_id": 371, "original_prompt": "Write a function to sort a given list of strings of numbers numerically. https://www.geeksforgeeks.org/python-sort-numeric-strings-in-a-list/", "query": "numbers.sort(key=int)"}
+{"source_id": 371, "original_prompt": "Write a function to sort a given list of strings of numbers numerically. https://www.geeksforgeeks.org/python-sort-numeric-strings-in-a-list/", "query": "numbers = sorted(numbers, key=int)"}
+{"source_id": 372, "original_prompt": "Write a function to add the given tuple to the given list.", "query": "add tuple to list"}
+{"source_id": 373, "original_prompt": "Write a function to check if the given array represents min heap or not. https://www.geeksforgeeks.org/how-to-check-if-a-given-array-represents-a-binary-heap/", "query": "isMinHeap"}
+{"source_id": 373, "original_prompt": "Write a function to check if the given array represents min heap or not. https://www.geeksforgeeks.org/how-to-check-if-a-given-array-represents-a-binary-heap/", "query": "buildMinHeap"}
+{"source_id": 373, "original_prompt": "Write a function to check if the given array represents min heap or not. https://www.geeksforgeeks.org/how-to-check-if-a-given-array-represents-a-binary-heap/", "query": "extractMin"}
+{"source_id": 373, "original_prompt": "Write a function to check if the given array represents min heap or not. https://www.geeksforgeeks.org/how-to-check-if-a-given-array-represents-a-binary-heap/", "query": "decreaseKey"}
+{"source_id": 373, "original_prompt": "Write a function to check if the given array represents min heap or not. https://www.geeksforgeeks.org/how-to-check-if-a-given-array-represents-a-binary-heap/", "query": "heapify"}
+{"source_id": 374, "original_prompt": "Write a function to find the nth jacobsthal number. https://www.geeksforgeeks.org/jacobsthal-and-jacobsthal-lucas-numbers/ 0, 1, 1, 3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, ...", "query": "jacobsthal(0)"}
+{"source_id": 374, "original_prompt": "Write a function to find the nth jacobsthal number. https://www.geeksforgeeks.org/jacobsthal-and-jacobsthal-lucas-numbers/ 0, 1, 1, 3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, ...", "query": "jacobsthal(1)"}
+{"source_id": 374, "original_prompt": "Write a function to find the nth jacobsthal number. https://www.geeksforgeeks.org/jacobsthal-and-jacobsthal-lucas-numbers/ 0, 1, 1, 3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, ...", "query": "jacobsthal(5)"}
+{"source_id": 374, "original_prompt": "Write a function to find the nth jacobsthal number. https://www.geeksforgeeks.org/jacobsthal-and-jacobsthal-lucas-numbers/ 0, 1, 1, 3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, ...", "query": "jacobsthal(10)"}
+{"source_id": 374, "original_prompt": "Write a function to find the nth jacobsthal number. https://www.geeksforgeeks.org/jacobsthal-and-jacobsthal-lucas-numbers/ 0, 1, 1, 3, 5, 11, 21, 43, 85, 171, 341, 683, 1365, 2731, ...", "query": "jacobsthal(20)"}
+{"source_id": 375, "original_prompt": "Write a function to find minimum k records from tuple list. https://www.geeksforgeeks.org/python-find-minimum-k-records-from-tuple-list/ - in this case a verbatim copy of test cases", "query": "findMin(10, [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])"}
+{"source_id": 375, "original_prompt": "Write a function to find minimum k records from tuple list. https://www.geeksforgeeks.org/python-find-minimum-k-records-from-tuple-list/ - in this case a verbatim copy of test cases", "query": "findMin(5, [[20, 19], [21, 22], [11, 5], [10, 3], [5, 2], [1, 20]])"}
+{"source_id": 375, "original_prompt": "Write a function to find minimum k records from tuple list. https://www.geeksforgeeks.org/python-find-minimum-k-records-from-tuple-list/ - in this case a verbatim copy of test cases", "query": "findMin(3, [[3, 2], [1, 4], [1, 1], [1, 0], [0, 1]])"}
+{"source_id": 375, "original_prompt": "Write a function to find minimum k records from tuple list. https://www.geeksforgeeks.org/python-find-minimum-k-records-from-tuple-list/ - in this case a verbatim copy of test cases", "query": "findMin(7, [[5, 2], [10, 8], [1, 4], [6, 9], [2, 1], [3, 7], [4, 5]])"}
+{"source_id": 375, "original_prompt": "Write a function to find minimum k records from tuple list. https://www.geeksforgeeks.org/python-find-minimum-k-records-from-tuple-list/ - in this case a verbatim copy of test cases", "query": "findMin(2, [[7, 8], [7, 7], [6, 6]])"}
+{"source_id": 377, "original_prompt": "Write a function to find the second smallest number in a list.", "query": "Find second smallest in list"}
+{"source_id": 377, "original_prompt": "Write a function to find the second smallest number in a list.", "query": "Sort list, remove first element"}
+{"source_id": 378, "original_prompt": "Write a function that matches a string that has an 'a' followed by one or more 'b's. https://www.w3resource.com/python-exercises/re/python-re-exercise-3.php", "query": "^a+b+"}
+{"source_id": 379, "original_prompt": "Write a function to count the pairs of reverse strings in the given string list. https://www.geeksforgeeks.org/python-program-to-count-the-pairs-of-reverse-strings/", "query": "list_reverse"}
+{"source_id": 379, "original_prompt": "Write a function to count the pairs of reverse strings in the given string list. https://www.geeksforgeeks.org/python-program-to-count-the-pairs-of-reverse-strings/", "query": "pair_compare"}
+{"source_id": 379, "original_prompt": "Write a function to count the pairs of reverse strings in the given string list. https://www.geeksforgeeks.org/python-program-to-count-the-pairs-of-reverse-strings/", "query": "reverse_equal"}
+{"source_id": 379, "original_prompt": "Write a function to count the pairs of reverse strings in the given string list. https://www.geeksforgeeks.org/python-program-to-count-the-pairs-of-reverse-strings/", "query": "count_pairs"}
+{"source_id": 379, "original_prompt": "Write a function to count the pairs of reverse strings in the given string list. https://www.geeksforgeeks.org/python-program-to-count-the-pairs-of-reverse-strings/", "query": "print_result"}
+{"source_id": 382, "original_prompt": "Write a python function to check whether a list of numbers contains only one distinct element or not.", "query": "contains_single_distinct"}
+{"source_id": 382, "original_prompt": "Write a python function to check whether a list of numbers contains only one distinct element or not.", "query": "list_unique_count"}
+{"source_id": 383, "original_prompt": "Write a function to check whether the given month number contains 30 days or not. Months are given as number from 1 to 12.", "query": "contains_thirty_days"}
+{"source_id": 383, "original_prompt": "Write a function to check whether the given month number contains 30 days or not. Months are given as number from 1 to 12.", "query": "month_number"}
+{"source_id": 385, "original_prompt": "Write a python function to count number of digits in a given string.", "query": "len(str.isdigit)"}
+{"source_id": 385, "original_prompt": "Write a python function to count number of digits in a given string.", "query": "sum(map(int, str))"}
+{"source_id": 385, "original_prompt": "Write a python function to count number of digits in a given string.", "query": "count digits in list of unique chars"}
+{"source_id": 385, "original_prompt": "Write a python function to count number of digits in a given string.", "query": "is string all digits"}
+{"source_id": 385, "original_prompt": "Write a python function to count number of digits in a given string.", "query": "find first non-digit character"}
+{"source_id": 386, "original_prompt": "Write a function to find nth polite number. geeksforgeeks.org/n-th-polite-number/", "query": "Define polite number"}
+{"source_id": 386, "original_prompt": "Write a function to find nth polite number. geeksforgeeks.org/n-th-polite-number/", "query": "What is nth polite number"}
+{"source_id": 386, "original_prompt": "Write a function to find nth polite number. geeksforgeeks.org/n-th-polite-number/", "query": "Polite number formula"}
+{"source_id": 386, "original_prompt": "Write a function to find nth polite number. geeksforgeeks.org/n-th-polite-number/", "query": "Find polite number formula for n=3"}
+{"source_id": 386, "original_prompt": "Write a function to find nth polite number. geeksforgeeks.org/n-th-polite-number/", "query": "Implement nth polite number function"}
+{"source_id": 387, "original_prompt": "Write a function to return a list of all pairs of consecutive items in a given list.", "query": "consecutive pair"}
+{"source_id": 387, "original_prompt": "Write a function to return a list of all pairs of consecutive items in a given list.", "query": "list items pairs"}
+{"source_id": 389, "original_prompt": "Write a python function to get the difference between two lists.", "query": "list1 subtract list2"}
+{"source_id": 389, "original_prompt": "Write a python function to get the difference between two lists.", "query": "difference of lists"}
+{"source_id": 390, "original_prompt": "Write a python function to find the sum of fourth power of first n odd natural numbers.", "query": "Fourth power of first n odd natural numbers sum"}
+{"source_id": 395, "original_prompt": "Write a function to count those characters which have vowels as their neighbors in the given string.", "query": "countVowelNeighbors"}
+{"source_id": 395, "original_prompt": "Write a function to count those characters which have vowels as their neighbors in the given string.", "query": "inGivenString"}
+{"source_id": 396, "original_prompt": "Write a python function to find the sum of non-repeated elements in a given list.", "query": "List of unique numbers"}
+{"source_id": 396, "original_prompt": "Write a python function to find the sum of non-repeated elements in a given list.", "query": "Sum unique numbers"}
+{"source_id": 396, "original_prompt": "Write a python function to find the sum of non-repeated elements in a given list.", "query": "List without duplicates"}
+{"source_id": 396, "original_prompt": "Write a python function to find the sum of non-repeated elements in a given list.", "query": "Add unique numbers"}
+{"source_id": 397, "original_prompt": "Write a function to pack consecutive duplicates of a given list elements into sublists.", "query": "packConsecutiveDuplicates"}
+{"source_id": 397, "original_prompt": "Write a function to pack consecutive duplicates of a given list elements into sublists.", "query": "listElementsToSublists"}
+{"source_id": 401, "original_prompt": "Write a python function to find the sum of all odd length subarrays. https://www.geeksforgeeks.org/sum-of-all-odd-length-subarrays/", "query": "def sum_odd(arr)"}
+{"source_id": 401, "original_prompt": "Write a python function to find the sum of all odd length subarrays. https://www.geeksforgeeks.org/sum-of-all-odd-length-subarrays/", "query": "return sum([sum(a) for a in arr if len(a) % 2 == 1])"}
+{"source_id": 401, "original_prompt": "Write a python function to find the sum of all odd length subarrays. https://www.geeksforgeeks.org/sum-of-all-odd-length-subarrays/", "query": "arr = list(map(int, input('Enter the array: ').split()))"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "Convert RGB to HSV"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "function rgbToHsv(r, g, b)"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "let min = Math.min(r, g, b);"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "let max = Math.max(r, g, b);"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "let delta = max - min;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "let h = null;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "if (delta == 0) h = 0;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "else if (max == r) h = ((g - b) / delta) % 6;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "else if (max == g) h = ((b - r) / delta) + 2;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "else if (max == b) h = ((r - g) / delta) + 4;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "h *= 60;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "let s = delta / max;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "let v = max;"}
+{"source_id": 402, "original_prompt": "Write a function to convert rgb color to hsv color. https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/", "query": "return { h: Math.round(h), s: Math.round(s * 100), v: Math.round(v * 100) };"}
+{"source_id": 403, "original_prompt": "Write a function to find the product of first even and odd number of a given list.", "query": "find even number"}
+{"source_id": 403, "original_prompt": "Write a function to find the product of first even and odd number of a given list.", "query": "find odd number"}
+{"source_id": 403, "original_prompt": "Write a function to find the product of first even and odd number of a given list.", "query": "multiply found numbers"}
+{"source_id": 404, "original_prompt": "Write a function to convert tuple string to integer tuple.", "query": "tuple_string_to_int_tuple"}
+{"source_id": 404, "original_prompt": "Write a function to convert tuple string to integer tuple.", "query": "str_split"}
+{"source_id": 404, "original_prompt": "Write a function to convert tuple string to integer tuple.", "query": "map_to_int"}
+{"source_id": 404, "original_prompt": "Write a function to convert tuple string to integer tuple.", "query": "join_list"}
+{"source_id": 404, "original_prompt": "Write a function to convert tuple string to integer tuple.", "query": "convert_tuple"}
+{"source_id": 405, "original_prompt": "Write a function to locate the right insertion point for a specified value in sorted order.", "query": "findInsertPosition"}
+{"source_id": 405, "original_prompt": "Write a function to locate the right insertion point for a specified value in sorted order.", "query": "inSortedArray"}
+{"source_id": 405, "original_prompt": "Write a function to locate the right insertion point for a specified value in sorted order.", "query": "forValue"}
+{"source_id": 406, "original_prompt": "Write a function that matches a string that has an a followed by three 'b'.", "query": "a followed by three b"}
+{"source_id": 406, "original_prompt": "Write a function that matches a string that has an a followed by three 'b'.", "query": "string contains aabbabb"}
+{"source_id": 409, "original_prompt": "Write a function to remove tuples from the given tuple.", "query": "REMOVE FROM tuple"}
+{"source_id": 409, "original_prompt": "Write a function to remove tuples from the given tuple.", "query": "WHERE element = ?"}
+{"source_id": 409, "original_prompt": "Write a function to remove tuples from the given tuple.", "query": "SET deleted = true"}
+{"source_id": 409, "original_prompt": "Write a function to remove tuples from the given tuple.", "query": "COMMIT"}
+{"source_id": 411, "original_prompt": "Write a python function to find the last position of an element in a sorted array.", "query": "Find last position in sorted array"}
+{"source_id": 411, "original_prompt": "Write a python function to find the last position of an element in a sorted array.", "query": "Last index of sorted array element"}
+{"source_id": 412, "original_prompt": "Write a function that matches a string that has an 'a' followed by anything, ending in 'b'.", "query": "String contains a and ends with b"}
+{"source_id": 414, "original_prompt": "Write a python function to find the sum of all odd natural numbers within the range l and r.", "query": "Sum of odd numbers in range"}
+{"source_id": 414, "original_prompt": "Write a python function to find the sum of all odd natural numbers within the range l and r.", "query": "l and r"}
+{"source_id": 415, "original_prompt": "Write a python function to find the sum of an array.", "query": "Define array"}
+{"source_id": 415, "original_prompt": "Write a python function to find the sum of an array.", "query": "Get length"}
+{"source_id": 415, "original_prompt": "Write a python function to find the sum of an array.", "query": "Iterate through elements"}
+{"source_id": 415, "original_prompt": "Write a python function to find the sum of an array.", "query": "Sum elements"}
+{"source_id": 415, "original_prompt": "Write a python function to find the sum of an array.", "query": "Return total"}
+{"source_id": 416, "original_prompt": "Write a function to that rotate left bits by d bits a given number. We assume that the number is 32 bit.", "query": "defineLeftRotate"}
+{"source_id": 416, "original_prompt": "Write a function to that rotate left bits by d bits a given number. We assume that the number is 32 bit.", "query": "leftRotateFunctionPrototype"}
+{"source_id": 416, "original_prompt": "Write a function to that rotate left bits by d bits a given number. We assume that the number is 32 bit.", "query": "implementLeftRotateFunction"}
+{"source_id": 416, "original_prompt": "Write a function to that rotate left bits by d bits a given number. We assume that the number is 32 bit.", "query": "testLeftRotateFunction"}
+{"source_id": 416, "original_prompt": "Write a function to that rotate left bits by d bits a given number. We assume that the number is 32 bit.", "query": "optimizeLeftRotateFunction"}
+{"source_id": 417, "original_prompt": "Write a function to remove all whitespaces from a string.", "query": "remove whitespace"}
+{"source_id": 417, "original_prompt": "Write a function to remove all whitespaces from a string.", "query": "function for"}
+{"source_id": 417, "original_prompt": "Write a function to remove all whitespaces from a string.", "query": "string as argument"}
+{"source_id": 418, "original_prompt": "Write a python function to count the number of equal numbers from three given integers.", "query": "count_equal_numbers"}
+{"source_id": 418, "original_prompt": "Write a python function to count the number of equal numbers from three given integers.", "query": "three_integers_given"}
+{"source_id": 418, "original_prompt": "Write a python function to count the number of equal numbers from three given integers.", "query": "return_count"}
+{"source_id": 421, "original_prompt": "Write a function to check whether the product of numbers in a list is even or not.", "query": "Is product of list integers even?"}
+{"source_id": 421, "original_prompt": "Write a function to check whether the product of numbers in a list is even or not.", "query": "Find factorial of product of list members"}
+{"source_id": 421, "original_prompt": "Write a function to check whether the product of numbers in a list is even or not.", "query": "Determine if product of list powers of 2"}
+{"source_id": 421, "original_prompt": "Write a function to check whether the product of numbers in a list is even or not.", "query": "Check if product of prime factors of each number equals product of all numbers?"}
+{"source_id": 422, "original_prompt": "Write a function that returns the list in a list of lists whose sum of elements is the highest.", "query": "sum_of_lists"}
+{"source_id": 422, "original_prompt": "Write a function that returns the list in a list of lists whose sum of elements is the highest.", "query": "highest_list_sum"}
+{"source_id": 423, "original_prompt": "Write a function to find maximum run of uppercase characters in the given string.", "query": "MaxRunUppercaseString"}
+{"source_id": 423, "original_prompt": "Write a function to find maximum run of uppercase characters in the given string.", "query": "LengthOfCapitalLetters"}
+{"source_id": 423, "original_prompt": "Write a function to find maximum run of uppercase characters in the given string.", "query": "FindLongestUppercaseSequence"}
+{"source_id": 423, "original_prompt": "Write a function to find maximum run of uppercase characters in the given string.", "query": "MaxConsecutiveUppercase"}
+{"source_id": 423, "original_prompt": "Write a function to find maximum run of uppercase characters in the given string.", "query": "LongestRunOfCapsInString"}
+{"source_id": 424, "original_prompt": "Write a python function to find the first odd number in a given list of numbers.", "query": "find_odd_number"}
+{"source_id": 424, "original_prompt": "Write a python function to find the first odd number in a given list of numbers.", "query": "in_list"}
+{"source_id": 424, "original_prompt": "Write a python function to find the first odd number in a given list of numbers.", "query": "of_numbers"}
+{"source_id": 425, "original_prompt": "Write a function to check if the given tuples contain the k or not.", "query": "contains_k(tuple1)"}
+{"source_id": 425, "original_prompt": "Write a function to check if the given tuples contain the k or not.", "query": "contains_k(tuple2)"}
+{"source_id": 425, "original_prompt": "Write a function to check if the given tuples contain the k or not.", "query": "contains_k(tuple3)"}
+{"source_id": 425, "original_prompt": "Write a function to check if the given tuples contain the k or not.", "query": "contains_k(tuple4)"}
+{"source_id": 425, "original_prompt": "Write a function to check if the given tuples contain the k or not.", "query": "contains_k(tuple5)"}
+{"source_id": 426, "original_prompt": "Write a function to check if each element of second tuple is smaller than its corresponding element in the first tuple.", "query": "first > second"}
+{"source_id": 426, "original_prompt": "Write a function to check if each element of second tuple is smaller than its corresponding element in the first tuple.", "query": "first[1] > second[1]"}
+{"source_id": 426, "original_prompt": "Write a function to check if each element of second tuple is smaller than its corresponding element in the first tuple.", "query": "first[2] > second[2]"}
+{"source_id": 426, "original_prompt": "Write a function to check if each element of second tuple is smaller than its corresponding element in the first tuple.", "query": "first[3] > second[3]"}
+{"source_id": 426, "original_prompt": "Write a function to check if each element of second tuple is smaller than its corresponding element in the first tuple.", "query": "first[4] > second[4]"}
+{"source_id": 426, "original_prompt": "Write a function to check if each element of second tuple is smaller than its corresponding element in the first tuple.", "query": "first[5] > second[5]"}
+{"source_id": 426, "original_prompt": "Write a function to check if each element of second tuple is smaller than its corresponding element in the first tuple.", "query": "first.length > second.length"}
