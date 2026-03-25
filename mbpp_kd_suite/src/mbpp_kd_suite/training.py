@@ -16,7 +16,7 @@ from transformers import AutoTokenizer
 
 from .config import DistillTargets, RetrievalSplit, RetrievalSplits, TrainConfig
 from .constants import METHOD_ORDER, TRAINED_BASELINE_NAME
-from .data import make_pair_dataloader, make_query_dataloader
+from .data import make_indexed_pair_dataloader, make_pair_dataloader, make_query_dataloader
 from .metrics import (
     doc_alignment_cosine_student_vs_target,
     evaluate_asymmetric,
@@ -294,12 +294,15 @@ def _build_train_loader(
             max_code_length=cfg.max_code_length,
             shuffle=True,
         )
-    return make_query_dataloader(
+    # KD methods: need indices (for teacher target lookup) + codes (to encode with student)
+    return make_indexed_pair_dataloader(
         queries=split.queries,
+        codes=split.codes,
         tokenizer=tokenizer,
         encoding_spec=student_model.encoding_spec,
         batch_size=cfg.batch_size,
         max_query_length=cfg.max_query_length,
+        max_code_length=cfg.max_code_length,
         shuffle=True,
     )
 
@@ -329,10 +332,12 @@ def _compute_kd_batch_losses(
     cfg: TrainConfig,
     device: torch.device,
 ) -> LossComponents:
-    batch_indices, tokenized_queries = batch
+    batch_indices, tokenized_queries, tokenized_codes = batch
     tokenized_queries = to_device(tokenized_queries, device)
+    tokenized_codes = to_device(tokenized_codes, device)
 
     student_q = student_model.encode(tokenized_queries)
+    student_d = student_model.encode(tokenized_codes)
     train_target_q, train_target_d = targets.split("train")
     teacher_train_q, teacher_train_d = full_teacher_targets.split("train")
 
@@ -341,7 +346,8 @@ def _compute_kd_batch_losses(
     teacher_q = _slice_batch_tensor(teacher_train_q, batch_indices, device)
     teacher_d = _slice_batch_tensor(teacher_train_d, batch_indices, device)
 
-    student_scores = student_q @ target_d.T
+    # student_scores uses student-encoded docs so train/eval are consistent
+    student_scores = student_q @ student_d.T
     teacher_scores = target_q @ target_d.T
     full_teacher_scores = teacher_q @ teacher_d.T
 

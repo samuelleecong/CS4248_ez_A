@@ -91,7 +91,7 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
         "zeroshot_student": "zs_student",
         "phase1_ft_teacher": "ft_teacher",
         "phase1_ft_student": "ft_student",
-        "phase2_control_supervised": "ctrl_sup",
+        "phase2_control_supervised": "ft_student_nodistill",
     }
     labels = []
     for key in display_order:
