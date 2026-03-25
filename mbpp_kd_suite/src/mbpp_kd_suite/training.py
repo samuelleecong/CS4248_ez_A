@@ -345,6 +345,7 @@ def _compute_kd_batch_losses(
     teacher_scores = target_q @ target_d.T
     full_teacher_scores = teacher_q @ teacher_d.T
 
+    name = name.removeprefix("phase2_")
     losses = LossComponents.from_one_hot(
         one_hot=one_hot_loss(student_scores, cfg.temperature),
         device=device,
@@ -528,6 +529,7 @@ def train_student(
     full_teacher_targets: DistillTargets,
     model_name: str | None = None,
     supervised: bool | None = None,
+    initial_backbone_state_dict: dict[str, torch.Tensor] | None = None,
 ) -> tuple[dict[str, Any], StudentQueryEncoder, AutoTokenizer]:
     effective_model = model_name or cfg.student_model
     is_supervised = supervised if supervised is not None else (name == TRAINED_BASELINE_NAME)
@@ -536,6 +538,8 @@ def train_student(
         model_name=effective_model,
         target_hidden_size=None if is_supervised else targets.hidden_size,
     ).to(device)
+    if initial_backbone_state_dict is not None:
+        student_model.backbone.load_state_dict(initial_backbone_state_dict)
     init_stats = initialize_projection_from_targets(
         cfg=cfg,
         student_model=student_model,
