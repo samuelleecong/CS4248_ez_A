@@ -329,6 +329,7 @@ def run(
         seed=seed,
         run_diagnostics=not skip_diagnostics,
         output_dir=output_dir,
+        save_models=True,
     )
     apply_device_runtime_optimizations(cfg=phase1_cfg, device=device)
     apply_device_runtime_optimizations(cfg=phase2_cfg, device=device)
