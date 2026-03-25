@@ -16,7 +16,7 @@ from transformers import AutoTokenizer
 
 from .config import DistillTargets, RetrievalSplit, RetrievalSplits, TrainConfig
 from .constants import METHOD_ORDER, TRAINED_BASELINE_NAME
-from .data import make_pair_dataloader, make_query_dataloader
+from .data import make_indexed_pair_dataloader, make_pair_dataloader, make_query_dataloader
 from .metrics import (
     doc_alignment_cosine_student_vs_target,
     evaluate_asymmetric,
@@ -294,12 +294,15 @@ def _build_train_loader(
             max_code_length=cfg.max_code_length,
             shuffle=True,
         )
-    return make_query_dataloader(
+    # KD methods: need indices (for teacher target lookup) + codes (to encode with student)
+    return make_indexed_pair_dataloader(
         queries=split.queries,
+        codes=split.codes,
         tokenizer=tokenizer,
         encoding_spec=student_model.encoding_spec,
         batch_size=cfg.batch_size,
         max_query_length=cfg.max_query_length,
+        max_code_length=cfg.max_code_length,
         shuffle=True,
     )
 
@@ -329,10 +332,12 @@ def _compute_kd_batch_losses(
     cfg: TrainConfig,
     device: torch.device,
 ) -> LossComponents:
-    batch_indices, tokenized_queries = batch
+    batch_indices, tokenized_queries, tokenized_codes = batch
     tokenized_queries = to_device(tokenized_queries, device)
+    tokenized_codes = to_device(tokenized_codes, device)
 
     student_q = student_model.encode(tokenized_queries)
+    student_d = student_model.encode(tokenized_codes)
     train_target_q, train_target_d = targets.split("train")
     teacher_train_q, teacher_train_d = full_teacher_targets.split("train")
 
@@ -341,10 +346,12 @@ def _compute_kd_batch_losses(
     teacher_q = _slice_batch_tensor(teacher_train_q, batch_indices, device)
     teacher_d = _slice_batch_tensor(teacher_train_d, batch_indices, device)
 
-    student_scores = student_q @ target_d.T
+    # student_scores uses student-encoded docs so train/eval are consistent
+    student_scores = student_q @ student_d.T
     teacher_scores = target_q @ target_d.T
     full_teacher_scores = teacher_q @ teacher_d.T
 
+    name = name.removeprefix("phase2_")
     losses = LossComponents.from_one_hot(
         one_hot=one_hot_loss(student_scores, cfg.temperature),
         device=device,
@@ -528,6 +535,7 @@ def train_student(
     full_teacher_targets: DistillTargets,
     model_name: str | None = None,
     supervised: bool | None = None,
+    initial_backbone_state_dict: dict[str, torch.Tensor] | None = None,
 ) -> tuple[dict[str, Any], StudentQueryEncoder, AutoTokenizer]:
     effective_model = model_name or cfg.student_model
     is_supervised = supervised if supervised is not None else (name == TRAINED_BASELINE_NAME)
@@ -536,6 +544,8 @@ def train_student(
         model_name=effective_model,
         target_hidden_size=None if is_supervised else targets.hidden_size,
     ).to(device)
+    if initial_backbone_state_dict is not None:
+        student_model.backbone.load_state_dict(initial_backbone_state_dict)
     init_stats = initialize_projection_from_targets(
         cfg=cfg,
         student_model=student_model,
@@ -562,6 +572,8 @@ def train_student(
     best_val_mrr = -math.inf
     best_state_dict: dict[str, torch.Tensor] | None = None
     history: list[dict[str, float]] = []
+    no_improve = 0
+    stopped_epoch = cfg.epochs
 
     for epoch in range(1, cfg.epochs + 1):
         student_model.train()
@@ -628,6 +640,13 @@ def train_student(
             best_state_dict = {
                 key: value.detach().cpu().clone() for key, value in student_model.state_dict().items()
             }
+            no_improve = 0
+        else:
+            no_improve += 1
+            if cfg.early_stopping_patience > 0 and no_improve >= cfg.early_stopping_patience:
+                print(f"  Early stopping at epoch {epoch} (no val MRR improvement for {cfg.early_stopping_patience} epochs)")
+                stopped_epoch = epoch
+                break
 
     assert best_state_dict is not None
     student_model.load_state_dict(best_state_dict)
@@ -645,6 +664,7 @@ def train_student(
         "model_name": effective_model,
         "target_space": "student_native" if is_supervised else targets.name,
         "evaluation_mode": cfg.eval_mode,
+        "stopped_epoch": stopped_epoch,
         "train": final_metrics["train"],
         "validation": final_metrics["validation"],
         "test": final_metrics["test"],
