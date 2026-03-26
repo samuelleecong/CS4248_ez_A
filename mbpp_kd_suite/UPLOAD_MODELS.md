@@ -6,7 +6,19 @@ community can use them.
 
 ---
 
-## 1. Connect to HuggingFace
+## 1. Install the package
+
+From the repo root:
+
+```bash
+pip install -e mbpp_kd_suite
+```
+
+This installs all dependencies (including `huggingface-hub`) and registers the `mbpp-kd-upload` command.
+
+---
+
+## 2. Connect to HuggingFace
 
 You need a HuggingFace account and a write-access token.
 
@@ -30,7 +42,7 @@ export HUGGING_FACE_HUB_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxx
 
 ---
 
-## 2. Run the upload command
+## 3. Run the upload command
 
 ```bash
 mbpp-kd-upload --run-dir artifacts/two_phase_kd/<timestamp> --hf-org cs4248-nlp
@@ -75,7 +87,7 @@ mbpp-kd-upload \
 
 ---
 
-## 3. What gets uploaded
+## 4. What gets uploaded
 
 The tool scans the run directory for every model saved in HuggingFace format
 (i.e. directories that contain `backbone/model.safetensors`).  For each one it:
@@ -90,7 +102,7 @@ saved models.  Runs without saved models cannot be uploaded.
 
 ---
 
-## 4. Naming convention
+## 5. Naming convention
 
 Repository names follow this pattern:
 
@@ -132,7 +144,7 @@ Available roles from a full two-phase run (role slug = directory name with `_` â
 
 ---
 
-## 5. Using an uploaded model
+## 6. Using an uploaded model
 
 ```python
 from transformers import AutoModel, AutoTokenizer
@@ -162,7 +174,7 @@ print(f"Similarity: {score:.4f}")
 
 ---
 
-## 6. All CLI options
+## 7. All CLI options
 
 ```
 mbpp-kd-upload --help
