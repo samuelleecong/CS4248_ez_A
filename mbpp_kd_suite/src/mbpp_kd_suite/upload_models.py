@@ -35,6 +35,16 @@ def _dir_to_role(dir_name: str) -> str:
     return dir_name.replace("_", "-")
 
 
+def _model_slug(model_name: str) -> str:
+    """Convert a HuggingFace model name to a URL-safe slug.
+
+    'sentence-transformers/all-MiniLM-L6-v2' → 'all-minilm-l6-v2'
+    'sentence-transformers/all-mpnet-base-v2' → 'all-mpnet-base-v2'
+    """
+    name = model_name.split("/")[-1]
+    return name.lower()
+
+
 def _dataset_slug(dataset_name: str) -> str:
     """Convert a HuggingFace dataset name to a URL-safe slug.
 
@@ -56,8 +66,8 @@ def _timestamp_slug(run_dir_name: str) -> str:
     return run_dir_name.replace("_", "-")
 
 
-def _make_repo_name(prefix: str, role: str, dataset: str, timestamp: str) -> str:
-    parts = [prefix, role, dataset, timestamp]
+def _make_repo_name(prefix: str, role: str, model: str, dataset: str, timestamp: str) -> str:
+    parts = [prefix, role, model, dataset, timestamp]
     repo = "-".join(p for p in parts if p)
     # Sanitise: only allow alphanumerics and hyphens
     repo = re.sub(r"[^a-z0-9-]", "-", repo.lower())
@@ -256,6 +266,18 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Print what would be uploaded without actually uploading anything",
     )
     parser.add_argument(
+        "--teacher-model",
+        default="",
+        metavar="MODEL",
+        help="Override teacher model name (e.g. sentence-transformers/all-mpnet-base-v2)",
+    )
+    parser.add_argument(
+        "--student-model",
+        default="",
+        metavar="MODEL",
+        help="Override student model name (e.g. sentence-transformers/all-MiniLM-L6-v2)",
+    )
+    parser.add_argument(
         "--dataset-name",
         default="",
         metavar="DATASET",
@@ -303,6 +325,13 @@ def main() -> None:
         sys.exit(1)
 
     dataset = _dataset_slug(raw_dataset_name)
+
+    teacher_model = args.teacher_model.strip() or run_config.get("teacher_model", "")
+    student_model = args.student_model.strip() or run_config.get("student_model", "")
+    if not teacher_model or not student_model:
+        missing = "teacher" if not teacher_model else "student"
+        print(f"ERROR: could not determine {missing} model name. Pass --{missing}-model <model-name>.")
+        sys.exit(1)
     timestamp = _timestamp_slug(run_dir_name)
 
     model_dirs = _find_model_dirs(run_dir)
@@ -323,6 +352,8 @@ def main() -> None:
         sys.exit(1)
 
     print(f"Run directory : {run_dir}")
+    print(f"Teacher model : {teacher_model}")
+    print(f"Student model : {student_model}")
     print(f"Dataset slug  : {dataset}")
     print(f"Timestamp slug: {timestamp}")
     print(f"Namespace     : {namespace}")
@@ -330,7 +361,10 @@ def main() -> None:
     print()
 
     for role, backbone_dir in selected:
-        repo_name = _make_repo_name(args.prefix, role, dataset, timestamp)
+        # ft_teacher uses the teacher backbone; everything else is the student
+        base_model = teacher_model if role == "ft-teacher" else student_model
+        model = _model_slug(base_model)
+        repo_name = _make_repo_name(args.prefix, role, model, dataset, timestamp)
         repo_id = f"{namespace}/{repo_name}"
         print(f"[{role}] → {repo_id}")
         _upload_model(

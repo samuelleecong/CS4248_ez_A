@@ -107,23 +107,26 @@ saved models.  Runs without saved models cannot be uploaded.
 Repository names follow this pattern:
 
 ```
-{role}-{dataset-slug}-{timestamp}
+{role}-{model-slug}-{dataset-slug}-{timestamp}
 ```
 
 Optionally add a prefix with `--prefix`:
 
 ```
-{prefix}-{role}-{dataset-slug}-{timestamp}
+{prefix}-{role}-{model-slug}-{dataset-slug}-{timestamp}
 ```
 
 | Part | Example | Meaning |
 |------|---------|---------|
 | `role` | `ft-student` | Which model in the pipeline |
+| `model-slug` | `all-minilm-l6-v2` | Base model (`ft-teacher` uses teacher model, all others use student model) |
 | `dataset-slug` | `taco` | Lowercased last segment of the dataset name |
-| `timestamp` | `20260326-142654` | Run directory name (underscores → hyphens) |
+| `timestamp` | `20260326-110507` | Run directory name (underscores → hyphens) |
 
-**Full example:**
-`cs4248-nlp/score-distill-taco-20260326-142654`
+**Full examples:**
+`cs4248-nlp/ft-student-all-minilm-l6-v2-taco-20260326-110507`
+`cs4248-nlp/score-distill-all-minilm-l6-v2-taco-20260326-110507`
+`cs4248-nlp/ft-teacher-all-mpnet-base-v2-taco-20260326-110507`
 
 Available roles from a full two-phase run (role slug = directory name with `_` → `-`):
 
@@ -150,7 +153,7 @@ Available roles from a full two-phase run (role slug = directory name with `_` �
 from transformers import AutoModel, AutoTokenizer
 import torch
 
-repo_id = "cs4248-nlp/ft-student-taco-20260326-142654"
+repo_id = "cs4248-nlp/ft-student-all-minilm-l6-v2-taco-20260326-110507"
 
 tokenizer = AutoTokenizer.from_pretrained(repo_id)
 model = AutoModel.from_pretrained(repo_id)
@@ -185,6 +188,8 @@ mbpp-kd-upload --help
   --prefix PREFIX       Repo name prefix (default: none)
   --private             Create private repositories
   --dry-run             Preview uploads without actually uploading
+  --teacher-model MODEL Override teacher model name (required if run has no config.json)
+  --student-model MODEL Override student model name (required if run has no config.json)
   --dataset-name NAME   Override dataset name used in repo slug (required if run has no config.json)
   --roles ROLE1,ROLE2   Only upload the listed roles (default: all)
 ```
