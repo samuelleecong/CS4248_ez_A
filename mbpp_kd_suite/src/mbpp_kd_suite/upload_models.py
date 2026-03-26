@@ -190,13 +190,17 @@ def _upload_model(
         print("ERROR: huggingface_hub is not installed. Run: pip install huggingface-hub")
         sys.exit(1)
 
-    # Collect files to upload: backbone/* + tokenizer/* (sibling of backbone)
+    # Collect files to upload:
+    #   backbone/* + tokenizer/* from .../model/
+    #   metrics.json + history.json from the role dir (.../ft_student/)
     model_root = backbone_dir.parent  # .../model/
+    role_dir = model_root.parent      # .../ft_student/
     files_to_upload: list[tuple[Path, str]] = []
     for p in sorted(model_root.rglob("*")):
         if p.is_file():
-            rel = p.relative_to(model_root)
-            files_to_upload.append((p, str(rel)))
+            files_to_upload.append((p, str(p.relative_to(model_root))))
+    for p in sorted(role_dir.glob("*.json")):
+        files_to_upload.append((p, p.name))
 
     if not files_to_upload:
         print(f"  WARNING: no files found under {model_root}, skipping.")
