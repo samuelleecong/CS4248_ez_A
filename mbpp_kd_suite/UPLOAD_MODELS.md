@@ -95,18 +95,23 @@ saved models.  Runs without saved models cannot be uploaded.
 Repository names follow this pattern:
 
 ```
+{role}-{dataset-slug}-{timestamp}
+```
+
+Optionally add a prefix with `--prefix`:
+
+```
 {prefix}-{role}-{dataset-slug}-{timestamp}
 ```
 
 | Part | Example | Meaning |
 |------|---------|---------|
-| `prefix` | `cs4248` | Configurable via `--prefix` (default `cs4248`) |
-| `role` | `phase1-student` | Which model in the pipeline |
+| `role` | `ft-student` | Which model in the pipeline |
 | `dataset-slug` | `taco` | Lowercased last segment of the dataset name |
-| `timestamp` | `20260325-014013` | Run directory name (underscores → hyphens) |
+| `timestamp` | `20260326-142654` | Run directory name (underscores → hyphens) |
 
 **Full example:**
-`cs4248-nlp/cs4248-score-distill-taco-20260325-014013`
+`cs4248-nlp/score-distill-taco-20260326-142654`
 
 Available roles from a full two-phase run (role slug = directory name with `_` → `-`):
 
@@ -133,7 +138,7 @@ Available roles from a full two-phase run (role slug = directory name with `_` �
 from transformers import AutoModel, AutoTokenizer
 import torch
 
-repo_id = "cs4248-nlp/cs4248-ft-student-taco-20260325-014013"
+repo_id = "cs4248-nlp/ft-student-taco-20260326-142654"
 
 tokenizer = AutoTokenizer.from_pretrained(repo_id)
 model = AutoModel.from_pretrained(repo_id)
@@ -165,7 +170,7 @@ mbpp-kd-upload --help
   --run-dir PATH        Path to the two-phase KD run directory
   --hf-user USERNAME    Your HuggingFace username (mutually exclusive with --hf-org)
   --hf-org ORG          HuggingFace organisation name (mutually exclusive with --hf-user)
-  --prefix PREFIX       Repo name prefix (default: cs4248)
+  --prefix PREFIX       Repo name prefix (default: none)
   --private             Create private repositories
   --dry-run             Preview uploads without actually uploading
   --roles ROLE1,ROLE2   Only upload the listed roles (default: all)

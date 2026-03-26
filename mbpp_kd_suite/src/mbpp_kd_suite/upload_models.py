@@ -241,9 +241,9 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--prefix",
-        default="cs4248",
+        default="",
         metavar="PREFIX",
-        help="Repo name prefix (default: cs4248)",
+        help="Repo name prefix (default: none)",
     )
     parser.add_argument(
         "--private",
