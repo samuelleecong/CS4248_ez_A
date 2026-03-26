@@ -185,5 +185,6 @@ mbpp-kd-upload --help
   --prefix PREFIX       Repo name prefix (default: none)
   --private             Create private repositories
   --dry-run             Preview uploads without actually uploading
+  --dataset-name NAME   Override dataset name used in repo slug (required if run has no config.json)
   --roles ROLE1,ROLE2   Only upload the listed roles (default: all)
 ```

@@ -256,6 +256,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Print what would be uploaded without actually uploading anything",
     )
     parser.add_argument(
+        "--dataset-name",
+        default="",
+        metavar="DATASET",
+        help=(
+            "Override the dataset name used in the repo slug "
+            "(e.g. BAAI/TACO). Required when the run dir has no config.json."
+        ),
+    )
+    parser.add_argument(
         "--roles",
         metavar="ROLE1,ROLE2",
         default="",
@@ -287,10 +296,13 @@ def main() -> None:
     namespace = args.hf_user or args.hf_org
 
     run_config = _load_run_config(run_dir)
-    if not run_config:
-        print(f"WARNING: no config.json found in {run_dir}; dataset slug will be 'unknown'.")
 
-    dataset = _dataset_slug(run_config.get("dataset_name", "unknown"))
+    raw_dataset_name = args.dataset_name.strip() or run_config.get("dataset_name", "")
+    if not raw_dataset_name:
+        print("ERROR: could not determine dataset name. Pass --dataset-name BAAI/TACO (or whichever dataset was used).")
+        sys.exit(1)
+
+    dataset = _dataset_slug(raw_dataset_name)
     timestamp = _timestamp_slug(run_dir_name)
 
     model_dirs = _find_model_dirs(run_dir)
