@@ -118,6 +118,17 @@ def _make_model_card(
     method = role.replace("phase2-", "").replace("phase1-", "")
 
     lines = [
+        "---",
+        "language:",
+        "- en",
+        "license: mit",
+        "tags:",
+        "- code-search",
+        "- embeddings",
+        "- knowledge-distillation",
+        "- sentence-transformers",
+        "---",
+        "",
         f"# {repo_id}",
         "",
         "Code-search embedding model trained with the CS4248 two-phase KD pipeline.",
