@@ -118,20 +118,20 @@ Repository names follow this pattern:
 
 Available roles from a full two-phase run (role slug = directory name with `_` â†’ `-`):
 
-| Directory name | Role slug |
-|---------------|-----------|
-| `ft_student_phase1` | `ft-student-phase1` |
-| `ft_teacher_phase1` | `ft-teacher-phase1` |
-| `phase2_control_supervised` | `phase2-control-supervised` |
-| `phase2_score_distill` | `phase2-score-distill` |
-| `phase2_embed_distill` | `phase2-embed-distill` |
-| `phase2_pair_distill` | `phase2-pair-distill` |
-| `phase2_qed_align` | `phase2-qed-align` |
-| `phase2_distilcse_lite` | `phase2-distilcse-lite` |
-| `phase2_adam_lite` | `phase2-adam-lite` |
-| `phase2_hpd` | `phase2-hpd` |
-| `phase2_margin_mse` | `phase2-margin-mse` |
-| `phase2_pointwise` | `phase2-pointwise` |
+| Phase | Directory name | Role slug |
+|-------|---------------|-----------|
+| 1 | `phase1/ft_teacher/` | `ft-teacher` |
+| 1 | `phase1/ft_student/` | `ft-student` |
+| 2 | `phase2/control_supervised/` | `control-supervised` |
+| 2 | `phase2/score_distill/` | `score-distill` |
+| 2 | `phase2/embed_distill/` | `embed-distill` |
+| 2 | `phase2/pair_distill/` | `pair-distill` |
+| 2 | `phase2/qed_align/` | `qed-align` |
+| 2 | `phase2/distilcse_lite/` | `distilcse-lite` |
+| 2 | `phase2/adam_lite/` | `adam-lite` |
+| 2 | `phase2/hpd/` | `hpd` |
+| 2 | `phase2/margin_mse/` | `margin-mse` |
+| 2 | `phase2/pointwise/` | `pointwise` |
 
 ---
 
@@ -141,7 +141,7 @@ Available roles from a full two-phase run (role slug = directory name with `_` â
 from transformers import AutoModel, AutoTokenizer
 import torch
 
-repo_id = "samuelleecong/cs4248-ft-student-phase1-taco-20260325-014013"
+repo_id = "samuelleecong/cs4248-ft-student-taco-20260325-014013"
 
 tokenizer = AutoTokenizer.from_pretrained(repo_id)
 model = AutoModel.from_pretrained(repo_id)

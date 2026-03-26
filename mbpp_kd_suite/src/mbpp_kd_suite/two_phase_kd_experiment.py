@@ -80,8 +80,8 @@ def _write_json(path: Path, payload: Any) -> None:
 def _plot_phase1_training(run_dir: Path) -> None:
     """Plot train loss and val MRR per epoch for teacher and student phase 1 runs."""
     runs = {
-        "teacher": run_dir / "phase1" / "ft_teacher_phase1" / "history.json",
-        "student": run_dir / "phase1" / "ft_student_phase1" / "history.json",
+        "teacher": run_dir / "phase1" / "ft_teacher" / "history.json",
+        "student": run_dir / "phase1" / "ft_student" / "history.json",
     }
     histories: dict[str, list[dict]] = {}
     for label, path in runs.items():
@@ -132,20 +132,18 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
     # Build ordered list of runs to display
     display_order = [
         "zeroshot_teacher", "zeroshot_student",
-        "phase1_ft_teacher", "phase1_ft_student", "phase2_control_supervised",
-    ] + [f"phase2_{m}" for m in KD_METHOD_ORDER]
+        "ft_teacher", "ft_student", "control_supervised",
+    ] + list(KD_METHOD_ORDER)
     short_map = {
         "zeroshot_teacher": "zs_teacher",
         "zeroshot_student": "zs_student",
-        "phase1_ft_teacher": "ft_teacher",
-        "phase1_ft_student": "ft_student",
-        "phase2_control_supervised": "ft_student_nodistill",
+        "control_supervised": "ft_student_nodistill",
     }
     labels = []
     for key in display_order:
         if key not in results:
             continue
-        short = short_map.get(key, key.replace("phase2_", ""))
+        short = short_map.get(key, key)
         labels.append((key, short))
 
     keys = [k for k, _ in labels]
@@ -157,11 +155,11 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
     for k in keys:
         if k in ("zeroshot_teacher", "zeroshot_student"):
             colors.append("#bdc3c7")
-        elif k == "phase1_ft_teacher":
+        elif k == "ft_teacher":
             colors.append("#8e44ad")
-        elif k == "phase1_ft_student":
+        elif k == "ft_student":
             colors.append("#95a5a6")
-        elif k == "phase2_control_supervised":
+        elif k == "control_supervised":
             colors.append("#3498db")
         else:
             colors.append("#e67e22")
@@ -205,8 +203,8 @@ def _plot_results(results: dict[str, Any], run_dir: Path, dataset_name: str) -> 
     plt.close(fig)
 
     # ── Chart 2: MRR delta vs phase2 control ──────────────────────
-    control_mrr = results.get("phase2_control_supervised", {}).get("test", {}).get("MRR", 0)
-    kd_keys = [k for k in keys if k.startswith("phase2_") and k != "phase2_control_supervised"]
+    control_mrr = results.get("control_supervised", {}).get("test", {}).get("MRR", 0)
+    kd_keys = [k for k in keys if k in set(KD_METHOD_ORDER)]
     kd_labels = [s for k, s in labels if k in kd_keys]
     kd_deltas = [results[k]["test"].get("MRR", 0) - control_mrr for k in kd_keys]
 
@@ -249,7 +247,7 @@ def _print_results(results: dict[str, Any]) -> None:
         )
 
     print("\n=== Phase 1 Results ===")
-    for key in ["phase1_ft_teacher", "phase1_ft_student"]:
+    for key in ["ft_teacher", "ft_student"]:
         if key not in results:
             continue
         m = results[key]["test"]
@@ -259,7 +257,7 @@ def _print_results(results: dict[str, Any]) -> None:
         )
 
     print("\n=== Phase 2 Results (initialized from finetuned student) ===")
-    phase2_keys = sorted(k for k in results if k.startswith("phase2_"))
+    phase2_keys = ["control_supervised"] + [k for k in KD_METHOD_ORDER if k in results]
     for key in phase2_keys:
         m = results[key]["test"]
         print(
@@ -394,7 +392,7 @@ def run(
         # --- Phase 1: Finetune teacher (supervised contrastive, 3 epochs) ---
         print(f"\n=== Phase 1: Finetuning teacher ({teacher_model}, {phase1_epochs} epochs) ===")
         ft_teacher_metrics, ft_teacher_model, ft_teacher_tokenizer = train_student(
-            name="ft_teacher_phase1",
+            name="ft_teacher",
             cfg=phase1_cfg,
             run_dir=run_dir / "phase1",
             device=device,
@@ -428,7 +426,7 @@ def run(
         print(f"\n=== Phase 1: Finetuning student ({student_model}, {phase1_epochs} epochs) ===")
         # Eval uses symmetric mode so fixed_doc_embs are not used; ft_teacher_targets supplies shape info for diagnostics
         ft_student_metrics, ft_student_model, _ = train_student(
-            name="ft_student_phase1",
+            name="ft_student",
             cfg=phase1_cfg,
             run_dir=run_dir / "phase1",
             device=device,
@@ -479,14 +477,14 @@ def run(
     results: dict[str, Any] = {
         "zeroshot_teacher": zs_teacher,
         "zeroshot_student": zs_student,
-        "phase1_ft_teacher": ft_teacher_metrics,
-        "phase1_ft_student": ft_student_metrics,
+        "ft_teacher": ft_teacher_metrics,
+        "ft_student": ft_student_metrics,
     }
 
     # --- Phase 2: Control — supervised finetuning (no KD) from phase 1 student ---
     print(f"\n=== Phase 2: Control - supervised ({phase2_epochs} epochs, init from phase1 student) ===")
     control_metrics, _, _ = train_student(
-        name="phase2_control_supervised",
+        name="control_supervised",
         cfg=phase2_cfg,
         run_dir=run_dir / "phase2",
         device=device,
@@ -497,13 +495,13 @@ def run(
         supervised=True,
         initial_backbone_state_dict=phase1_student_backbone_state,
     )
-    results["phase2_control_supervised"] = control_metrics
+    results["control_supervised"] = control_metrics
 
     # --- Phase 2: KD methods from phase 1 student ---
     for method_name in methods:
         print(f"\n=== Phase 2: KD '{method_name}' ({phase2_epochs} epochs, init from phase1 student) ===")
         kd_metrics, _, _ = train_student(
-            name=f"phase2_{method_name}",
+            name=method_name,
             cfg=phase2_cfg,
             run_dir=run_dir / "phase2",
             device=device,
@@ -512,7 +510,7 @@ def run(
             full_teacher_targets=ft_teacher_targets,
             initial_backbone_state_dict=phase1_student_backbone_state,
         )
-        results[f"phase2_{method_name}"] = kd_metrics
+        results[method_name] = kd_metrics
 
     config_payload = {
         "teacher_model": teacher_model,
