@@ -33,25 +33,17 @@ export HUGGING_FACE_HUB_TOKEN=hf_xxxxxxxxxxxxxxxxxxxxxxxx
 ## 2. Run the upload command
 
 ```bash
-mbpp-kd-upload --run-dir artifacts/two_phase_kd/<timestamp> --hf-user <your-username>
+mbpp-kd-upload --run-dir artifacts/two_phase_kd/<timestamp> --hf-org cs4248-nlp
 ```
 
 ### Examples
 
-Upload everything from a timestamped run to your personal account:
+Upload everything from a timestamped run to the shared org:
 
 ```bash
 mbpp-kd-upload \
   --run-dir artifacts/two_phase_kd/20260325_014013 \
-  --hf-user samuelleecong
-```
-
-Upload to a shared organisation instead of your personal account:
-
-```bash
-mbpp-kd-upload \
-  --run-dir artifacts/two_phase_kd/20260325_014013 \
-  --hf-org cs4248-team
+  --hf-org cs4248-nlp
 ```
 
 Preview what would be uploaded without actually uploading anything:
@@ -59,7 +51,7 @@ Preview what would be uploaded without actually uploading anything:
 ```bash
 mbpp-kd-upload \
   --run-dir artifacts/two_phase_kd/20260325_014013 \
-  --hf-user samuelleecong \
+  --hf-org cs4248-nlp \
   --dry-run
 ```
 
@@ -68,8 +60,8 @@ Upload only specific models (e.g. just the phase 1 student and one KD method):
 ```bash
 mbpp-kd-upload \
   --run-dir artifacts/two_phase_kd/20260325_014013 \
-  --hf-user samuelleecong \
-  --roles phase1-student,phase2-score-distill
+  --hf-org cs4248-nlp \
+  --roles ft-student,score-distill
 ```
 
 Make all uploaded repos private:
@@ -77,7 +69,7 @@ Make all uploaded repos private:
 ```bash
 mbpp-kd-upload \
   --run-dir artifacts/two_phase_kd/20260325_014013 \
-  --hf-user samuelleecong \
+  --hf-org cs4248-nlp \
   --private
 ```
 
@@ -114,7 +106,7 @@ Repository names follow this pattern:
 | `timestamp` | `20260325-014013` | Run directory name (underscores → hyphens) |
 
 **Full example:**
-`cs4248-phase2-score-distill-taco-20260325-014013`
+`cs4248-nlp/cs4248-score-distill-taco-20260325-014013`
 
 Available roles from a full two-phase run (role slug = directory name with `_` → `-`):
 
@@ -141,7 +133,7 @@ Available roles from a full two-phase run (role slug = directory name with `_` �
 from transformers import AutoModel, AutoTokenizer
 import torch
 
-repo_id = "samuelleecong/cs4248-ft-student-taco-20260325-014013"
+repo_id = "cs4248-nlp/cs4248-ft-student-taco-20260325-014013"
 
 tokenizer = AutoTokenizer.from_pretrained(repo_id)
 model = AutoModel.from_pretrained(repo_id)
