@@ -116,6 +116,10 @@ def _make_model_card(
     student = run_config.get("student_model", "unknown")
     phase = "Phase 1" if role in ("ft-teacher", "ft-student") else "Phase 2"
     method = role
+    phase1_epochs = run_config.get("phase1_epochs", "unknown")
+    phase1_patience = run_config.get("phase1_patience", "unknown")
+    phase2_epochs = run_config.get("phase2_epochs", "unknown")
+    phase2_patience = run_config.get("phase2_patience", "unknown")
 
     lines = [
         "---",
@@ -143,6 +147,10 @@ def _make_model_card(
         f"| Dataset | `{dataset}` |",
         f"| Teacher | `{teacher}` |",
         f"| Student base | `{student}` |",
+        f"| Phase 1 epochs | `{phase1_epochs}` |",
+        f"| Phase 1 patience | `{phase1_patience}` |",
+        f"| Phase 2 epochs | `{phase2_epochs}` |",
+        f"| Phase 2 patience | `{phase2_patience}` |",
         f"| Run timestamp | `{run_dir_name}` |",
         "",
         "## Usage",
