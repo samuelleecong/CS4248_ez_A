@@ -114,8 +114,8 @@ def _make_model_card(
     dataset = run_config.get("dataset_name", "unknown")
     teacher = run_config.get("teacher_model", "unknown")
     student = run_config.get("student_model", "unknown")
-    phase = "Phase 1" if "phase1" in role else "Phase 2"
-    method = role.replace("phase2-", "").replace("phase1-", "")
+    phase = "Phase 1" if role in ("ft-teacher", "ft-student") else "Phase 2"
+    method = role
 
     lines = [
         "---",
