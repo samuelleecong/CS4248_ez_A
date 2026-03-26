@@ -16,6 +16,7 @@ dependencies = [
     "scikit-learn>=1.5.0",
     "sentence-transformers>=3.0.0",
     "torch>=2.5.1",
+    "huggingface-hub>=0.24.0",
     "tqdm>=4.66.0",
     "transformers>=4.44.0",
 ]
@@ -27,6 +28,7 @@ mbpp-kd-baselines = "mbpp_kd_suite.baseline_comparison:main"
 mbpp-kd-finetune = "mbpp_kd_suite.finetune_comparison:main"
 mbpp-kd-eval = "eval.run:main"
 mbpp-kd-two-phase = "mbpp_kd_suite.two_phase_kd_experiment:main"
+mbpp-kd-upload = "mbpp_kd_suite.upload_models:main"
 
 [build-system]
 requires = ["hatchling"]
