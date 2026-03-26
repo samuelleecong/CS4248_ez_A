@@ -10,6 +10,12 @@ community can use them.
 
 You need a HuggingFace account and a write-access token.
 
+### Install / upgrade huggingface_hub
+
+```bash
+pip install -U huggingface_hub
+```
+
 ### Get a token
 
 1. Go to [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
@@ -18,7 +24,7 @@ You need a HuggingFace account and a write-access token.
 ### Log in (one-time setup)
 
 ```bash
-huggingface-cli login
+hf auth login
 # Paste your token when prompted. It is stored in ~/.cache/huggingface/token
 ```
 
