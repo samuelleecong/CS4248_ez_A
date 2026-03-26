@@ -120,6 +120,10 @@ def _make_model_card(
     phase1_patience = run_config.get("phase1_patience", "unknown")
     phase2_epochs = run_config.get("phase2_epochs", "unknown")
     phase2_patience = run_config.get("phase2_patience", "unknown")
+    batch_size = run_config.get("batch_size", "unknown")
+    eval_batch_size = run_config.get("eval_batch_size", "unknown")
+    lr = run_config.get("lr", "unknown")
+    seed = run_config.get("seed", "unknown")
 
     lines = [
         "---",
@@ -151,6 +155,10 @@ def _make_model_card(
         f"| Phase 1 patience | `{phase1_patience}` |",
         f"| Phase 2 epochs | `{phase2_epochs}` |",
         f"| Phase 2 patience | `{phase2_patience}` |",
+        f"| Batch size | `{batch_size}` |",
+        f"| Eval batch size | `{eval_batch_size}` |",
+        f"| Learning rate | `{lr}` |",
+        f"| Seed | `{seed}` |",
         f"| Run timestamp | `{run_dir_name}` |",
         "",
         "## Usage",
