@@ -165,6 +165,26 @@ def margin_mse_loss(student_scores: torch.Tensor, teacher_scores: torch.Tensor) 
     return (mask * (student_margin - teacher_margin) ** 2).sum() / mask.sum()
 
 
+def all_pairs_distill_loss(student_scores: torch.Tensor, teacher_scores: torch.Tensor) -> torch.Tensor:
+    """KL on 2-way softmax over *(positive, every in-batch other doc)* — all ``j != i`` (PairDistill / Sam pairdistil).
+
+    For each query i and column j, logits are ``[sim(q_i, d_i^+), sim(q_i, d_j)]``; teacher and student each
+    yield a binary distribution; loss is ``KL(P_teacher || P_student)`` averaged over all off-diagonal pairs.
+    """
+    b = student_scores.size(0)
+    if b < 2:
+        return torch.zeros((), device=student_scores.device)
+    pos_t = teacher_scores.diag().unsqueeze(1).expand(b, b)
+    pos_s = student_scores.diag().unsqueeze(1).expand(b, b)
+    pair_teacher = torch.stack([pos_t, teacher_scores], dim=2)
+    pair_student = torch.stack([pos_s, student_scores], dim=2)
+    teacher_probs = F.softmax(pair_teacher, dim=2)
+    student_log_probs = F.log_softmax(pair_student, dim=2)
+    kl_per_pair = F.kl_div(student_log_probs, teacher_probs, reduction="none").sum(dim=2)
+    mask = 1.0 - torch.eye(b, device=student_scores.device, dtype=kl_per_pair.dtype)
+    return (kl_per_pair * mask).sum() / mask.sum()
+
+
 def pointwise_loss(student_scores: torch.Tensor, teacher_scores: torch.Tensor) -> torch.Tensor:
     return F.mse_loss(student_scores, teacher_scores)
 
@@ -175,6 +195,7 @@ def pairwise_preference_loss(
     temperature: float,
     hard_negatives: int,
 ) -> torch.Tensor:
+    """BCE on margins for teacher's top-``hard_negatives`` **negative** columns per row (not all in-batch pairs)."""
     batch_size = student_scores.size(0)
     if batch_size < 2:
         return torch.zeros((), device=student_scores.device)
@@ -365,7 +386,7 @@ def _compute_kd_batch_losses(
         losses.align = align_loss(student_q, target_q)
     elif name == "distilcse_lite":
         losses.relation = contrastive_kd_loss(student_q, target_q, cfg.temperature)
-    elif name == "pair_distill":
+    elif name == "hard_negative_pair_distill":
         losses.distill_kl = distill_kl(student_scores, teacher_scores, cfg.temperature)
         losses.pairwise = pairwise_preference_loss(
             student_scores=student_scores,
@@ -386,6 +407,8 @@ def _compute_kd_batch_losses(
         )
     elif name == "margin_mse":
         losses.pairwise = margin_mse_loss(student_scores, teacher_scores)
+    elif name == "all_pairs_distill":
+        losses.distill_kl = all_pairs_distill_loss(student_scores, teacher_scores)
     elif name == "pointwise":
         losses.distill_kl = pointwise_loss(student_scores, teacher_scores)
     elif name == "hpd":

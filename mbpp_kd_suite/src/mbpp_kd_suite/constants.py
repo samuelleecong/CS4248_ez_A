@@ -12,10 +12,11 @@ KD_METHOD_ORDER = [
     "embed_distill",
     "qed_align",
     "distilcse_lite",
-    "pair_distill",
+    "hard_negative_pair_distill",
     "adam_lite",
     "hpd",
     "margin_mse",
+    "all_pairs_distill",
     "pointwise",
 ]
 
@@ -81,8 +82,17 @@ PAPER_SPECS = [
         venue="EMNLP",
         year=2024,
         pdf_name="04_pairdistill_2024.emnlp-main.1013.pdf",
-        method_name="pair_distill",
-        implementation_note="pairwise preference distillation over teacher-induced hard negatives",
+        method_name="hard_negative_pair_distill",
+        implementation_note="listwise score KL plus BCE-style pairwise prefs on teacher top-k hard negatives only",
+    ),
+    PaperSpec(
+        paper_id="all_pairs_distill",
+        title="PairDistill: Pairwise Relevance Distillation for Dense Retrieval",
+        venue="EMNLP",
+        year=2024,
+        pdf_name="04_pairdistill_2024.emnlp-main.1013.pdf",
+        method_name="all_pairs_distill",
+        implementation_note="KL(P_teacher || P_student) on 2-way softmax over (sim(q,pos), sim(q,neg_j)) for every in-batch j≠i",
     ),
     PaperSpec(
         paper_id="adam",

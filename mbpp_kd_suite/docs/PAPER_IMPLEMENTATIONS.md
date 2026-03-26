@@ -28,7 +28,7 @@ This suite keeps one shared MBPP benchmark and implements lightweight variants o
 ### PairDistill
 
 - Paper: `PAIR DISTILL: Pairwise Relevance Distillation for Dense Retrieval`
-- Local method: `pair_distill`
+- Local method: `hard_negative_pair_distill`
 - MBPP mapping: standard score distillation plus pairwise preference loss against teacher-induced hard negatives
 - Gap: uses the teacher bi-encoder as the pairwise supervisor instead of a pairwise reranker
 

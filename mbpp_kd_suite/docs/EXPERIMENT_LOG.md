@@ -16,7 +16,8 @@ Baseline comparisons use the same MBPP protocol as the earlier internal baseline
 - selected paper-inspired methods from:
   - `qed_align`
   - `distilcse_lite`
-  - `pair_distill`
+  - `hard_negative_pair_distill` (logged in older tables as `pair_distill`)
+  - `all_pairs_distill`
   - `adam_lite`
   - `hpd`
 
@@ -48,7 +49,7 @@ Artifacts:
 
 ```bash
 cd mbpp_kd_suite
-./.venv/bin/mbpp-kd-suite --methods score_distill,embed_distill,qed_align,distilcse_lite,pair_distill,adam_lite,hpd --epochs 1 --batch-size 16 --eval-batch-size 32 --output-dir quick_compare --skip-diagnostics
+./.venv/bin/mbpp-kd-suite --methods score_distill,embed_distill,qed_align,distilcse_lite,hard_negative_pair_distill,adam_lite,hpd --epochs 1 --batch-size 16 --eval-batch-size 32 --output-dir quick_compare --skip-diagnostics
 ```
 
 ### Test Metrics
@@ -81,7 +82,7 @@ Artifacts:
 
 ```bash
 cd mbpp_kd_suite
-./.venv/bin/mbpp-kd-suite --methods score_distill,embed_distill,qed_align,distilcse_lite,pair_distill,adam_lite,hpd --epochs 3 --batch-size 16 --eval-batch-size 32 --output-dir longer_compare --skip-diagnostics
+./.venv/bin/mbpp-kd-suite --methods score_distill,embed_distill,qed_align,distilcse_lite,hard_negative_pair_distill,adam_lite,hpd --epochs 3 --batch-size 16 --eval-batch-size 32 --output-dir longer_compare --skip-diagnostics
 ```
 
 ### Test Metrics

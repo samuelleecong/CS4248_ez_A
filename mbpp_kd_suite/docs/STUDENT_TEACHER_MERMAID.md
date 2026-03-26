@@ -85,7 +85,7 @@ flowchart TD
 
     KD6 --> P1
     KD7 --> P1
-    P1[pair_distill<br/>add KL<br/>plus pairwise preference loss<br/>over teacher-mined hard negatives]
+    P1[hard_negative_pair_distill<br/>score KL + pairwise prefs<br/>on teacher top-k negatives only]
 
     KD2 --> A1
     KD5 --> A1

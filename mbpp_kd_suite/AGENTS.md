@@ -7,7 +7,7 @@ You are a 10x ml engineer. Organise your code clearly and reduce code duplicatio
 ## Reading Order
 
 1. `README.md`
-2. `DISTILL_METHOD_QUICKSTART.md` if the task is specifically about `embed_distill` or `pair_distill`
+2. `DISTILL_METHOD_QUICKSTART.md` if the task is specifically about `embed_distill` or `hard_negative_pair_distill`
 3. `docs/PAPER_IMPLEMENTATIONS.md`
 4. `docs/PROJECT_STATUS.md`
 5. `docs/EXPERIMENT_LOG.md`

@@ -1,17 +1,20 @@
 # Distill Method Quickstart
 
-This quickstart is for contributors who only want to run one of the two strongest KD baselines in this repo:
+This quickstart is for contributors who want the main KD baselines that use **pairwise** structure:
 
 - `embed_distill`
-- `pair_distill`
+- `hard_negative_pair_distill` — extra pairwise term on **teacher top-k negative docs only**
+- `all_pairs_distill` — **2-way KL on every in-batch** query–doc pair `j ≠ i` (same loss family as Sam’s `--kd-loss pairdistil`)
 
 ## Which One To Pick
 
 - `embed_distill`: retrieval loss + score KL + direct query-embedding alignment
-- `pair_distill`: retrieval loss + score KL + pairwise preference loss over teacher-chosen hard negatives
+- `hard_negative_pair_distill`: retrieval loss + score KL + BCE-style margin prefs on **hard negatives only** (`--pair-hard-negatives`)
+- `all_pairs_distill`: retrieval loss + **all** off-diagonal binary preference KLs (no hard-negative mining)
 
 If you want the simpler geometric baseline, start with `embed_distill`.
-If you want the ranking-oriented variant, start with `pair_distill`.
+If you want ranking signal on **few, teacher-hard negatives**, use `hard_negative_pair_distill`.
+If you want **dense** pairwise supervision over the **whole in-batch** cross-product, use `all_pairs_distill`.
 
 ## Fastest Way To Run Either Method
 
@@ -19,7 +22,8 @@ If you want the ranking-oriented variant, start with `pair_distill`.
 cd mbpp_kd_suite
 uv sync
 uv run mbpp-kd-suite --methods embed_distill
-uv run mbpp-kd-suite --methods pair_distill
+uv run mbpp-kd-suite --methods hard_negative_pair_distill
+uv run mbpp-kd-suite --methods all_pairs_distill
 ```
 
 Each run writes artifacts to:
@@ -43,11 +47,11 @@ uv run mbpp-kd-suite \
 
 ```bash
 uv run mbpp-kd-suite \
-  --methods pair_distill \
+  --methods hard_negative_pair_distill \
   --epochs 1 \
   --batch-size 16 \
   --eval-batch-size 32 \
-  --output-dir mbpp/pair_distill_smoke
+  --output-dir mbpp/hard_negative_pair_distill_smoke
 ```
 
 ## How To Compare Them Fairly
@@ -58,7 +62,7 @@ The fair trained baseline is `supervised_student`, because all three methods upd
 
 ```bash
 uv run mbpp-kd-suite \
-  --methods supervised_student,embed_distill,pair_distill \
+  --methods supervised_student,embed_distill,hard_negative_pair_distill,all_pairs_distill \
   --epochs 1 \
   --batch-size 16 \
   --eval-batch-size 32 \
@@ -77,11 +81,11 @@ uv run mbpp-kd-suite \
   --projection-init least_squares_both
 ```
 
-For `pair_distill`, the main extra control is the number of teacher-selected hard negatives:
+For `hard_negative_pair_distill`, the main extra control is the number of teacher-selected hard negatives:
 
 ```bash
 uv run mbpp-kd-suite \
-  --methods pair_distill \
+  --methods hard_negative_pair_distill \
   --pair-hard-negatives 4
 ```
 
@@ -100,11 +104,11 @@ uv run mbpp-kd-suite \
 ```bash
 uv run mbpp-kd-suite \
   --dataset-name BEE-spoke-data/TACO-hf \
-  --methods pair_distill \
+  --methods hard_negative_pair_distill \
   --epochs 1 \
   --batch-size 16 \
   --eval-batch-size 32 \
-  --output-dir taco/pair_distill_smoke
+  --output-dir taco/hard_negative_pair_distill_smoke
 ```
 
 ## What To Inspect After A Run
@@ -114,14 +118,15 @@ Inside the run directory, start with:
 - `results_summary.json`
 - `diagnostics_summary.json`
 - `embed_distill/history.json` and `embed_distill/metrics.json`
-- `pair_distill/history.json` and `pair_distill/metrics.json`
+- `hard_negative_pair_distill/history.json` and `hard_negative_pair_distill/metrics.json`
+- `all_pairs_distill/history.json` and `all_pairs_distill/metrics.json`
 
 If you enabled `--save-models`, the saved checkpoint lives under `<method>/model/`.
 
 ## Where The Logic Lives
 
 - `src/mbpp_kd_suite/experiment.py`: teacher loading, teacher precompute, run orchestration
-- `src/mbpp_kd_suite/training.py`: `embed_distill` and `pair_distill` loss branches
+- `src/mbpp_kd_suite/training.py`: `embed_distill`, `hard_negative_pair_distill`, `all_pairs_distill` loss branches
 - `src/mbpp_kd_suite/modeling.py`: student encoder and optional projection layer
 - `src/mbpp_kd_suite/metrics.py`: symmetric vs asymmetric evaluation
 

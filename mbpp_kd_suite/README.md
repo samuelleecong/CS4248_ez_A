@@ -24,7 +24,8 @@ Core training and modeling code lives under `src/mbpp_kd_suite/`. The standalone
   - `embed_distill`
   - `qed_align`
   - `distilcse_lite`
-  - `pair_distill`
+  - `hard_negative_pair_distill`
+  - `all_pairs_distill`
   - `adam_lite`
   - `hpd`
 
@@ -33,7 +34,7 @@ Core training and modeling code lives under `src/mbpp_kd_suite/`. The standalone
 If you are new to the repo, use this reading order:
 
 1. `README.md`
-2. [DISTILL_METHOD_QUICKSTART.md](DISTILL_METHOD_QUICKSTART.md) if you only care about `embed_distill` or `pair_distill`
+2. [DISTILL_METHOD_QUICKSTART.md](DISTILL_METHOD_QUICKSTART.md) if you only care about `embed_distill` or `hard_negative_pair_distill`
 3. `docs/PAPER_IMPLEMENTATIONS.md`
 4. `docs/PROJECT_STATUS.md`
 5. `docs/EXPERIMENT_LOG.md`
@@ -54,7 +55,7 @@ uv run mbpp-kd-suite
 
 If MBPP is already cached locally, the suite reads the Arrow files directly and avoids write-lock issues in the global Hugging Face cache.
 
-If you only want the `embed_distill` or `pair_distill` path, start with [DISTILL_METHOD_QUICKSTART.md](DISTILL_METHOD_QUICKSTART.md).
+If you only want the `embed_distill` or `hard_negative_pair_distill` path, start with [DISTILL_METHOD_QUICKSTART.md](DISTILL_METHOD_QUICKSTART.md).
 
 ## Common Commands
 
@@ -73,7 +74,7 @@ uv run mbpp-kd-suite --epochs 1 --batch-size 16 --eval-batch-size 32 --output-di
 Compare a subset of methods:
 
 ```bash
-uv run mbpp-kd-suite --methods score_distill,embed_distill,pair_distill
+uv run mbpp-kd-suite --methods score_distill,embed_distill,hard_negative_pair_distill,all_pairs_distill
 ```
 
 Switch to TACO:
@@ -161,7 +162,7 @@ Historical runs from the earlier flat layout now live under `artifacts/legacy/`.
 - `eval/tests/`: unit tests for eval adapters and retrieval metrics
 - `eval/runs/`: repo-local evaluator run history; generated outputs remain git-ignored
 - `papers/`: paper registry and download script
-- `DISTILL_METHOD_QUICKSTART.md`: focused quickstart for the `embed_distill` / `pair_distill` workflows
+- `DISTILL_METHOD_QUICKSTART.md`: focused quickstart for the `embed_distill` / pairwise KD workflows
 - `docs/PAPER_IMPLEMENTATIONS.md`: method notes and faithfulness/gap summary
 - `docs/ORGANIZATION.md`: suite layout and experiment storage conventions
 - `docs/EMBEDDISTILL_MERMAID.md`: focused Mermaid diagram for the `embed_distill` method

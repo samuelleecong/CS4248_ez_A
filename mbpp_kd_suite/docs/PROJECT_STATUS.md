@@ -14,7 +14,8 @@ Last updated: 2026-03-14
   - `embed_distill`
   - `qed_align`
   - `distilcse_lite`
-  - `pair_distill`
+  - `hard_negative_pair_distill`
+  - `all_pairs_distill`
   - `adam_lite`
   - `hpd`
 
@@ -27,7 +28,7 @@ Last updated: 2026-03-14
 - In the 3-epoch comparison, the direct small baseline (`MRR=0.7717`) still remained stronger than every distillation variant.
 - In the first fair MBPP smoke run with the same 1-epoch budget, `supervised_student` reached `MRR=0.7926` while `embed_distill` reached `MRR=0.7806`, so KD did not beat normal student fine-tuning there.
 - Among the current distillation variants, `embed_distill` is the strongest (`MRR=0.7375`), with `qed_align` (`MRR=0.7359`) next and `adam_lite` (`MRR=0.7269`) slightly behind.
-- `score_distill`, `embed_distill`, `qed_align`, `distilcse_lite`, `pair_distill`, and `adam_lite` all improved over their 1-epoch runs.
+- `score_distill`, `embed_distill`, `qed_align`, `distilcse_lite`, `hard_negative_pair_distill` (formerly `pair_distill`), and `adam_lite` all improved over their 1-epoch runs.
 - Switching to the stronger generic teacher `all-mpnet-base-v2` raises the direct teacher baseline to `MRR=0.8229`.
 - The initial `MiniLM -> MPNet` KD collapse was largely caused by a randomly initialized student projection head (`384 -> 768`) on a very small MBPP train split.
 - Adding least-squares teacher-space initialization for that projection recovers `embed_distill` to `MRR=0.7137` on test, up from `0.2610`.
