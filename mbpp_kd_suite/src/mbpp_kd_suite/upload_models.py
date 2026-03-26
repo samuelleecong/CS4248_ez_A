@@ -24,19 +24,15 @@ from pathlib import Path
 
 # ── Role name helpers ──────────────────────────────────────────────────────────
 
-_ROLE_MAP: dict[str, str] = {
-    "ft_student_phase1": "phase1-student",
-    "ft_teacher_phase1": "phase1-teacher",
-}
-
-
 def _dir_to_role(dir_name: str) -> str:
-    """Convert a model subdirectory name to a human-readable role slug."""
-    if dir_name in _ROLE_MAP:
-        return _ROLE_MAP[dir_name]
-    # phase2_score_distill → phase2-score-distill
-    slug = dir_name.replace("_", "-")
-    return slug
+    """Convert a model subdirectory name to a URL-safe role slug.
+
+    Preserves the directory name exactly, replacing underscores with hyphens.
+      ft_student_phase1      → ft-student-phase1
+      ft_teacher_phase1      → ft-teacher-phase1
+      phase2_score_distill   → phase2-score-distill
+    """
+    return dir_name.replace("_", "-")
 
 
 def _dataset_slug(dataset_name: str) -> str:

@@ -116,12 +116,12 @@ Repository names follow this pattern:
 **Full example:**
 `cs4248-phase2-score-distill-taco-20260325-014013`
 
-Available roles from a full two-phase run:
+Available roles from a full two-phase run (role slug = directory name with `_` → `-`):
 
 | Directory name | Role slug |
 |---------------|-----------|
-| `ft_student_phase1` | `phase1-student` |
-| `ft_teacher_phase1` | `phase1-teacher` |
+| `ft_student_phase1` | `ft-student-phase1` |
+| `ft_teacher_phase1` | `ft-teacher-phase1` |
 | `phase2_control_supervised` | `phase2-control-supervised` |
 | `phase2_score_distill` | `phase2-score-distill` |
 | `phase2_embed_distill` | `phase2-embed-distill` |
@@ -141,7 +141,7 @@ Available roles from a full two-phase run:
 from transformers import AutoModel, AutoTokenizer
 import torch
 
-repo_id = "samuelleecong/cs4248-phase1-student-taco-20260325-014013"
+repo_id = "samuelleecong/cs4248-ft-student-phase1-taco-20260325-014013"
 
 tokenizer = AutoTokenizer.from_pretrained(repo_id)
 model = AutoModel.from_pretrained(repo_id)
