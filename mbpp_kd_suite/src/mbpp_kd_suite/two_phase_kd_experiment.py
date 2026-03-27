@@ -20,6 +20,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from torch.utils.tensorboard import SummaryWriter
 from transformers import AutoModel, AutoTokenizer
 
 from .config import DistillTargets, TrainConfig, resolve_output_root
@@ -276,6 +277,7 @@ def run(
     eval_batch_size: int = 64,
     lr: float = 2e-5,
     seed: int = 42,
+    distill_temperature: float = 4.0,
     output_dir: str = TWO_PHASE_OUTPUT_DIR,
     skip_diagnostics: bool = False,
     methods: tuple[str, ...] | None = None,
@@ -295,6 +297,11 @@ def run(
     run_dir = output_root / time.strftime("%Y%m%d_%H%M%S")
     run_dir.mkdir(parents=True, exist_ok=True)
 
+    tb_log_dir = run_dir / "tensorboard"
+    tb_writer = SummaryWriter(log_dir=str(tb_log_dir))
+    print(f"TensorBoard logs: {tb_log_dir}")
+    print(f"  Run: tensorboard --logdir {tb_log_dir}")
+
     print(f"Loading dataset: {dataset_name}")
     dataset = load_retrieval_dataset(dataset_name=dataset_name, taco_val_size=taco_val_size, seed=seed)
     data = dataset_dict_to_splits(dataset)
@@ -312,6 +319,7 @@ def run(
         eval_batch_size=eval_batch_size,
         lr=lr,
         seed=seed,
+        distill_temperature=distill_temperature,
         run_diagnostics=not skip_diagnostics,
         output_dir=output_dir,
         early_stopping_patience=phase1_patience,
@@ -326,6 +334,7 @@ def run(
         eval_batch_size=eval_batch_size,
         lr=lr,
         seed=seed,
+        distill_temperature=distill_temperature,
         run_diagnostics=not skip_diagnostics,
         output_dir=output_dir,
         save_models=True,
@@ -401,6 +410,7 @@ def run(
             full_teacher_targets=raw_teacher_targets,
             model_name=teacher_model,
             supervised=True,
+            tb_writer=tb_writer,
         )
 
         # Re-encode targets using the finetuned teacher (these become the KD distillation targets)
@@ -435,6 +445,7 @@ def run(
             full_teacher_targets=ft_teacher_targets,
             model_name=student_model,
             supervised=True,
+            tb_writer=tb_writer,
         )
 
         # Capture finetuned student backbone weights for phase 2 initialization
@@ -494,6 +505,7 @@ def run(
         model_name=student_model,
         supervised=True,
         initial_backbone_state_dict=phase1_student_backbone_state,
+        tb_writer=tb_writer,
     )
     results["control_supervised"] = control_metrics
 
@@ -509,6 +521,7 @@ def run(
             targets=method_targets[method_name],
             full_teacher_targets=ft_teacher_targets,
             initial_backbone_state_dict=phase1_student_backbone_state,
+            tb_writer=tb_writer,
         )
         results[method_name] = kd_metrics
 
@@ -524,13 +537,16 @@ def run(
         "eval_batch_size": eval_batch_size,
         "lr": lr,
         "seed": seed,
+        "distill_temperature": distill_temperature,
         "methods": list(methods),
     }
     _write_json(run_dir / "config.json", config_payload)
     _write_json(run_dir / "results_summary.json", results)
 
     _plot_results(results, run_dir, dataset_name)
+    tb_writer.close()
     print(f"\nArtifacts saved to: {run_dir}")
+    print(f"TensorBoard logs: {tb_log_dir}")
     _print_results(results)
     return results
 
@@ -556,6 +572,8 @@ def main() -> None:
     parser.add_argument("--eval-batch-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=2e-5)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--distill-temperature", type=float, default=4.0,
+                        help="Temperature for KD softmax (higher = softer teacher distributions, default: 4.0)")
     parser.add_argument("--output-dir", default=TWO_PHASE_OUTPUT_DIR)
     parser.add_argument("--skip-diagnostics", action="store_true")
     parser.add_argument("--taco-val-size", type=int, default=1000)
@@ -585,6 +603,7 @@ def main() -> None:
         eval_batch_size=args.eval_batch_size,
         lr=args.lr,
         seed=args.seed,
+        distill_temperature=args.distill_temperature,
         output_dir=args.output_dir,
         skip_diagnostics=args.skip_diagnostics,
         methods=methods,

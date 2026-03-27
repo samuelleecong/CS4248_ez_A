@@ -21,6 +21,7 @@ class TrainConfig:
     lr: float = 2e-5
     weight_decay: float = 1e-2
     temperature: float = 0.05
+    distill_temperature: float = 4.0
     distill_weight: float = 1.0
     align_weight: float = 1.0
     pair_weight: float = 1.0
@@ -122,6 +123,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--epochs", type=int, default=TrainConfig.epochs)
     parser.add_argument("--lr", type=float, default=TrainConfig.lr)
     parser.add_argument("--temperature", type=float, default=TrainConfig.temperature)
+    parser.add_argument("--distill-temperature", type=float, default=TrainConfig.distill_temperature,
+                        help="Temperature for KD softmax (higher = softer teacher distributions, default: 4.0)")
     parser.add_argument("--distill-weight", type=float, default=TrainConfig.distill_weight)
     parser.add_argument("--align-weight", type=float, default=TrainConfig.align_weight)
     parser.add_argument("--pair-weight", type=float, default=TrainConfig.pair_weight)
@@ -175,6 +178,7 @@ def train_config_from_args(args: argparse.Namespace) -> TrainConfig:
         epochs=args.epochs,
         lr=args.lr,
         temperature=args.temperature,
+        distill_temperature=args.distill_temperature,
         distill_weight=args.distill_weight,
         align_weight=args.align_weight,
         pair_weight=args.pair_weight,

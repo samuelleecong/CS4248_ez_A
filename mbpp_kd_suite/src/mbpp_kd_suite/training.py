@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.decomposition import PCA
+from torch.utils.tensorboard import SummaryWriter
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer
 
@@ -377,31 +378,32 @@ def _compute_kd_batch_losses(
         one_hot=one_hot_loss(student_scores, cfg.temperature),
         device=device,
     )
+    dt = cfg.distill_temperature
     if name == "score_distill":
-        losses.distill_kl = distill_kl(student_scores, teacher_scores, cfg.temperature)
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
     elif name == "embed_distill":
-        losses.distill_kl = distill_kl(student_scores, teacher_scores, cfg.temperature)
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
         losses.align = align_loss(student_q, target_q)
     elif name == "qed_align":
         losses.align = align_loss(student_q, target_q)
     elif name == "distilcse_lite":
-        losses.relation = contrastive_kd_loss(student_q, target_q, cfg.temperature)
+        losses.relation = contrastive_kd_loss(student_q, target_q, dt)
     elif name == "hard_negative_pair_distill":
-        losses.distill_kl = distill_kl(student_scores, teacher_scores, cfg.temperature)
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
         losses.pairwise = pairwise_preference_loss(
             student_scores=student_scores,
             teacher_scores=teacher_scores,
-            temperature=cfg.temperature,
+            temperature=dt,
             hard_negatives=cfg.pair_hard_negatives,
         )
     elif name == "adam_lite":
-        losses.distill_kl = distill_kl(student_scores, teacher_scores, cfg.temperature)
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
         losses.dark_kl, losses.dark_confidence = adam_dark_example_loss(
             student_query_emb=student_q,
             teacher_query_emb=teacher_q,
             teacher_doc_embs=teacher_d,
             teacher_scores=full_teacher_scores,
-            temperature=cfg.temperature,
+            temperature=dt,
             hard_negatives=cfg.dark_negatives,
             dark_mix_ratio=cfg.dark_mix_ratio,
         )
@@ -559,6 +561,7 @@ def train_student(
     model_name: str | None = None,
     supervised: bool | None = None,
     initial_backbone_state_dict: dict[str, torch.Tensor] | None = None,
+    tb_writer: SummaryWriter | None = None,
 ) -> tuple[dict[str, Any], StudentQueryEncoder, AutoTokenizer]:
     effective_model = model_name or cfg.student_model
     is_supervised = supervised if supervised is not None else (name == TRAINED_BASELINE_NAME)
@@ -643,6 +646,21 @@ def train_student(
                 loss_sums[key] += value
             pbar.set_postfix(loss=f"{total_loss.item():.4f}", hot=f"{losses.one_hot.item():.4f}")
 
+            if tb_writer is not None:
+                global_step = (epoch - 1) * len(train_loader) + steps
+                tb_writer.add_scalar(f"{name}/step/total_loss", total_loss.item(), global_step)
+                tb_writer.add_scalar(f"{name}/step/one_hot", losses.one_hot.item(), global_step)
+                if losses.distill_kl.item() != 0.0:
+                    tb_writer.add_scalar(f"{name}/step/distill_kl", losses.distill_kl.item(), global_step)
+                if losses.align.item() != 0.0:
+                    tb_writer.add_scalar(f"{name}/step/align", losses.align.item(), global_step)
+                if losses.pairwise.item() != 0.0:
+                    tb_writer.add_scalar(f"{name}/step/pairwise", losses.pairwise.item(), global_step)
+                if losses.relation.item() != 0.0:
+                    tb_writer.add_scalar(f"{name}/step/relation", losses.relation.item(), global_step)
+                if losses.dark_kl.item() != 0.0:
+                    tb_writer.add_scalar(f"{name}/step/dark_kl", losses.dark_kl.item(), global_step)
+
         train_stats = {"epoch": float(epoch)}
         train_stats.update({key: value / max(steps, 1) for key, value in loss_sums.items()})
         maybe_empty_device_cache(device)
@@ -657,6 +675,13 @@ def train_student(
         )
         train_stats.update({f"val_{key}": value for key, value in val_metrics.items()})
         history.append(train_stats)
+
+        if tb_writer is not None:
+            for key, value in train_stats.items():
+                if key == "epoch":
+                    continue
+                tb_writer.add_scalar(f"{name}/epoch/{key}", value, epoch)
+            tb_writer.flush()
 
         if val_metrics["MRR"] > best_val_mrr:
             best_val_mrr = val_metrics["MRR"]

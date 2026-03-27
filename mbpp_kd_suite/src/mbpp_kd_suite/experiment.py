@@ -6,6 +6,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
+from torch.utils.tensorboard import SummaryWriter
 from transformers import AutoModel, AutoTokenizer
 
 from .config import DistillTargets, RetrievalSplits, TrainConfig, build_arg_parser, resolve_output_root, train_config_from_args
@@ -133,6 +134,10 @@ def run(cfg: TrainConfig) -> dict[str, Any]:
     output_root, run_dir = _build_run_dir(cfg)
     _write_run_metadata(run_dir=run_dir, cfg=cfg, output_root=output_root)
 
+    tb_log_dir = run_dir / "tensorboard"
+    tb_writer = SummaryWriter(log_dir=str(tb_log_dir))
+    print(f"TensorBoard logs: {tb_log_dir}")
+
     print(f"Using device: {device}")
     print(f"Loading retrieval dataset: {cfg.dataset_name}")
     data = _load_text_splits(cfg)
@@ -189,6 +194,7 @@ def run(cfg: TrainConfig) -> dict[str, Any]:
             full_teacher_targets=teacher_targets,
             model_name=cfg.teacher_model,
             supervised=True,
+            tb_writer=tb_writer,
         )
         result[FINETUNED_TEACHER_NAME] = ft_teacher_metrics
 
@@ -221,6 +227,7 @@ def run(cfg: TrainConfig) -> dict[str, Any]:
             full_teacher_targets=teacher_targets,
             model_name=extra_model,
             supervised=True,
+            tb_writer=tb_writer,
         )
         result[ft_name] = ft_extra_metrics
 
@@ -234,6 +241,7 @@ def run(cfg: TrainConfig) -> dict[str, Any]:
             data=data,
             targets=method_targets[method_name],
             full_teacher_targets=teacher_targets,
+            tb_writer=tb_writer,
         )
         result[method_name] = method_metrics
 
@@ -248,7 +256,9 @@ def run(cfg: TrainConfig) -> dict[str, Any]:
     for model_name, values in analysis.items():
         print(f"{model_name}: {values}")
 
+    tb_writer.close()
     print(f"\nArtifacts saved to: {run_dir}")
+    print(f"TensorBoard logs: {tb_log_dir}")
     return result
 
 
