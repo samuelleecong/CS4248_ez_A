@@ -108,6 +108,79 @@ uv run mbpp-kd-eval \
 
 Detailed evaluator usage, flag behavior, input path rules, and output layout live in [eval/README.md](eval/README.md). Keep that file as the source of truth for evaluator operations.
 
+## Two-Phase KD Experiments
+
+Run a full two-phase experiment (phase 1: finetune teacher + student, phase 2: KD methods):
+
+```bash
+uv run mbpp-kd-two-phase \
+  --student-model sentence-transformers/all-MiniLM-L6-v2 \
+  --teacher-model sentence-transformers/all-mpnet-base-v2 \
+  --dataset-name BEE-spoke-data/TACO-hf \
+  --distill-temperature 4.0 \
+  --batch-size 32 \
+  --eval-batch-size 64
+```
+
+### Resuming Phase 2 from a Checkpoint
+
+Phase 1 saves a checkpoint at `<run_dir>/phase1/checkpoint.pt`. You can skip phase 1 entirely and re-run phase 2 with different hyperparameters (e.g., temperature, methods, epochs) without retraining teacher or student. Previous run directories are never overwritten — each resume creates a new timestamped directory.
+
+List available checkpoints:
+
+```bash
+uv run python resume_phase2.py --list
+```
+
+Resume with a different distill temperature:
+
+```bash
+uv run python resume_phase2.py \
+  --pick 1 \
+  --distill-temperature 8.0
+```
+
+Resume with specific methods only:
+
+```bash
+uv run python resume_phase2.py \
+  --checkpoint artifacts/.../phase1/checkpoint.pt \
+  --methods embed_distill,margin_mse,adam_lite \
+  --distill-temperature 2.0
+```
+
+Sweep temperatures from the same checkpoint:
+
+```bash
+for dt in 1.0 2.0 4.0 8.0; do
+  uv run python resume_phase2.py --pick 1 --distill-temperature $dt --output-dir sweep_dt${dt}
+done
+```
+
+You can also use the built-in flag directly:
+
+```bash
+uv run mbpp-kd-two-phase \
+  --resume-from-phase1 artifacts/.../phase1/checkpoint.pt \
+  --distill-temperature 4.0 \
+  --methods embed_distill,score_distill
+```
+
+### Monitoring
+
+TensorBoard logs are saved automatically for every run. To view live loss curves:
+
+```bash
+uv run tensorboard --logdir artifacts/
+```
+
+Or use the lightweight CLI monitor:
+
+```bash
+uv run python monitor.py                          # auto-detect latest run
+uv run python monitor.py artifacts/<run_dir>/      # specific run
+```
+
 ## Papers
 
 Download or refresh the local paper copies with:
