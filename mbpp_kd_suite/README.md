@@ -200,7 +200,7 @@ All configs run sequentially on one GPU for maximum throughput.
 | 4 | `distill_temperature` | dt=0.2 is optimal | For cosine similarities in [-1,1]. Higher or lower hurts. |
 | 5 | `lr` | No improvement | Default 2e-5 is fine. Lower (5e-6) hurts. |
 
-The default configs in the script sweep `distill_weight` (25/50/100), `align_weight` (5/10), and `batch_size` (128), plus best-combo candidates.
+The default configs in the script sweep `distill_weight` (25/50/100) and `align_weight` (5/10), plus a best-combo candidate (dw=100, aw=5).
 
 **Output structure:**
 
@@ -223,7 +223,7 @@ artifacts/sweep_kd_params/<timestamp>/
 configs = [
     SweepConfig(name="dw100",       distill_temperature=0.2, distill_weight=100.0, methods=METHODS),
     SweepConfig(name="aw10_dw50",   distill_temperature=0.2, distill_weight=50.0, align_weight=10.0, methods=METHODS),
-    SweepConfig(name="best_combo",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0, batch_size=128, methods=METHODS),
+    SweepConfig(name="dw100_aw5",   distill_temperature=0.2, distill_weight=100.0, align_weight=5.0, methods=METHODS),
 ]
 ```
 

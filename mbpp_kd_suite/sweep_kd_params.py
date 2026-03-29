@@ -273,9 +273,8 @@ if __name__ == "__main__":
         SweepConfig(name="aw5_dw50",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0, methods=METHODS),
         SweepConfig(name="aw10_dw50", distill_temperature=0.2, distill_weight=50.0, align_weight=10.0, methods=METHODS),
 
-        # --- best combo candidates ---
-        SweepConfig(name="dw50_bs128",      distill_temperature=0.2, distill_weight=50.0, batch_size=128, methods=METHODS),
-        SweepConfig(name="dw50_aw5_bs128",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0, batch_size=128, methods=METHODS),
+        # --- best combo ---
+        SweepConfig(name="dw100_aw5", distill_temperature=0.2, distill_weight=100.0, align_weight=5.0, methods=METHODS),
     ]
 
     run_sweep(CHECKPOINT, configs)
