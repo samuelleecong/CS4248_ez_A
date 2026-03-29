@@ -186,6 +186,42 @@ def all_pairs_distill_loss(student_scores: torch.Tensor, teacher_scores: torch.T
     return (kl_per_pair * mask).sum() / mask.sum()
 
 
+def bimga_loss(
+    student_query_emb: torch.Tensor,
+    student_doc_emb: torch.Tensor,
+    target_query_emb: torch.Tensor,
+    target_doc_emb: torch.Tensor,
+    teacher_scores: torch.Tensor,
+    temperature: float,
+) -> torch.Tensor:
+    """Bidirectional Margin-Guided Alignment (BiMGA).
+
+    Aligns both query and document embeddings to teacher space, weighted by the
+    teacher's ranking confidence (margin between positive and hardest negative).
+    """
+    batch_size = teacher_scores.size(0)
+    if batch_size < 2:
+        q_align = torch.linalg.vector_norm(student_query_emb - target_query_emb, dim=-1).mean()
+        d_align = torch.linalg.vector_norm(student_doc_emb - target_doc_emb, dim=-1).mean()
+        return q_align + d_align
+
+    # Compute teacher margin: positive score - hardest in-batch negative score
+    pos_scores = teacher_scores.diag()  # (B,)
+    mask = torch.eye(batch_size, device=teacher_scores.device, dtype=torch.bool)
+    neg_scores = teacher_scores.masked_fill(mask, -1e9)
+    hardest_neg = neg_scores.max(dim=-1).values  # (B,)
+    margin = pos_scores - hardest_neg  # (B,)
+
+    # Sigmoid weighting: confident teacher -> strong alignment
+    weights = torch.sigmoid(margin / temperature)  # (B,)
+
+    # Weighted bidirectional alignment
+    q_dist = torch.linalg.vector_norm(student_query_emb - target_query_emb, dim=-1)  # (B,)
+    d_dist = torch.linalg.vector_norm(student_doc_emb - target_doc_emb, dim=-1)  # (B,)
+    weighted_align = (weights * (q_dist + d_dist)).mean()
+    return weighted_align
+
+
 def pointwise_loss(student_scores: torch.Tensor, teacher_scores: torch.Tensor) -> torch.Tensor:
     return F.mse_loss(student_scores, teacher_scores)
 
@@ -415,6 +451,16 @@ def _compute_kd_batch_losses(
         losses.distill_kl = pointwise_loss(student_scores, teacher_scores)
     elif name == "hpd":
         losses.align = align_loss(student_q, target_q)
+    elif name == "bimga":
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
+        losses.align = bimga_loss(
+            student_query_emb=student_q,
+            student_doc_emb=student_d,
+            target_query_emb=target_q,
+            target_doc_emb=target_d,
+            teacher_scores=teacher_scores,
+            temperature=dt,
+        )
     else:
         raise ValueError(f"Unknown method: {name}")
     return losses

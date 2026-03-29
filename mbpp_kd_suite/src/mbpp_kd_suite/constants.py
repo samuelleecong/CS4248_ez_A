@@ -18,6 +18,7 @@ KD_METHOD_ORDER = [
     "margin_mse",
     "all_pairs_distill",
     "pointwise",
+    "bimga",
 ]
 
 METHOD_ORDER = [TRAINED_BASELINE_NAME, *KD_METHOD_ORDER]
