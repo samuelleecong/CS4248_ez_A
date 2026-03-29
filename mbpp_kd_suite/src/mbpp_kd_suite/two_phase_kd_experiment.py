@@ -277,7 +277,12 @@ def run(
     eval_batch_size: int = 64,
     lr: float = 2e-5,
     seed: int = 42,
+    temperature: float = 0.05,
     distill_temperature: float = 4.0,
+    distill_weight: float = 1.0,
+    align_weight: float = 1.0,
+    pair_weight: float = 1.0,
+    relation_weight: float = 1.0,
     output_dir: str = TWO_PHASE_OUTPUT_DIR,
     skip_diagnostics: bool = False,
     methods: tuple[str, ...] | None = None,
@@ -319,7 +324,12 @@ def run(
         eval_batch_size=eval_batch_size,
         lr=lr,
         seed=seed,
+        temperature=temperature,
         distill_temperature=distill_temperature,
+        distill_weight=distill_weight,
+        align_weight=align_weight,
+        pair_weight=pair_weight,
+        relation_weight=relation_weight,
         run_diagnostics=not skip_diagnostics,
         output_dir=output_dir,
         early_stopping_patience=phase1_patience,
@@ -334,7 +344,12 @@ def run(
         eval_batch_size=eval_batch_size,
         lr=lr,
         seed=seed,
+        temperature=temperature,
         distill_temperature=distill_temperature,
+        distill_weight=distill_weight,
+        align_weight=align_weight,
+        pair_weight=pair_weight,
+        relation_weight=relation_weight,
         run_diagnostics=not skip_diagnostics,
         output_dir=output_dir,
         save_models=True,
@@ -482,6 +497,28 @@ def run(
         )
         print(f"Phase 1 checkpoint saved to: {phase1_ckpt_path}")
 
+        # Write config.json early so resume_phase2.py can read model names
+        _write_json(run_dir / "config.json", {
+            "teacher_model": teacher_model,
+            "student_model": student_model,
+            "dataset_name": dataset_name,
+            "phase1_epochs": phase1_epochs,
+            "phase1_patience": phase1_patience,
+            "phase2_epochs": phase2_epochs,
+            "phase2_patience": phase2_patience,
+            "batch_size": batch_size,
+            "eval_batch_size": eval_batch_size,
+            "lr": lr,
+            "seed": seed,
+            "temperature": temperature,
+            "distill_temperature": distill_temperature,
+            "distill_weight": distill_weight,
+            "align_weight": align_weight,
+            "pair_weight": pair_weight,
+            "relation_weight": relation_weight,
+            "methods": list(methods),
+        })
+
     # Build method-specific distillation targets (e.g., HPD applies PCA compression)
     method_targets = make_method_targets(cfg=phase2_cfg, full_teacher_targets=ft_teacher_targets)
 
@@ -537,7 +574,12 @@ def run(
         "eval_batch_size": eval_batch_size,
         "lr": lr,
         "seed": seed,
+        "temperature": temperature,
         "distill_temperature": distill_temperature,
+        "distill_weight": distill_weight,
+        "align_weight": align_weight,
+        "pair_weight": pair_weight,
+        "relation_weight": relation_weight,
         "methods": list(methods),
     }
     _write_json(run_dir / "config.json", config_payload)
@@ -572,8 +614,18 @@ def main() -> None:
     parser.add_argument("--eval-batch-size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=2e-5)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--temperature", type=float, default=0.05,
+                        help="Contrastive (one_hot) temperature (default: 0.05)")
     parser.add_argument("--distill-temperature", type=float, default=4.0,
                         help="Temperature for KD softmax (higher = softer teacher distributions, default: 4.0)")
+    parser.add_argument("--distill-weight", type=float, default=1.0,
+                        help="Weight for distill_kl and dark_kl losses (default: 1.0)")
+    parser.add_argument("--align-weight", type=float, default=1.0,
+                        help="Weight for embedding alignment loss (default: 1.0)")
+    parser.add_argument("--pair-weight", type=float, default=1.0,
+                        help="Weight for pairwise preference loss (default: 1.0)")
+    parser.add_argument("--relation-weight", type=float, default=1.0,
+                        help="Weight for relation/contrastive KD loss (default: 1.0)")
     parser.add_argument("--output-dir", default=TWO_PHASE_OUTPUT_DIR)
     parser.add_argument("--skip-diagnostics", action="store_true")
     parser.add_argument("--taco-val-size", type=int, default=1000)
@@ -603,7 +655,12 @@ def main() -> None:
         eval_batch_size=args.eval_batch_size,
         lr=args.lr,
         seed=args.seed,
+        temperature=args.temperature,
         distill_temperature=args.distill_temperature,
+        distill_weight=args.distill_weight,
+        align_weight=args.align_weight,
+        pair_weight=args.pair_weight,
+        relation_weight=args.relation_weight,
         output_dir=args.output_dir,
         skip_diagnostics=args.skip_diagnostics,
         methods=methods,
