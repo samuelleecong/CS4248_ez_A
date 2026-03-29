@@ -239,20 +239,22 @@ def run_sweep(
 
 
 if __name__ == "__main__":
-    # ── Edit these two lines to point at your checkpoint and choose methods ──
+    # ── Edit this to point at your checkpoint ─────────────────────────────────
     CHECKPOINT = "artifacts/two_phase_tinybert4l_taco_dt4/20260328_040837/phase1/checkpoint.pt"
-    METHODS = ("embed_distill", "score_distill", "adam_lite")
+
+    # ── Method groups by which parameter affects them ────────────────────────
+    #
+    # distill_weight  → score_distill, embed_distill, hard_negative_pair_distill,
+    #                    adam_lite, all_pairs_distill, pointwise (uses distill_kl)
+    # align_weight    → embed_distill, qed_align, hpd (uses align loss)
+    # pair_weight     → hard_negative_pair_distill, margin_mse (uses pairwise loss)
+    # relation_weight → distilcse_lite (uses relation loss)
+    #
+    DISTILL_METHODS = ("score_distill", "embed_distill", "adam_lite")
+    ALIGN_METHODS = ("embed_distill", "qed_align", "hpd")
+    ALL_KD = ("score_distill", "embed_distill", "adam_lite", "qed_align", "hpd")
 
     # ── Default sweep: parameters that matter most ──────────────────────────
-    #
-    # From our experiments, the two highest-impact params are:
-    #   1. distill_weight (dw)  — scales the KD loss to match supervised loss
-    #   2. align_weight  (aw)  — scales embedding alignment (embed_distill, qed_align, hpd)
-    #
-    # Lower impact:
-    #   - batch_size: modest gains from more in-batch negatives
-    #   - lr: default 2e-5 is fine, lower hurts
-    #   - distill_temperature: 0.2 is the sweet spot for cosine similarities
     #
     # Results from initial sweep (TinyBERT-4L student, MiniLM-L6 teacher, TACO):
     #   control_supervised:           MRR=0.1983
@@ -261,20 +263,19 @@ if __name__ == "__main__":
     #   dw=50, dt=0.2:  adam_lite     MRR=0.2225 (+0.0242)
     #   aw=5,  dw=10:   embed_distill MRR=0.2219 (+0.0235)
     #   dw=25, dt=0.2:  score_distill MRR=0.2106 (+0.0123)
-    #   bs=128, dw=10:  score_distill MRR=0.2099 (+0.0116)
 
     configs = [
-        # --- distill_weight sweep (highest impact) ---
-        SweepConfig(name="dw25",   distill_temperature=0.2, distill_weight=25.0,  methods=METHODS),
-        SweepConfig(name="dw50",   distill_temperature=0.2, distill_weight=50.0,  methods=METHODS),
-        SweepConfig(name="dw100",  distill_temperature=0.2, distill_weight=100.0, methods=METHODS),
+        # --- distill_weight sweep (only methods that use distill_kl) ---
+        SweepConfig(name="dw25",   distill_temperature=0.2, distill_weight=25.0,  methods=DISTILL_METHODS),
+        SweepConfig(name="dw50",   distill_temperature=0.2, distill_weight=50.0,  methods=DISTILL_METHODS),
+        SweepConfig(name="dw100",  distill_temperature=0.2, distill_weight=100.0, methods=DISTILL_METHODS),
 
-        # --- align_weight sweep (high impact for embed_distill/qed_align) ---
-        SweepConfig(name="aw5_dw50",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0, methods=METHODS),
-        SweepConfig(name="aw10_dw50", distill_temperature=0.2, distill_weight=50.0, align_weight=10.0, methods=METHODS),
+        # --- align_weight sweep (only methods that use align loss) ---
+        SweepConfig(name="aw5_dw50",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0,  methods=ALIGN_METHODS),
+        SweepConfig(name="aw10_dw50", distill_temperature=0.2, distill_weight=50.0, align_weight=10.0, methods=ALIGN_METHODS),
 
-        # --- best combo ---
-        SweepConfig(name="dw100_aw5", distill_temperature=0.2, distill_weight=100.0, align_weight=5.0, methods=METHODS),
+        # --- best combo (all affected methods) ---
+        SweepConfig(name="dw100_aw5", distill_temperature=0.2, distill_weight=100.0, align_weight=5.0, methods=ALL_KD),
     ]
 
     run_sweep(CHECKPOINT, configs)
