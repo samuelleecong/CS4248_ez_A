@@ -182,40 +182,48 @@ uv run mbpp-kd-two-phase \
 
 ### Hyperparameter Sweep
 
-`sweep_kd_params.py` runs a systematic sweep over KD hyperparameters from a phase 1 checkpoint. Edit the `configs` list at the bottom of the file, then run:
+`sweep_kd_params.py` runs a systematic sweep over KD hyperparameters from a phase 1 checkpoint. Edit `CHECKPOINT`, `METHODS`, and the `configs` list at the bottom of the file, then run:
 
 ```bash
 uv run python sweep_kd_params.py
 ```
 
-Each sweep config specifies `distill_temperature`, `distill_weight`, `align_weight`, `pair_weight`, `relation_weight`, `batch_size`, `lr`, and which methods to test. All configs run sequentially on one GPU for maximum throughput.
+All configs run sequentially on one GPU for maximum throughput.
 
-Output structure:
+**Which parameters matter most** (ranked by impact from our experiments):
+
+| Rank | Parameter | Impact | Notes |
+|:----:|-----------|--------|-------|
+| 1 | `distill_weight` | +0.029 MRR at dw=50 | Scales KD loss to match supervised loss. Default 1.0 is far too low. |
+| 2 | `align_weight` | +0.024 MRR at aw=5 | Boosts embedding alignment for `embed_distill`, `qed_align`, `hpd`. |
+| 3 | `batch_size` | +0.012 MRR at bs=128 | More in-batch negatives = richer teacher signal. |
+| 4 | `distill_temperature` | dt=0.2 is optimal | For cosine similarities in [-1,1]. Higher or lower hurts. |
+| 5 | `lr` | No improvement | Default 2e-5 is fine. Lower (5e-6) hurts. |
+
+The default configs in the script sweep `distill_weight` (25/50/100), `align_weight` (5/10), and `batch_size` (128), plus best-combo candidates.
+
+**Output structure:**
 
 ```text
 artifacts/sweep_kd_params/<timestamp>/
   sweep_index.json          # all configs + params + results in one file
   results_summary.json      # flat map of config/method -> metrics
   control_supervised/       # baseline (no KD)
-    metrics.json
-    history.json
-  dw50_dt0.2/               # one dir per sweep config
-    sweep_config.json        # hyperparameters for this config
+  dw50/                     # one dir per sweep config
+    sweep_config.json        # hyperparameters used
     embed_distill/
-      metrics.json
-      history.json
-    score_distill/
-      metrics.json
-      history.json
-  tensorboard/              # TensorBoard logs for all configs
+      metrics.json           # final test metrics
+      history.json           # per-epoch training curves
+  tensorboard/              # loss curves for all configs
 ```
 
-To add new configs, edit the `configs` list:
+**To customise**, edit the `configs` list:
 
 ```python
 configs = [
-    SweepConfig(name="dw100_dt0.2", distill_temperature=0.2, distill_weight=100.0, methods=METHODS),
+    SweepConfig(name="dw100",       distill_temperature=0.2, distill_weight=100.0, methods=METHODS),
     SweepConfig(name="aw10_dw50",   distill_temperature=0.2, distill_weight=50.0, align_weight=10.0, methods=METHODS),
+    SweepConfig(name="best_combo",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0, batch_size=128, methods=METHODS),
 ]
 ```
 

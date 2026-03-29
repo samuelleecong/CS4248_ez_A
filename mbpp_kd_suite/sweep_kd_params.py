@@ -239,25 +239,43 @@ def run_sweep(
 
 
 if __name__ == "__main__":
+    # ── Edit these two lines to point at your checkpoint and choose methods ──
     CHECKPOINT = "artifacts/two_phase_tinybert4l_taco_dt4/20260328_040837/phase1/checkpoint.pt"
-
     METHODS = ("embed_distill", "score_distill", "adam_lite")
 
+    # ── Default sweep: parameters that matter most ──────────────────────────
+    #
+    # From our experiments, the two highest-impact params are:
+    #   1. distill_weight (dw)  — scales the KD loss to match supervised loss
+    #   2. align_weight  (aw)  — scales embedding alignment (embed_distill, qed_align, hpd)
+    #
+    # Lower impact:
+    #   - batch_size: modest gains from more in-batch negatives
+    #   - lr: default 2e-5 is fine, lower hurts
+    #   - distill_temperature: 0.2 is the sweet spot for cosine similarities
+    #
+    # Results from initial sweep (TinyBERT-4L student, MiniLM-L6 teacher, TACO):
+    #   control_supervised:           MRR=0.1983
+    #   dw=50, dt=0.2:  score_distill MRR=0.2274 (+0.0290)  *** best overall
+    #   dw=50, dt=0.2:  embed_distill MRR=0.2262 (+0.0278)
+    #   dw=50, dt=0.2:  adam_lite     MRR=0.2225 (+0.0242)
+    #   aw=5,  dw=10:   embed_distill MRR=0.2219 (+0.0235)
+    #   dw=25, dt=0.2:  score_distill MRR=0.2106 (+0.0123)
+    #   bs=128, dw=10:  score_distill MRR=0.2099 (+0.0116)
+
     configs = [
-        # --- Sweep 1: distill_weight at best temperature (dt=0.2) ---
-        SweepConfig(name="dw10_dt0.2",  distill_temperature=0.2, distill_weight=10.0,  methods=METHODS),
-        SweepConfig(name="dw25_dt0.2",  distill_temperature=0.2, distill_weight=25.0,  methods=METHODS),
-        SweepConfig(name="dw50_dt0.2",  distill_temperature=0.2, distill_weight=50.0,  methods=METHODS),
+        # --- distill_weight sweep (highest impact) ---
+        SweepConfig(name="dw25",   distill_temperature=0.2, distill_weight=25.0,  methods=METHODS),
+        SweepConfig(name="dw50",   distill_temperature=0.2, distill_weight=50.0,  methods=METHODS),
+        SweepConfig(name="dw100",  distill_temperature=0.2, distill_weight=100.0, methods=METHODS),
 
-        # --- Sweep 2: batch_size (more in-batch negatives) ---
-        SweepConfig(name="bs64_dt0.2",  distill_temperature=0.2, distill_weight=10.0, batch_size=64, methods=METHODS),
-        SweepConfig(name="bs128_dt0.2", distill_temperature=0.2, distill_weight=10.0, batch_size=128, methods=METHODS),
+        # --- align_weight sweep (high impact for embed_distill/qed_align) ---
+        SweepConfig(name="aw5_dw50",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0, methods=METHODS),
+        SweepConfig(name="aw10_dw50", distill_temperature=0.2, distill_weight=50.0, align_weight=10.0, methods=METHODS),
 
-        # --- Sweep 3: lower lr for Phase 2 ---
-        SweepConfig(name="lr5e6_dw10",  distill_temperature=0.2, distill_weight=10.0, lr=5e-6, methods=METHODS),
-
-        # --- Sweep 4: high align_weight (boost embedding alignment) ---
-        SweepConfig(name="aw5_dw10",    distill_temperature=0.2, distill_weight=10.0, align_weight=5.0, methods=METHODS),
+        # --- best combo candidates ---
+        SweepConfig(name="dw50_bs128",      distill_temperature=0.2, distill_weight=50.0, batch_size=128, methods=METHODS),
+        SweepConfig(name="dw50_aw5_bs128",  distill_temperature=0.2, distill_weight=50.0, align_weight=5.0, batch_size=128, methods=METHODS),
     ]
 
     run_sweep(CHECKPOINT, configs)
