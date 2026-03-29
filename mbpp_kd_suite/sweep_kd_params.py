@@ -149,6 +149,19 @@ def run_sweep(
 
         config_dir = sweep_dir / sc.name
         config_dir.mkdir(parents=True, exist_ok=True)
+        # Save per-config hyperparameters
+        with (config_dir / "sweep_config.json").open("w") as f:
+            json.dump({
+                "name": sc.name,
+                "distill_temperature": sc.distill_temperature,
+                "distill_weight": sc.distill_weight,
+                "align_weight": sc.align_weight,
+                "pair_weight": sc.pair_weight,
+                "relation_weight": sc.relation_weight,
+                "batch_size": sc.batch_size,
+                "lr": sc.lr,
+                "methods": list(sc.methods),
+            }, f, indent=2)
         for method_name in sc.methods:
             tag = f"{sc.name}/{method_name}"
             print(f"\n  --- {tag} ---")
@@ -172,6 +185,38 @@ def run_sweep(
     # Save results
     with (sweep_dir / "results_summary.json").open("w") as f:
         json.dump(all_results, f, indent=2)
+
+    # Save sweep config index (all configs with their params + results)
+    sweep_index = {
+        "checkpoint": checkpoint_path,
+        "teacher_model": teacher_model,
+        "student_model": student_model,
+        "dataset_name": dataset_name,
+        "phase2_epochs": phase2_epochs,
+        "phase2_patience": phase2_patience,
+        "eval_batch_size": eval_batch_size,
+        "seed": seed,
+        "control_test_mrr": control_mrr,
+        "configs": {},
+    }
+    for sc in configs:
+        config_results = {}
+        for method_name in sc.methods:
+            tag = f"{sc.name}/{method_name}"
+            if tag in all_results:
+                config_results[method_name] = all_results[tag]["test"]
+        sweep_index["configs"][sc.name] = {
+            "distill_temperature": sc.distill_temperature,
+            "distill_weight": sc.distill_weight,
+            "align_weight": sc.align_weight,
+            "pair_weight": sc.pair_weight,
+            "relation_weight": sc.relation_weight,
+            "batch_size": sc.batch_size,
+            "lr": sc.lr,
+            "results": config_results,
+        }
+    with (sweep_dir / "sweep_index.json").open("w") as f:
+        json.dump(sweep_index, f, indent=2)
 
     tb_writer.close()
 

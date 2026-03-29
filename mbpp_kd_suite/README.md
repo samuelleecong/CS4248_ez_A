@@ -117,10 +117,24 @@ uv run mbpp-kd-two-phase \
   --student-model sentence-transformers/all-MiniLM-L6-v2 \
   --teacher-model sentence-transformers/all-mpnet-base-v2 \
   --dataset-name BEE-spoke-data/TACO-hf \
-  --distill-temperature 4.0 \
+  --distill-temperature 0.2 \
+  --distill-weight 50 \
   --batch-size 32 \
   --eval-batch-size 64
 ```
+
+### Key Hyperparameters
+
+| Parameter | Default | What it controls |
+|-----------|--------:|------------------|
+| `--temperature` | 0.05 | Contrastive (supervised) loss sharpness |
+| `--distill-temperature` | 4.0 | KD softmax temperature (use 0.2 for cosine similarities) |
+| `--distill-weight` | 1.0 | Weight for `distill_kl` and `dark_kl` losses (use 50 for meaningful KD) |
+| `--align-weight` | 1.0 | Weight for embedding alignment loss (`embed_distill`, `qed_align`, `hpd`) |
+| `--pair-weight` | 1.0 | Weight for pairwise preference loss (`hard_negative_pair_distill`, `margin_mse`) |
+| `--relation-weight` | 1.0 | Weight for relation/contrastive loss (`distilcse_lite`) |
+
+**Why `distill-weight=50`?** The KD loss (`distill_kl`) is scaled by T² internally. With cosine similarities in [-1, 1] and `distill-temperature=0.2`, T²=0.04 shrinks the raw KL from ~0.19 to ~0.007 — negligible vs the supervised loss (~0.3). Setting `distill-weight=50` compensates, making KD contribute ~0.35 to match the supervised signal.
 
 ### Resuming Phase 2 from a Checkpoint
 
@@ -164,6 +178,45 @@ uv run mbpp-kd-two-phase \
   --resume-from-phase1 artifacts/.../phase1/checkpoint.pt \
   --distill-temperature 4.0 \
   --methods embed_distill,score_distill
+```
+
+### Hyperparameter Sweep
+
+`sweep_kd_params.py` runs a systematic sweep over KD hyperparameters from a phase 1 checkpoint. Edit the `configs` list at the bottom of the file, then run:
+
+```bash
+uv run python sweep_kd_params.py
+```
+
+Each sweep config specifies `distill_temperature`, `distill_weight`, `align_weight`, `pair_weight`, `relation_weight`, `batch_size`, `lr`, and which methods to test. All configs run sequentially on one GPU for maximum throughput.
+
+Output structure:
+
+```text
+artifacts/sweep_kd_params/<timestamp>/
+  sweep_index.json          # all configs + params + results in one file
+  results_summary.json      # flat map of config/method -> metrics
+  control_supervised/       # baseline (no KD)
+    metrics.json
+    history.json
+  dw50_dt0.2/               # one dir per sweep config
+    sweep_config.json        # hyperparameters for this config
+    embed_distill/
+      metrics.json
+      history.json
+    score_distill/
+      metrics.json
+      history.json
+  tensorboard/              # TensorBoard logs for all configs
+```
+
+To add new configs, edit the `configs` list:
+
+```python
+configs = [
+    SweepConfig(name="dw100_dt0.2", distill_temperature=0.2, distill_weight=100.0, methods=METHODS),
+    SweepConfig(name="aw10_dw50",   distill_temperature=0.2, distill_weight=50.0, align_weight=10.0, methods=METHODS),
+]
 ```
 
 ### Monitoring
