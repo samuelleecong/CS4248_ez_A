@@ -2,6 +2,11 @@
 
 This suite keeps one shared MBPP benchmark and implements lightweight variants of several embedding-oriented KD papers.
 
+See also:
+
+- `docs/BIMGA.md` for the full BiMGA method note
+- `docs/BIMGA_POSITIONING.md` for the text-to-code motivation and symmetric vs asymmetric evaluation framing
+
 ## Included papers
 
 ### EmbedDistill
@@ -45,3 +50,10 @@ This suite keeps one shared MBPP benchmark and implements lightweight variants o
 - Local method: `hpd`
 - MBPP mapping: fits a PCA projector on teacher embeddings, distills the student into the compressed target space, and retrieves against projected teacher docs
 - Gap: uses PCA-based compression as the practical stand-in for the projective distillation target
+
+### BiMGA
+
+- Paper status: repo method note rather than direct external paper reproduction
+- Local method: `bimga`
+- MBPP mapping: score KL plus bidirectional query/code embedding alignment, weighted by teacher margin confidence
+- Gap: positioned as a symmetric text-to-code extension of embedding-alignment KD rather than an exact reproduction of a prior asymmetric retrieval paper

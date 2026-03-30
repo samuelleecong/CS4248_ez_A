@@ -1,10 +1,10 @@
 # BiMGA Positioning: Text-to-Code Asymmetry and Evaluation
 
-This note summarizes the conceptual framing behind `bimga` and explains why symmetric evaluation matters more in our text-to-code setting than in the asymmetric retrieval setups used by many prior KD papers.
+This note summarizes the conceptual framing behind `bimga` and explains the hypothesis we are currently evaluating: in text-to-code retrieval, a symmetric student retriever trained on both sides may outperform the usual asymmetric setup where only the query side is learned against frozen teacher-side code embeddings.
 
 ## Short Version
 
-BiMGA is motivated by a deployment mismatch.
+BiMGA is motivated by a deployment mismatch and a performance hypothesis.
 
 Most embedding-distillation papers for retrieval assume an **asymmetric deployment**:
 
@@ -14,7 +14,7 @@ Most embedding-distillation papers for retrieval assume an **asymmetric deployme
 
 That makes query-only alignment a reasonable design choice.
 
-Our setting is different. In MBPP and code search more broadly, we want a **small self-contained bi-encoder** that can encode both natural-language queries and code snippets at inference time. Once evaluation becomes `student(query) x student(code)`, the document/code tower is no longer protected by the teacher. Query-only alignment is therefore incomplete.
+Our setting is different. In MBPP and code search more broadly, we want a **small self-contained bi-encoder** that can encode both natural-language queries and code snippets at inference time. Once evaluation becomes `student(query) x student(code)`, the document/code tower is no longer protected by the teacher. Query-only alignment is therefore incomplete, and training both sides may produce a better joint query-code space than forcing student queries into a frozen teacher code space.
 
 BiMGA extends retrieval KD to this setting by:
 
@@ -37,7 +37,7 @@ In text-to-code retrieval for this project:
 - the student is evaluated as a standalone model that must encode both sides
 - the code/document encoder therefore needs direct supervision too
 
-That changes the KD problem. If the student code tower only learns through the supervised retrieval loss, it receives an indirect ranking signal but no explicit geometric target in the teacher space. BiMGA adds that missing signal.
+That changes the KD problem. If the student code tower only learns through the supervised retrieval loss, it receives an indirect ranking signal but no explicit geometric target in the teacher space. BiMGA adds that missing signal, and the broader hypothesis is that this symmetric training setup may outperform asymmetric retrieval rather than merely matching it.
 
 ## Why Text-to-Code Makes This More Interesting
 
@@ -50,7 +50,7 @@ The two sides differ in several ways:
 - code carries stronger compositional and lexical regularities than ordinary text
 - matching often depends on behavioral equivalence rather than surface similarity
 
-Because of this, transferring the teacher's code-space geometry matters. Prior asymmetric KD results can look strong partly because the harder side of the retrieval problem, the document/code representation, is still handled by the teacher. Under symmetric evaluation, that advantage disappears, so code-side alignment becomes a more meaningful contribution.
+Because of this, transferring the teacher's code-space geometry matters. Prior asymmetric KD results can look strong partly because the harder side of the retrieval problem, the document/code representation, is still handled by the teacher. Under symmetric evaluation, that advantage disappears, so code-side alignment becomes a more meaningful contribution and a plausible source of better end-to-end retrieval quality.
 
 ## Asymmetric vs Symmetric Evaluation
 
@@ -85,7 +85,19 @@ For this repository, symmetric evaluation is the more faithful metric because:
 - the student code tower directly determines final MRR and Recall@k
 - asymmetric evaluation can hide weaknesses in the student's code embeddings
 
-That is why the suite now treats symmetric evaluation as the default comparison mode.
+That is why the suite now treats symmetric evaluation as the default comparison mode when comparing trained student retrievers.
+
+## Current Hypothesis
+
+The specific idea we are evaluating is not just that symmetric retrieval is a cleaner deployment target, but that it may actually perform better than asymmetric retrieval in text-to-code search.
+
+More concretely:
+
+- asymmetric retrieval asks the student to make good queries for a teacher-owned code space
+- symmetric retrieval lets the student co-adapt both the query and code encoders
+- in text-to-code search, this co-adaptation may be beneficial because the two sides are structurally different but semantically coupled
+
+In other words, a student trained symmetrically may learn a better joint space for mapping natural-language intent to code behavior than a student trained only to be compatible with fixed teacher code embeddings.
 
 ## How BiMGA Fits
 
@@ -152,11 +164,11 @@ So the novelty is not only bidirectional alignment. It is **bidirectional alignm
 
 Use this if you want a concise project description:
 
-> BiMGA extends embedding-alignment knowledge distillation from the standard asymmetric retrieval setting to a symmetric text-to-code bi-encoder. Prior methods mainly align student queries because the teacher document encoder is reused at inference time. In our setting, however, the student must encode both natural-language queries and code snippets, so the code tower also requires direct teacher supervision. BiMGA addresses this with bidirectional alignment on query and code embeddings, combined with margin-guided weighting so that high-confidence teacher examples receive stronger alignment than uncertain ones.
+> BiMGA extends embedding-alignment knowledge distillation from the standard asymmetric retrieval setting to a symmetric text-to-code bi-encoder. Prior methods mainly align student queries because the teacher document encoder is reused at inference time. In our setting, however, the student must encode both natural-language queries and code snippets, so the code tower also requires direct teacher supervision. We are evaluating the hypothesis that this symmetric training setup can outperform asymmetric retrieval by learning a better joint space for query-code matching. BiMGA supports that hypothesis with bidirectional alignment on query and code embeddings, combined with margin-guided weighting so that high-confidence teacher examples receive stronger alignment than uncertain ones.
 
 Use this if you want a concise evaluation description:
 
-> We distinguish asymmetric evaluation, which scores `student(query) x teacher(code)`, from symmetric evaluation, which scores `student(query) x student(code)`. For text-to-code retrieval, symmetric evaluation is the more meaningful primary metric because it measures the actual quality of the standalone distilled retriever rather than the student's compatibility with a teacher-owned code space.
+> We distinguish asymmetric evaluation, which scores `student(query) x teacher(code)`, from symmetric evaluation, which scores `student(query) x student(code)`. For text-to-code retrieval, symmetric evaluation is the more meaningful primary metric because it measures the actual quality of the standalone distilled retriever. More importantly, it tests our hypothesis that jointly training both sides of the student model may outperform asymmetric retrieval against frozen teacher code embeddings.
 
 ## Takeaway
 
@@ -164,4 +176,5 @@ The key contribution is best framed as:
 
 - adapting retrieval KD from an asymmetric teacher-doc setting to a symmetric student bi-encoder
 - showing why that distinction matters more in text-to-code retrieval
+- evaluating whether symmetric training can outperform asymmetric retrieval in this setting
 - introducing a bidirectional, margin-guided alignment loss that supervises both towers rather than only the query side
