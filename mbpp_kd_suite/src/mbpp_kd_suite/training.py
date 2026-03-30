@@ -222,6 +222,105 @@ def bimga_loss(
     return weighted_align
 
 
+def bimga_progressive_loss(
+    student_query_emb: torch.Tensor,
+    student_doc_emb: torch.Tensor,
+    target_query_emb: torch.Tensor,
+    target_doc_emb: torch.Tensor,
+    teacher_scores: torch.Tensor,
+    base_temperature: float,
+    epoch: int,
+    total_epochs: int,
+    tau_max: float = 2.0,
+    tau_min: float = 0.1,
+) -> torch.Tensor:
+    """BiMGA with annealing temperature: uniform early -> selective late."""
+    batch_size = teacher_scores.size(0)
+    if batch_size < 2:
+        q_align = torch.linalg.vector_norm(student_query_emb - target_query_emb, dim=-1).mean()
+        d_align = torch.linalg.vector_norm(student_doc_emb - target_doc_emb, dim=-1).mean()
+        return q_align + d_align
+
+    progress = epoch / max(total_epochs, 1)
+    effective_tau = tau_max * (1 - progress) + tau_min * progress
+
+    pos_scores = teacher_scores.diag()
+    mask = torch.eye(batch_size, device=teacher_scores.device, dtype=torch.bool)
+    neg_scores = teacher_scores.masked_fill(mask, -1e9)
+    hardest_neg = neg_scores.max(dim=-1).values
+    margin = pos_scores - hardest_neg
+    weights = torch.sigmoid(margin / effective_tau)
+
+    q_dist = torch.linalg.vector_norm(student_query_emb - target_query_emb, dim=-1)
+    d_dist = torch.linalg.vector_norm(student_doc_emb - target_doc_emb, dim=-1)
+    return (weights * (q_dist + d_dist)).mean()
+
+
+def precompute_hard_negatives(teacher_targets: DistillTargets, k: int = 32) -> torch.Tensor:
+    """Pre-compute top-k hard negative doc indices for each training query."""
+    q = teacher_targets.train_query
+    d = teacher_targets.train_doc
+    n = q.size(0)
+    all_indices = []
+    chunk_size = 1024
+    for start in range(0, n, chunk_size):
+        end = min(start + chunk_size, n)
+        sim = q[start:end] @ d.T  # (chunk, N)
+        for i in range(end - start):
+            sim[i, start + i] = -1e9  # mask positive
+        topk_indices = sim.topk(k, dim=-1).indices
+        all_indices.append(topk_indices)
+    return torch.cat(all_indices, dim=0)  # (N, K)
+
+
+def bimga_bridge_loss(
+    student_query_emb: torch.Tensor,
+    student_doc_emb: torch.Tensor,
+    target_query_emb: torch.Tensor,
+    target_doc_emb: torch.Tensor,
+    teacher_scores: torch.Tensor,
+    temperature: float,
+    shared_ratio: float = 0.5,
+    ortho_weight: float = 0.01,
+) -> torch.Tensor:
+    """BiMGA with semantic bridge: align shared subspace, regularize orthogonality."""
+    batch_size = teacher_scores.size(0)
+    d = student_query_emb.size(-1)
+    k = int(d * shared_ratio)
+
+    sq_shared, sq_specific = student_query_emb[:, :k], student_query_emb[:, k:]
+    sd_shared, sd_specific = student_doc_emb[:, :k], student_doc_emb[:, k:]
+    tq_shared = target_query_emb[:, :k]
+    td_shared = target_doc_emb[:, :k]
+
+    if batch_size < 2:
+        q_align = torch.linalg.vector_norm(sq_shared - tq_shared, dim=-1).mean()
+        d_align = torch.linalg.vector_norm(sd_shared - td_shared, dim=-1).mean()
+        return q_align + d_align
+
+    # BiMGA-style margin weighting on shared subspace
+    pos_scores = teacher_scores.diag()
+    mask = torch.eye(batch_size, device=teacher_scores.device, dtype=torch.bool)
+    neg_scores = teacher_scores.masked_fill(mask, -1e9)
+    hardest_neg = neg_scores.max(dim=-1).values
+    margin = pos_scores - hardest_neg
+    weights = torch.sigmoid(margin / temperature)
+
+    q_dist = torch.linalg.vector_norm(sq_shared - tq_shared, dim=-1)
+    d_dist = torch.linalg.vector_norm(sd_shared - td_shared, dim=-1)
+    align = (weights * (q_dist + d_dist)).mean()
+
+    # Cross-correlation orthogonality (Barlow Twins style)
+    if d > k and k > 0:
+        cross_q = (sq_shared.T @ sq_specific) / batch_size
+        cross_d = (sd_shared.T @ sd_specific) / batch_size
+        ortho = cross_q.pow(2).mean() + cross_d.pow(2).mean()
+    else:
+        ortho = torch.zeros((), device=student_query_emb.device)
+
+    return align + ortho_weight * ortho
+
+
 def pointwise_loss(student_scores: torch.Tensor, teacher_scores: torch.Tensor) -> torch.Tensor:
     return F.mse_loss(student_scores, teacher_scores)
 
@@ -389,6 +488,9 @@ def _compute_kd_batch_losses(
     full_teacher_targets: DistillTargets,
     cfg: TrainConfig,
     device: torch.device,
+    epoch: int = 1,
+    total_epochs: int = 1,
+    hard_neg_indices: torch.Tensor | None = None,
 ) -> LossComponents:
     batch_indices, tokenized_queries, tokenized_codes = batch
     tokenized_queries = to_device(tokenized_queries, device)
@@ -454,6 +556,60 @@ def _compute_kd_batch_losses(
     elif name == "bimga":
         losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
         losses.align = bimga_loss(
+            student_query_emb=student_q,
+            student_doc_emb=student_d,
+            target_query_emb=target_q,
+            target_doc_emb=target_d,
+            teacher_scores=teacher_scores,
+            temperature=dt,
+        )
+    elif name == "bimga_progressive":
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
+        losses.align = bimga_progressive_loss(
+            student_query_emb=student_q,
+            student_doc_emb=student_d,
+            target_query_emb=target_q,
+            target_doc_emb=target_d,
+            teacher_scores=teacher_scores,
+            base_temperature=dt,
+            epoch=epoch,
+            total_epochs=total_epochs,
+        )
+    elif name == "bimga_hardneg":
+        # Expand score matrix with teacher-mined hard negatives
+        if hard_neg_indices is not None:
+            hn_idx = hard_neg_indices[batch_indices]  # (B, K)
+            hn_docs = teacher_train_d[hn_idx.flatten()].to(device).reshape(
+                batch_indices.size(0), hn_idx.size(1), -1
+            )
+            student_hn_scores = torch.einsum("bd,bkd->bk", student_q, hn_docs)
+            teacher_hn_scores = torch.einsum("bd,bkd->bk", target_q, hn_docs)
+            aug_student = torch.cat([student_scores, student_hn_scores], dim=1)
+            aug_teacher = torch.cat([teacher_scores, teacher_hn_scores], dim=1)
+            losses.distill_kl = distill_kl(aug_student, aug_teacher, dt)
+        else:
+            losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
+        losses.align = bimga_loss(
+            student_query_emb=student_q,
+            student_doc_emb=student_d,
+            target_query_emb=target_q,
+            target_doc_emb=target_d,
+            teacher_scores=teacher_scores,
+            temperature=dt,
+        )
+    elif name == "bimga_attn_pool":
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
+        losses.align = bimga_loss(
+            student_query_emb=student_q,
+            student_doc_emb=student_d,
+            target_query_emb=target_q,
+            target_doc_emb=target_d,
+            teacher_scores=teacher_scores,
+            temperature=dt,
+        )
+    elif name == "bimga_bridge":
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
+        losses.align = bimga_bridge_loss(
             student_query_emb=student_q,
             student_doc_emb=student_d,
             target_query_emb=target_q,
@@ -608,13 +764,16 @@ def train_student(
     supervised: bool | None = None,
     initial_backbone_state_dict: dict[str, torch.Tensor] | None = None,
     tb_writer: SummaryWriter | None = None,
+    hard_neg_indices: torch.Tensor | None = None,
 ) -> tuple[dict[str, Any], StudentQueryEncoder, AutoTokenizer]:
     effective_model = model_name or cfg.student_model
     is_supervised = supervised if supervised is not None else (name == TRAINED_BASELINE_NAME)
+    use_attn_pool = "attn_pool" in name
     student_tokenizer = AutoTokenizer.from_pretrained(effective_model)
     student_model = StudentQueryEncoder(
         model_name=effective_model,
         target_hidden_size=None if is_supervised else targets.hidden_size,
+        use_attention_pool=use_attn_pool,
     ).to(device)
     if initial_backbone_state_dict is not None:
         student_model.backbone.load_state_dict(initial_backbone_state_dict)
@@ -679,6 +838,9 @@ def train_student(
                     full_teacher_targets=full_teacher_targets,
                     cfg=cfg,
                     device=device,
+                    epoch=epoch,
+                    total_epochs=cfg.epochs,
+                    hard_neg_indices=hard_neg_indices,
                 )
 
             total_loss = losses.total(cfg)

@@ -46,8 +46,22 @@ def format_texts_for_role(
     return texts
 
 
+class AttentionPooling(nn.Module):
+    """Learned attention-weighted pooling over token embeddings."""
+
+    def __init__(self, hidden_size: int) -> None:
+        super().__init__()
+        self.attention = nn.Linear(hidden_size, 1, bias=True)
+
+    def forward(self, last_hidden_state: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        weights = self.attention(last_hidden_state).squeeze(-1)  # (B, L)
+        weights = weights.masked_fill(~attention_mask.bool(), -1e9)
+        weights = F.softmax(weights, dim=-1)  # (B, L)
+        return (last_hidden_state * weights.unsqueeze(-1)).sum(dim=1)  # (B, H)
+
+
 class StudentQueryEncoder(nn.Module):
-    def __init__(self, model_name: str, target_hidden_size: int | None = None) -> None:
+    def __init__(self, model_name: str, target_hidden_size: int | None = None, use_attention_pool: bool = False) -> None:
         super().__init__()
         self.backbone = AutoModel.from_pretrained(model_name)
         self.encoding_spec = infer_model_encoding_spec(
@@ -61,24 +75,24 @@ class StudentQueryEncoder(nn.Module):
             if student_hidden == self.output_hidden_size
             else nn.Linear(student_hidden, self.output_hidden_size, bias=False)
         )
+        self.use_attention_pool = use_attention_pool
+        if use_attention_pool:
+            self.attn_pool = AttentionPooling(student_hidden)
+
+    def _pool(self, last_hidden_state: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
+        if self.use_attention_pool:
+            return self.attn_pool(last_hidden_state, attention_mask)
+        return pool_hidden_state(last_hidden_state, attention_mask, self.encoding_spec.pooling)
 
     def encode(self, tokenized_batch: dict[str, torch.Tensor]) -> torch.Tensor:
         outputs = self.backbone(**tokenized_batch)
-        pooled = pool_hidden_state(
-            outputs.last_hidden_state,
-            tokenized_batch["attention_mask"],
-            self.encoding_spec.pooling,
-        )
+        pooled = self._pool(outputs.last_hidden_state, tokenized_batch["attention_mask"])
         projected = self.proj(pooled)
         return F.normalize(projected, p=2, dim=-1)
 
     def pooled_backbone(self, tokenized_batch: dict[str, torch.Tensor]) -> torch.Tensor:
         outputs = self.backbone(**tokenized_batch)
-        return pool_hidden_state(
-            outputs.last_hidden_state,
-            tokenized_batch["attention_mask"],
-            self.encoding_spec.pooling,
-        )
+        return self._pool(outputs.last_hidden_state, tokenized_batch["attention_mask"])
 
 
 def to_device(batch: dict[str, torch.Tensor], device: torch.device) -> dict[str, torch.Tensor]:
