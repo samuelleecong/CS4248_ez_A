@@ -222,6 +222,50 @@ def bimga_loss(
     return weighted_align
 
 
+def bimga_uniform_loss(
+    student_query_emb: torch.Tensor,
+    student_doc_emb: torch.Tensor,
+    target_query_emb: torch.Tensor,
+    target_doc_emb: torch.Tensor,
+) -> torch.Tensor:
+    """Bidirectional alignment WITHOUT margin weighting (ablation A2).
+
+    Aligns both query and document embeddings to teacher space with uniform
+    weight (w_i = 1.0 for all samples). Tests whether bidirectional alignment
+    helps independently of the margin-guided weighting.
+    """
+    q_dist = torch.linalg.vector_norm(student_query_emb - target_query_emb, dim=-1)
+    d_dist = torch.linalg.vector_norm(student_doc_emb - target_doc_emb, dim=-1)
+    return (q_dist + d_dist).mean()
+
+
+def bimga_query_only_loss(
+    student_query_emb: torch.Tensor,
+    target_query_emb: torch.Tensor,
+    teacher_scores: torch.Tensor,
+    temperature: float,
+) -> torch.Tensor:
+    """Margin-weighted query-only alignment (ablation A3).
+
+    Applies margin-guided weighting to query alignment only, without document
+    alignment. Tests whether margin weighting helps independently of
+    bidirectional alignment.
+    """
+    batch_size = teacher_scores.size(0)
+    if batch_size < 2:
+        return torch.linalg.vector_norm(student_query_emb - target_query_emb, dim=-1).mean()
+
+    pos_scores = teacher_scores.diag()
+    mask = torch.eye(batch_size, device=teacher_scores.device, dtype=torch.bool)
+    neg_scores = teacher_scores.masked_fill(mask, -1e9)
+    hardest_neg = neg_scores.max(dim=-1).values
+    margin = pos_scores - hardest_neg
+
+    weights = torch.sigmoid(margin / temperature)
+    q_dist = torch.linalg.vector_norm(student_query_emb - target_query_emb, dim=-1)
+    return (weights * q_dist).mean()
+
+
 def bimga_progressive_loss(
     student_query_emb: torch.Tensor,
     student_doc_emb: torch.Tensor,
@@ -560,6 +604,22 @@ def _compute_kd_batch_losses(
             student_doc_emb=student_d,
             target_query_emb=target_q,
             target_doc_emb=target_d,
+            teacher_scores=teacher_scores,
+            temperature=dt,
+        )
+    elif name == "bimga_uniform":
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
+        losses.align = bimga_uniform_loss(
+            student_query_emb=student_q,
+            student_doc_emb=student_d,
+            target_query_emb=target_q,
+            target_doc_emb=target_d,
+        )
+    elif name == "bimga_query_only":
+        losses.distill_kl = distill_kl(student_scores, teacher_scores, dt)
+        losses.align = bimga_query_only_loss(
+            student_query_emb=student_q,
+            target_query_emb=target_q,
             teacher_scores=teacher_scores,
             temperature=dt,
         )

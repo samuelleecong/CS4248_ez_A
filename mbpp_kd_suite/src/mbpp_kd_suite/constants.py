@@ -19,6 +19,8 @@ KD_METHOD_ORDER = [
     "all_pairs_distill",
     "pointwise",
     "bimga",
+    "bimga_uniform",
+    "bimga_query_only",
 ]
 
 METHOD_ORDER = [TRAINED_BASELINE_NAME, *KD_METHOD_ORDER]
