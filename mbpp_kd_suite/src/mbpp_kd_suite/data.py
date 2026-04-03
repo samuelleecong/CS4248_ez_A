@@ -9,11 +9,9 @@ import torch
 from datasets import Dataset as HFDataset
 from datasets import DatasetDict, load_dataset
 from torch.utils.data import DataLoader, Dataset as TorchDataset
-from transformers import AutoTokenizer
 
 from .config import RetrievalSplit, RetrievalSplits
 from .constants import CSN_DATASET_NAMES, TACO_DATASET_NAMES
-from .modeling import ModelEncodingSpec, format_texts_for_role
 
 
 class QueryOnlyDataset(TorchDataset):
@@ -43,12 +41,14 @@ class PairedTextDataset(TorchDataset):
 
 def make_query_dataloader(
     queries: list[str],
-    tokenizer: AutoTokenizer,
-    encoding_spec: ModelEncodingSpec,
+    tokenizer: Any,
+    encoding_spec: Any,
     batch_size: int,
     max_query_length: int,
     shuffle: bool,
 ) -> DataLoader:
+    from .modeling import format_texts_for_role
+
     dataset = QueryOnlyDataset(queries)
 
     def collate_fn(batch: list[tuple[int, str]]) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
@@ -74,13 +74,15 @@ def make_query_dataloader(
 def make_pair_dataloader(
     queries: list[str],
     codes: list[str],
-    tokenizer: AutoTokenizer,
-    encoding_spec: ModelEncodingSpec,
+    tokenizer: Any,
+    encoding_spec: Any,
     batch_size: int,
     max_query_length: int,
     max_code_length: int,
     shuffle: bool,
 ) -> DataLoader:
+    from .modeling import format_texts_for_role
+
     dataset = PairedTextDataset(queries=queries, codes=codes)
 
     def collate_fn(batch: list[tuple[str, str]]) -> tuple[dict[str, torch.Tensor], dict[str, torch.Tensor]]:
@@ -113,14 +115,16 @@ def make_pair_dataloader(
 def make_indexed_pair_dataloader(
     queries: list[str],
     codes: list[str],
-    tokenizer: AutoTokenizer,
-    encoding_spec: ModelEncodingSpec,
+    tokenizer: Any,
+    encoding_spec: Any,
     batch_size: int,
     max_query_length: int,
     max_code_length: int,
     shuffle: bool,
 ) -> DataLoader:
     """Like make_pair_dataloader but also returns batch indices for teacher target lookup."""
+    from .modeling import format_texts_for_role
+
     class _IndexedPaired(TorchDataset):
         def __len__(self) -> int:
             return len(queries)

@@ -5,15 +5,8 @@ from typing import Any
 import numpy as np
 import torch
 import torch.nn.functional as F
-from transformers import AutoModel, AutoTokenizer
 
 from .constants import METHOD_ORDER, TRAINED_BASELINE_NAME
-from .modeling import (
-    StudentQueryEncoder,
-    encode_student_texts,
-    encode_texts_backbone,
-    infer_model_encoding_spec,
-)
 
 
 def paired_ranks(score_matrix: np.ndarray) -> np.ndarray:
@@ -53,14 +46,16 @@ def score_metrics_from_embeddings(query_embs: torch.Tensor, doc_embs: torch.Tens
 
 @torch.no_grad()
 def evaluate_asymmetric(
-    student_model: StudentQueryEncoder,
-    tokenizer: AutoTokenizer,
+    student_model: Any,
+    tokenizer: Any,
     queries: list[str],
     fixed_doc_embs: torch.Tensor,
     max_query_length: int,
     eval_batch_size: int,
     device: torch.device,
 ) -> dict[str, float]:
+    from .modeling import encode_student_texts
+
     query_embs = encode_student_texts(
         student_model=student_model,
         tokenizer=tokenizer,
@@ -76,8 +71,8 @@ def evaluate_asymmetric(
 
 @torch.no_grad()
 def evaluate_symmetric_student(
-    student_model: StudentQueryEncoder,
-    tokenizer: AutoTokenizer,
+    student_model: Any,
+    tokenizer: Any,
     queries: list[str],
     codes: list[str],
     max_query_length: int,
@@ -85,6 +80,8 @@ def evaluate_symmetric_student(
     eval_batch_size: int,
     device: torch.device,
 ) -> dict[str, float]:
+    from .modeling import encode_student_texts
+
     query_embs = encode_student_texts(
         student_model=student_model,
         tokenizer=tokenizer,
@@ -110,8 +107,8 @@ def evaluate_symmetric_student(
 
 def evaluate_student_mode(
     eval_mode: str,
-    student_model: StudentQueryEncoder,
-    tokenizer: AutoTokenizer,
+    student_model: Any,
+    tokenizer: Any,
     queries: list[str],
     codes: list[str],
     fixed_doc_embs: torch.Tensor,
@@ -159,6 +156,10 @@ def evaluate_symmetric_backbone(
     eval_batch_size: int,
     device: torch.device,
 ) -> dict[str, dict[str, float]]:
+    from transformers import AutoModel, AutoTokenizer
+
+    from .modeling import encode_texts_backbone, infer_model_encoding_spec
+
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name).to(device)
     encoding_spec = infer_model_encoding_spec(
@@ -220,14 +221,16 @@ def evaluate_symmetric_backbone(
 
 @torch.no_grad()
 def query_alignment_cosine(
-    student_model: StudentQueryEncoder,
-    tokenizer: AutoTokenizer,
+    student_model: Any,
+    tokenizer: Any,
     queries: list[str],
     target_query_embs: torch.Tensor,
     max_query_length: int,
     eval_batch_size: int,
     device: torch.device,
 ) -> float:
+    from .modeling import encode_student_texts
+
     student_q = encode_student_texts(
         student_model=student_model,
         tokenizer=tokenizer,
@@ -243,14 +246,16 @@ def query_alignment_cosine(
 
 @torch.no_grad()
 def doc_alignment_cosine_student_vs_target(
-    student_model: StudentQueryEncoder,
-    tokenizer: AutoTokenizer,
+    student_model: Any,
+    tokenizer: Any,
     codes: list[str],
     target_doc_embs: torch.Tensor,
     max_code_length: int,
     eval_batch_size: int,
     device: torch.device,
 ) -> float:
+    from .modeling import encode_student_texts
+
     student_d = encode_student_texts(
         student_model=student_model,
         tokenizer=tokenizer,

@@ -34,6 +34,20 @@ For built-in CLI help, run:
 uv run mbpp-kd-eval --help
 ```
 
+For the multi-model OOD + robustness workflow added for MBPP sanitized OOD and
+TACO perturbation studies, use:
+
+```bash
+uv run mbpp-kd-ood-robustness \
+  --model sentence-transformers/all-MiniLM-L6-v2 \
+  --task all \
+  --perturbation-tier all
+```
+
+The perturbation tiers in `mbpp-kd-ood-robustness` are TextAttack-backed. The
+current implementation uses TextAttack augmenters/transformations for typo and
+mixed-noise generation instead of hand-written perturbation rules.
+
 A `run` means one evaluator execution over exactly one dataset split with one model. Each run writes one timestamped output folder plus local aggregate indices under `eval/runs/`.
 
 ## Examples

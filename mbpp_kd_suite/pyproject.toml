@@ -10,6 +10,7 @@ requires-python = ">=3.10,<3.13"
 dependencies = [
     "accelerate>=0.33.0",
     "datasets>=2.20.0",
+    "textattack>=0.3.10",
     "matplotlib>=3.10.8",
     "numpy>=1.26.0",
     "psutil>=6.1.0",
@@ -28,6 +29,7 @@ mbpp-kd-inventory = "mbpp_kd_suite.experiment_inventory:main"
 mbpp-kd-baselines = "mbpp_kd_suite.baseline_comparison:main"
 mbpp-kd-finetune = "mbpp_kd_suite.finetune_comparison:main"
 mbpp-kd-eval = "eval.run:main"
+mbpp-kd-ood-robustness = "eval.ood_robustness:main"
 mbpp-kd-two-phase = "mbpp_kd_suite.two_phase_kd_experiment:main"
 mbpp-kd-upload = "mbpp_kd_suite.upload_models:main"
 

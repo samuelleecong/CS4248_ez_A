@@ -8,10 +8,13 @@ from pathlib import Path
 
 from eval.data_adapters import get_dataset_adapter
 
+_TMP_ROOT = Path(__file__).resolve().parent / ".tmp"
+_TMP_ROOT.mkdir(parents=True, exist_ok=True)
+
 
 class EvalAdaptersTest(unittest.TestCase):
     def test_mbpp_local_file_produces_nonempty_splits(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory(dir=_TMP_ROOT) as tmpdir:
             path = Path(tmpdir) / "mbpp.jsonl"
             with path.open("w", encoding="utf-8") as handle:
                 for idx in range(20):
@@ -31,7 +34,7 @@ class EvalAdaptersTest(unittest.TestCase):
             self.assertGreater(len(corpus.test), 0)
 
     def test_codesearchnet_local_directory_loads_python_splits(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory(dir=_TMP_ROOT) as tmpdir:
             root = Path(tmpdir)
             for split_name, folder_name in (("train", "train"), ("validation", "valid"), ("test", "test")):
                 split_dir = root / folder_name
@@ -56,7 +59,7 @@ class EvalAdaptersTest(unittest.TestCase):
             self.assertEqual(len(corpus.test), 1)
 
     def test_codesearchnet_remote_style_schema_is_supported(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory(dir=_TMP_ROOT) as tmpdir:
             root = Path(tmpdir)
             for split_name, folder_name in (("train", "train"), ("validation", "valid"), ("test", "test")):
                 split_dir = root / folder_name
