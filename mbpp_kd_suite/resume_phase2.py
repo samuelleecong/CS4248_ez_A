@@ -27,7 +27,7 @@ import json
 import sys
 from pathlib import Path
 
-ARTIFACTS = Path(__file__).parent / "artifacts"
+ARTIFACTS = Path(__file__).parent.parent / "artifacts"
 
 
 def list_checkpoints() -> list[Path]:
@@ -70,6 +70,18 @@ def main() -> None:
     parser.add_argument("--dataset-name", type=str, default=None,
                         help="Override dataset (default: same as phase 1)")
     parser.add_argument("--distill-temperature", type=float, default=4.0)
+    parser.add_argument(
+        "--distill-weight",
+        type=float,
+        default=1.0,
+        help="Weight for distill_kl / dark_kl (same as two_phase_kd_experiment)",
+    )
+    parser.add_argument(
+        "--align-weight",
+        type=float,
+        default=1.0,
+        help="Weight for embedding alignment loss (same as two_phase_kd_experiment)",
+    )
     parser.add_argument("--phase2-epochs", type=int, default=10)
     parser.add_argument("--phase2-patience", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=32)
@@ -139,6 +151,8 @@ def main() -> None:
     print(f"  Student: {student}")
     print(f"  Dataset: {dataset}")
     print(f"  Distill temperature: {args.distill_temperature}")
+    print(f"  Distill weight: {args.distill_weight}")
+    print(f"  Align weight: {args.align_weight}")
     print(f"  Methods: {', '.join(methods)}")
     print(f"  Output: {output_dir}")
     print()
@@ -154,6 +168,8 @@ def main() -> None:
         lr=args.lr,
         seed=args.seed,
         distill_temperature=args.distill_temperature,
+        distill_weight=args.distill_weight,
+        align_weight=args.align_weight,
         output_dir=output_dir,
         skip_diagnostics=args.skip_diagnostics,
         methods=methods,
