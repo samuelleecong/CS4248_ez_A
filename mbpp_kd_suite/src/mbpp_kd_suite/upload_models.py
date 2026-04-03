@@ -212,14 +212,27 @@ def _upload_model(
         sys.exit(1)
 
     # Collect files to upload:
-    #   backbone/* + tokenizer/* from .../model/
-    #   metrics.json + history.json from the role dir (.../ft_student/)
+    #   backbone/* + tokenizer/* flattened to repo root (HF convention)
+    #   projection.pt at root
+    #   metrics.json + history.json from the role dir
     model_root = backbone_dir.parent  # .../model/
     role_dir = model_root.parent      # .../ft_student/
     files_to_upload: list[tuple[Path, str]] = []
-    for p in sorted(model_root.rglob("*")):
+    # Backbone files -> repo root (config.json, model.safetensors, etc.)
+    for p in sorted(backbone_dir.rglob("*")):
         if p.is_file():
-            files_to_upload.append((p, str(p.relative_to(model_root))))
+            files_to_upload.append((p, p.name))
+    # Tokenizer files -> repo root (tokenizer.json, tokenizer_config.json, vocab.txt, etc.)
+    tokenizer_dir = model_root / "tokenizer"
+    if tokenizer_dir.exists():
+        for p in sorted(tokenizer_dir.rglob("*")):
+            if p.is_file():
+                files_to_upload.append((p, p.name))
+    # Projection layer -> repo root
+    proj_file = model_root / "projection.pt"
+    if proj_file.exists():
+        files_to_upload.append((proj_file, "projection.pt"))
+    # Metrics/history from role dir
     for p in sorted(role_dir.glob("*.json")):
         files_to_upload.append((p, p.name))
 
