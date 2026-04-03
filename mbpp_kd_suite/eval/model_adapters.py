@@ -5,13 +5,18 @@ from pathlib import Path
 from typing import Any
 
 import torch
+import torch.nn.functional as F
+from huggingface_hub import hf_hub_download
+from huggingface_hub.utils import EntryNotFoundError
 from transformers import AutoModel, AutoTokenizer
 
 from mbpp_kd_suite.modeling import (
     StudentQueryEncoder,
     encode_student_texts,
     encode_texts_backbone,
+    format_texts_for_role,
     infer_model_encoding_spec,
+    pool_hidden_state,
 )
 
 
@@ -65,6 +70,8 @@ class HFEncoderAdapter(EncoderAdapter):
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self.model = AutoModel.from_pretrained(model_name_or_path).to(device)
         self.model.eval()
+        self.projection = _maybe_load_projection_layer(model_name_or_path, self.model.config.hidden_size).to(device)
+        self.projection.eval()
         self._encoding_spec = infer_model_encoding_spec(
             model_name_or_path,
             getattr(self.model.config, "_name_or_path", None),
@@ -76,9 +83,10 @@ class HFEncoderAdapter(EncoderAdapter):
         return self._encoding_spec
 
     def encode_queries(self, texts: list[str]) -> torch.Tensor:
-        return encode_texts_backbone(
+        return _encode_hf_texts(
             model=self.model,
             tokenizer=self.tokenizer,
+            projection=self.projection,
             texts=texts,
             text_role="query",
             encoding_spec=self._encoding_spec,
@@ -89,9 +97,10 @@ class HFEncoderAdapter(EncoderAdapter):
         )
 
     def encode_codes(self, texts: list[str]) -> torch.Tensor:
-        return encode_texts_backbone(
+        return _encode_hf_texts(
             model=self.model,
             tokenizer=self.tokenizer,
+            projection=self.projection,
             texts=texts,
             text_role="document",
             encoding_spec=self._encoding_spec,
@@ -102,13 +111,19 @@ class HFEncoderAdapter(EncoderAdapter):
         )
 
     def metadata(self) -> dict[str, Any]:
+        has_projection = not isinstance(self.projection, torch.nn.Identity)
+        output_hidden_size = int(self.model.config.hidden_size)
+        if has_projection and isinstance(self.projection, torch.nn.Linear):
+            output_hidden_size = int(self.projection.out_features)
         return {
             "adapter_type": "hf",
             "model_name_or_path": self.model_name_or_path,
             "pooling": self._encoding_spec.pooling,
             "query_prefix": self._encoding_spec.query_prefix,
             "doc_prefix": self._encoding_spec.doc_prefix,
-            "hidden_size": int(self.model.config.hidden_size),
+            "hidden_size": output_hidden_size,
+            "backbone_hidden_size": int(self.model.config.hidden_size),
+            "has_projection": has_projection,
         }
 
 
@@ -257,3 +272,84 @@ def _looks_like_suite_model_dir(path: Path) -> bool:
 
 def _looks_like_hf_dir(path: Path) -> bool:
     return (path / "config.json").exists()
+
+
+def _encode_hf_texts(
+    model: AutoModel,
+    tokenizer: AutoTokenizer,
+    projection: torch.nn.Module,
+    texts: list[str],
+    text_role: str,
+    encoding_spec: Any,
+    max_length: int,
+    batch_size: int,
+    device: torch.device,
+    desc: str,
+) -> torch.Tensor:
+    if isinstance(projection, torch.nn.Identity):
+        return encode_texts_backbone(
+            model=model,
+            tokenizer=tokenizer,
+            texts=texts,
+            text_role=text_role,
+            encoding_spec=encoding_spec,
+            max_length=max_length,
+            batch_size=batch_size,
+            device=device,
+            desc=desc,
+        )
+
+    model.eval()
+    projection.eval()
+    all_embs: list[torch.Tensor] = []
+    for start in range(0, len(texts), batch_size):
+        batch = format_texts_for_role(
+            texts[start : start + batch_size],
+            text_role=text_role,
+            encoding_spec=encoding_spec,
+        )
+        tokens = tokenizer(
+            batch,
+            max_length=max_length,
+            truncation=True,
+            padding=True,
+            return_tensors="pt",
+        )
+        tokens = {key: value.to(device) for key, value in tokens.items()}
+        outputs = model(**tokens)
+        pooled = pool_hidden_state(
+            outputs.last_hidden_state,
+            tokens["attention_mask"],
+            encoding_spec.pooling,
+        )
+        projected = projection(pooled)
+        all_embs.append(F.normalize(projected, p=2, dim=-1).cpu())
+    return torch.cat(all_embs, dim=0)
+
+
+def _maybe_load_projection_layer(model_name_or_path: str, backbone_hidden_size: int) -> torch.nn.Module:
+    projection_path = _resolve_projection_path(model_name_or_path)
+    if projection_path is None:
+        return torch.nn.Identity()
+
+    projection_state = torch.load(projection_path, map_location="cpu", weights_only=True)
+    weight = projection_state.get("weight")
+    if weight is None:
+        raise ValueError(f"projection.pt at {projection_path} does not contain a 'weight' tensor")
+
+    projection = torch.nn.Linear(backbone_hidden_size, int(weight.shape[0]), bias=False)
+    projection.load_state_dict(projection_state)
+    return projection
+
+
+def _resolve_projection_path(model_name_or_path: str) -> Path | None:
+    local_path = Path(model_name_or_path).expanduser()
+    if local_path.exists():
+        projection_path = local_path / "projection.pt"
+        return projection_path if projection_path.exists() else None
+
+    try:
+        projection_file = hf_hub_download(repo_id=model_name_or_path, filename="projection.pt")
+    except EntryNotFoundError:
+        return None
+    return Path(projection_file)
