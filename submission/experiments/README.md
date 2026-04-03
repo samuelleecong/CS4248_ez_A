@@ -196,31 +196,30 @@ Examples:
 
 ```python
 from transformers import AutoModel, AutoTokenizer
+from huggingface_hub import hf_hub_download
 import torch
 
 repo = "cs4248-nlp/paper-s1-bimga-dw50-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143"
 tokenizer = AutoTokenizer.from_pretrained(repo)
 model = AutoModel.from_pretrained(repo)
 
-# Note: these models output 312d embeddings from the backbone.
-# The projection layer (312d -> 384d teacher space) is saved separately
-# as projection.pt in each run directory. For symmetric evaluation,
-# you need the projection to match teacher space:
-#
-#   proj = torch.nn.Linear(312, 384, bias=False)
-#   proj.load_state_dict(torch.load("projection.pt"))
+# Load projection layer (312d backbone -> 384d teacher space)
+proj = torch.nn.Linear(312, 384, bias=False)
+proj.load_state_dict(torch.load(hf_hub_download(repo, "projection.pt"), weights_only=True))
 
-def mean_pool(output, mask):
-    emb = output.last_hidden_state
-    mask = mask.unsqueeze(-1).expand(emb.size()).float()
-    return (emb * mask).sum(1) / mask.sum(1).clamp(min=1e-9)
+def encode(text, max_length=160):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=max_length)
+    with torch.no_grad():
+        emb = model(**inputs).last_hidden_state
+        mask = inputs["attention_mask"].unsqueeze(-1).expand(emb.size()).float()
+        pooled = (emb * mask).sum(1) / mask.sum(1).clamp(min=1e-9)
+        return torch.nn.functional.normalize(proj(pooled), p=2, dim=-1)
 
-inputs = tokenizer("find the maximum element in a list", return_tensors="pt", truncation=True, max_length=160)
-with torch.no_grad():
-    out = model(**inputs)
-embedding = mean_pool(out, inputs["attention_mask"])
-# embedding shape: (1, 312) -- apply projection for 384d teacher-space embedding
+query_emb = encode("find the maximum element in a list")
+# query_emb shape: (1, 384) -- L2-normalized, ready for cosine similarity
 ```
+
+Note: the control model (`s1_control_bs32`) has no projection layer. Load it with just `AutoModel` + mean pooling.
 
 ## Methods Reference
 
