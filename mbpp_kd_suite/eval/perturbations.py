@@ -79,6 +79,8 @@ def perturb_query(query: str, tier: str, seed: int, query_index: int = 0) -> str
         return _perturb_with_textattack(text, spec=spec, seed=seed, query_index=query_index)
     except ModuleNotFoundError:
         return _perturb_with_manual_fallback(text, tier=normalized_tier, seed=seed, query_index=query_index)
+    except Exception:
+        return _perturb_with_manual_fallback(text, tier=normalized_tier, seed=seed, query_index=query_index)
 
 
 def _normalize_tier(tier: str) -> str:
