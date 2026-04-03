@@ -87,9 +87,14 @@ def _find_model_dirs(run_dir: Path) -> list[tuple[str, Path]]:
     for backbone_dir in sorted(run_dir.rglob("backbone")):
         if not (backbone_dir / "model.safetensors").exists():
             continue
-        # Parent chain:  run_dir / {phase1|phase2} / {role} / model / backbone
-        role_dir = backbone_dir.parent.parent  # the {role} directory
-        role = _dir_to_role(role_dir.name)
+        # Parent chain varies by layout:
+        #   two-phase: run_dir / {phase1|phase2} / {role} / model / backbone
+        #   sweep:     run_dir / {run_name} / {method} / model / backbone
+        # Use the deepest ancestor that is a direct child of run_dir as the role.
+        rel = backbone_dir.relative_to(run_dir)
+        # The top-level directory under run_dir is the run/experiment name
+        top_dir = rel.parts[0]
+        role = _dir_to_role(top_dir)
         found.append((role, backbone_dir))
     return found
 
@@ -227,23 +232,23 @@ def _upload_model(
     if dry_run:
         print(f"  [dry-run] Would create repo: {repo_id} (private={private})")
         for local, remote in files_to_upload:
-            print(f"  [dry-run]   {remote}  ← {local.name} ({local.stat().st_size // 1024} KB)")
-        print("  [dry-run]   README.md  ← (generated model card)")
+            print(f"  [dry-run]   {remote}  <- {local.name} ({local.stat().st_size // 1024} KB)")
+        print("  [dry-run]   README.md  <- (generated model card)")
         return
 
     api = HfApi()
-    print(f"  Creating repo '{repo_id}' …")
+    print(f"  Creating repo '{repo_id}' ...")
     create_repo(repo_id=repo_id, exist_ok=True, private=private)
 
     for local_path, path_in_repo in files_to_upload:
-        print(f"  Uploading {path_in_repo} …")
+        print(f"  Uploading {path_in_repo} ...")
         api.upload_file(
             path_or_fileobj=str(local_path),
             path_in_repo=path_in_repo,
             repo_id=repo_id,
         )
 
-    print("  Uploading README.md …")
+    print("  Uploading README.md ...")
     api.upload_file(
         path_or_fileobj=card_content.encode(),
         path_in_repo="README.md",
@@ -397,7 +402,7 @@ def main() -> None:
         model = _model_slug(base_model)
         repo_name = _make_repo_name(args.prefix, role, model, dataset, timestamp)
         repo_id = f"{namespace}/{repo_name}"
-        print(f"[{role}] → {repo_id}")
+        print(f"[{role}] -> {repo_id}")
         _upload_model(
             backbone_dir=backbone_dir,
             repo_id=repo_id,
