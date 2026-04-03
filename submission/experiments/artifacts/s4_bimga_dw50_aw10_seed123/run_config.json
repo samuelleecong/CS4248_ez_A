@@ -1,0 +1,11 @@
+{
+  "name": "s4_bimga_dw50_aw10_seed123",
+  "method": "bimga",
+  "batch_size": 32,
+  "seed": 123,
+  "distill_weight": 50,
+  "align_weight": 10,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "supervised": false
+}

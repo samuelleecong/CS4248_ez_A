@@ -1,0 +1,11 @@
+{
+  "name": "s3_A3_bimga_query_only",
+  "method": "bimga_query_only",
+  "batch_size": 32,
+  "seed": 42,
+  "distill_weight": 100,
+  "align_weight": 10,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "supervised": false
+}

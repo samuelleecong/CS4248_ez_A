@@ -55,6 +55,9 @@ datasets/
 experiments/kai/logs/
 
 artifacts/
+!submission/experiments/artifacts/
+submission/experiments/artifacts/**/model/
+submission/experiments/artifacts/**/tensorboard/
 
 # ----------------------------
 # Visualization app

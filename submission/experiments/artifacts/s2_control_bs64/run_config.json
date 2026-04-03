@@ -1,0 +1,11 @@
+{
+  "name": "s2_control_bs64",
+  "method": "control",
+  "batch_size": 64,
+  "seed": 42,
+  "distill_weight": 50.0,
+  "align_weight": 1.0,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "supervised": true
+}

@@ -1,0 +1,11 @@
+{
+  "name": "s2_score_dw100_bs64",
+  "method": "score_distill",
+  "batch_size": 64,
+  "seed": 42,
+  "distill_weight": 100,
+  "align_weight": 1.0,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "supervised": false
+}

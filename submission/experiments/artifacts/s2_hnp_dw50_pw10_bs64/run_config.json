@@ -1,0 +1,11 @@
+{
+  "name": "s2_hnp_dw50_pw10_bs64",
+  "method": "hard_negative_pair_distill",
+  "batch_size": 64,
+  "seed": 42,
+  "distill_weight": 50,
+  "align_weight": 1.0,
+  "pair_weight": 10,
+  "distill_temperature": 0.2,
+  "supervised": false
+}

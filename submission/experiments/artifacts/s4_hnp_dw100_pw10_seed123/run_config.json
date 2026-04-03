@@ -1,0 +1,11 @@
+{
+  "name": "s4_hnp_dw100_pw10_seed123",
+  "method": "hard_negative_pair_distill",
+  "batch_size": 32,
+  "seed": 123,
+  "distill_weight": 100,
+  "align_weight": 1.0,
+  "pair_weight": 10,
+  "distill_temperature": 0.2,
+  "supervised": false
+}

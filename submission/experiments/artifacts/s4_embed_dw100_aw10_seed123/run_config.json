@@ -1,0 +1,11 @@
+{
+  "name": "s4_embed_dw100_aw10_seed123",
+  "method": "embed_distill",
+  "batch_size": 32,
+  "seed": 123,
+  "distill_weight": 100,
+  "align_weight": 10,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "supervised": false
+}
