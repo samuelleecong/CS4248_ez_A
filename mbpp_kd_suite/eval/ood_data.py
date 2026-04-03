@@ -41,7 +41,7 @@ def _load_mbpp_rows(path: str | None) -> list[dict[str, Any]]:
             raise FileNotFoundError(f"MBPP dataset path does not exist: {candidate}")
         return _load_local_mbpp_rows(candidate)
 
-    dataset: DatasetDict = load_dataset("google-research-datasets/mbpp", "sanitized")
+    dataset: DatasetDict = load_dataset("mbpp", "sanitized")
     rows: list[dict[str, Any]] = []
     for split_name in dataset.keys():
         rows.extend(dict(row) for row in dataset[split_name])
