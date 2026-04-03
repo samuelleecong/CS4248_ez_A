@@ -302,28 +302,29 @@ def _encode_hf_texts(
     model.eval()
     projection.eval()
     all_embs: list[torch.Tensor] = []
-    for start in range(0, len(texts), batch_size):
-        batch = format_texts_for_role(
-            texts[start : start + batch_size],
-            text_role=text_role,
-            encoding_spec=encoding_spec,
-        )
-        tokens = tokenizer(
-            batch,
-            max_length=max_length,
-            truncation=True,
-            padding=True,
-            return_tensors="pt",
-        )
-        tokens = {key: value.to(device) for key, value in tokens.items()}
-        outputs = model(**tokens)
-        pooled = pool_hidden_state(
-            outputs.last_hidden_state,
-            tokens["attention_mask"],
-            encoding_spec.pooling,
-        )
-        projected = projection(pooled)
-        all_embs.append(F.normalize(projected, p=2, dim=-1).cpu())
+    with torch.no_grad():
+        for start in range(0, len(texts), batch_size):
+            batch = format_texts_for_role(
+                texts[start : start + batch_size],
+                text_role=text_role,
+                encoding_spec=encoding_spec,
+            )
+            tokens = tokenizer(
+                batch,
+                max_length=max_length,
+                truncation=True,
+                padding=True,
+                return_tensors="pt",
+            )
+            tokens = {key: value.to(device) for key, value in tokens.items()}
+            outputs = model(**tokens)
+            pooled = pool_hidden_state(
+                outputs.last_hidden_state,
+                tokens["attention_mask"],
+                encoding_spec.pooling,
+            )
+            projected = projection(pooled)
+            all_embs.append(F.normalize(projected, p=2, dim=-1).cpu())
     return torch.cat(all_embs, dim=0)
 
 
