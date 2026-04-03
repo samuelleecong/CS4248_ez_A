@@ -83,7 +83,12 @@ class OODDataTest(unittest.TestCase):
                         row["question"] = f"{payload['question']} {split_name} {idx}"
                         handle.write(json.dumps(row) + "\n")
 
-            corpus = load_taco_retrieval_corpus("BEE-spoke-data/TACO-hf", dataset_path=str(root), split_seed=3)
+            corpus = load_taco_retrieval_corpus(
+                "BEE-spoke-data/TACO-hf",
+                dataset_path=str(root),
+                split_seed=3,
+                split="test",
+            )
             self.assertGreater(len(corpus.train), 0)
             self.assertGreater(len(corpus.validation), 0)
             self.assertGreater(len(corpus.test), 0)

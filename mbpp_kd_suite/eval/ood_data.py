@@ -8,7 +8,7 @@ from typing import Any
 
 from datasets import DatasetDict, load_dataset
 
-from mbpp_kd_suite.data import load_retrieval_dataset, taco_row_to_pair
+from mbpp_kd_suite.data import taco_row_to_pair
 
 from .types import RetrievalCorpus, RetrievalRecord
 
@@ -23,15 +23,11 @@ def load_taco_retrieval_corpus(
     dataset_name: str,
     dataset_path: str | None,
     split_seed: int,
+    split: str,
 ) -> RetrievalCorpus:
     if dataset_path:
         return _load_local_taco_corpus(Path(dataset_path).expanduser(), split_seed=split_seed)
-    dataset = load_retrieval_dataset(dataset_name=dataset_name, taco_val_size=1000, seed=split_seed)
-    return RetrievalCorpus(
-        train=_pairs_to_records(dataset["train"], split="train", source_dataset=dataset_name),
-        validation=_pairs_to_records(dataset["validation"], split="validation", source_dataset=dataset_name),
-        test=_pairs_to_records(dataset["test"], split="test", source_dataset=dataset_name),
-    )
+    return _load_remote_taco_split_corpus(dataset_name=dataset_name, split=split)
 
 
 def _load_mbpp_rows(path: str | None) -> list[dict[str, Any]]:
@@ -111,6 +107,22 @@ def _load_local_taco_corpus(path: Path, split_seed: int) -> RetrievalCorpus:
     records = _rows_to_taco_records(rows, split="pool", source_dataset="taco_local")
     corpus, _ = _deterministic_partition(records, split_seed=split_seed, source_dataset="taco_local")
     return corpus
+
+
+def _load_remote_taco_split_corpus(dataset_name: str, split: str) -> RetrievalCorpus:
+    effective_name = "BEE-spoke-data/TACO-hf" if dataset_name == "BAAI/TACO" else dataset_name
+    raw_split = load_dataset(effective_name, split=split)
+    split_records = _rows_to_taco_records(
+        [dict(row) for row in raw_split],
+        split=split,
+        source_dataset=effective_name,
+    )
+    empty: list[RetrievalRecord] = []
+    return RetrievalCorpus(
+        train=split_records if split == "train" else empty,
+        validation=split_records if split == "validation" else empty,
+        test=split_records if split == "test" else empty,
+    )
 
 
 def _maybe_load_local_taco_split_dir(path: Path) -> RetrievalCorpus | None:

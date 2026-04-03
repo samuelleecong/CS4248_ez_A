@@ -12,7 +12,7 @@ import numpy as np
 import torch
 
 from mbpp_kd_suite.metrics import paired_ranking_metrics, paired_ranks
-from mbpp_kd_suite.runtime import pick_device, set_seed
+from mbpp_kd_suite.runtime import maybe_empty_device_cache, pick_device, set_seed
 
 from .ood_data import load_mbpp_ood_corpus, load_taco_retrieval_corpus
 from .perturbations import PERTURBATION_TIERS, perturb_queries
@@ -153,67 +153,79 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
             if adapter_cls is None:
                 from .model_adapters import HFEncoderAdapter as adapter_cls
 
-            adapter = adapter_cls(
-                model_name_or_path=model_name,
-                max_query_length=cfg.max_query_length,
-                max_code_length=cfg.max_code_length,
-                batch_size=cfg.batch_size,
-                device=device,
-            )
-            code_embeddings = adapter.encode_codes(task_context["codes"])
-
-            for tier in task_context["tiers"]:
-                original_queries = task_context["queries"]
-                perturbed_queries = (
-                    original_queries
-                    if tier == "clean"
-                    else perturb_queries(original_queries, tier=tier, seed=cfg.split_seed)
+            adapter = None
+            code_embeddings = None
+            try:
+                adapter = adapter_cls(
+                    model_name_or_path=model_name,
+                    max_query_length=cfg.max_query_length,
+                    max_code_length=cfg.max_code_length,
+                    batch_size=cfg.batch_size,
+                    device=device,
                 )
+                code_embeddings = adapter.encode_codes(task_context["codes"])
 
-                started = time.perf_counter()
-                query_embeddings = adapter.encode_queries(perturbed_queries)
-                score_matrix = (query_embeddings @ code_embeddings.T).detach().cpu().numpy()
-                ranks = paired_ranks(score_matrix)
-                metrics = paired_ranking_metrics(score_matrix, ks=cfg.ks)
-                metrics["MeanRank"] = float(np.mean(ranks))
-                metrics["MedianRank"] = float(np.median(ranks))
-                runtime_sec = time.perf_counter() - started
+                for tier in task_context["tiers"]:
+                    original_queries = task_context["queries"]
+                    perturbed_queries = (
+                        original_queries
+                        if tier == "clean"
+                        else perturb_queries(original_queries, tier=tier, seed=cfg.split_seed)
+                    )
 
-                metrics_rows.append(
-                    {
-                        "model_name": model_name,
-                        "task": task_name,
-                        "dataset_name": task_context["dataset_name"],
-                        "split": cfg.split,
-                        "perturbation_tier": tier,
-                        "mrr": float(metrics["MRR"]),
-                        "recall@1": float(metrics.get("Recall@1", np.nan)),
-                        "recall@5": float(metrics.get("Recall@5", np.nan)),
-                        "recall@10": float(metrics.get("Recall@10", np.nan)),
-                        "mean_rank": float(metrics["MeanRank"]),
-                        "median_rank": float(metrics["MedianRank"]),
-                        "runtime_sec": runtime_sec,
-                        "query_count": len(task_context["records"]),
-                        "code_count": len(task_context["records"]),
-                    }
-                )
+                    started = time.perf_counter()
+                    query_embeddings = adapter.encode_queries(perturbed_queries)
+                    score_matrix = (query_embeddings @ code_embeddings.T).detach().cpu().numpy()
+                    ranks = paired_ranks(score_matrix)
+                    metrics = paired_ranking_metrics(score_matrix, ks=cfg.ks)
+                    metrics["MeanRank"] = float(np.mean(ranks))
+                    metrics["MedianRank"] = float(np.median(ranks))
+                    runtime_sec = time.perf_counter() - started
 
-                for record, perturbed_query, rank in zip(task_context["records"], perturbed_queries, ranks):
-                    per_query_rows.append(
+                    metrics_rows.append(
                         {
                             "model_name": model_name,
                             "task": task_name,
                             "dataset_name": task_context["dataset_name"],
                             "split": cfg.split,
                             "perturbation_tier": tier,
-                            "record_id": record.id,
-                            "original_query": record.query,
-                            "perturbed_query": perturbed_query,
-                            "code": record.code,
-                            "rank": int(rank),
-                            "reciprocal_rank": float(1.0 / rank),
+                            "mrr": float(metrics["MRR"]),
+                            "recall@1": float(metrics.get("Recall@1", np.nan)),
+                            "recall@5": float(metrics.get("Recall@5", np.nan)),
+                            "recall@10": float(metrics.get("Recall@10", np.nan)),
+                            "mean_rank": float(metrics["MeanRank"]),
+                            "median_rank": float(metrics["MedianRank"]),
+                            "runtime_sec": runtime_sec,
+                            "query_count": len(task_context["records"]),
+                            "code_count": len(task_context["records"]),
                         }
                     )
+
+                    for record, perturbed_query, rank in zip(task_context["records"], perturbed_queries, ranks):
+                        per_query_rows.append(
+                            {
+                                "model_name": model_name,
+                                "task": task_name,
+                                "dataset_name": task_context["dataset_name"],
+                                "split": cfg.split,
+                                "perturbation_tier": tier,
+                                "record_id": record.id,
+                                "original_query": record.query,
+                                "perturbed_query": perturbed_query,
+                                "code": record.code,
+                                "rank": int(rank),
+                                "reciprocal_rank": float(1.0 / rank),
+                            }
+                        )
+
+                    del query_embeddings, score_matrix, ranks, metrics
+                    maybe_empty_device_cache(device)
+            finally:
+                if code_embeddings is not None:
+                    del code_embeddings
+                if adapter is not None:
+                    del adapter
+                maybe_empty_device_cache(device)
 
     _attach_clean_deltas(metrics_rows)
     _write_csv(run_dir / "metrics.csv", metrics_rows)
@@ -279,6 +291,7 @@ def _load_task_context(task_name: str, cfg: WorkflowConfig) -> dict[str, Any]:
             dataset_name=cfg.taco_dataset_name,
             dataset_path=cfg.taco_dataset_path,
             split_seed=cfg.split_seed,
+            split=cfg.split,
         )
         records = corpus.get_split(cfg.split)
         return {
