@@ -142,20 +142,34 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
     task_payloads: list[dict[str, Any]] = []
 
     tasks = _resolve_tasks(cfg.task)
-    for task_name in tasks:
+    _log_progress(
+        "Starting evaluation "
+        f"(models={len(cfg.models)}, tasks={len(tasks)}, split={cfg.split}, batch_size={cfg.batch_size}, device={device})"
+    )
+    for task_index, task_name in enumerate(tasks, start=1):
+        _log_progress(f"[Task {task_index}/{len(tasks)}] Loading task context for '{task_name}'")
         task_context = _load_task_context(task_name, cfg)
+        _log_progress(
+            f"[Task {task_index}/{len(tasks)}] Loaded {len(task_context['records'])} records "
+            f"from {task_context['dataset_name']} with tiers={','.join(task_context['tiers'])}"
+        )
         task_payloads.append(task_context["payload"])
         if "selected_ids" in task_context:
             selected_ids[task_name] = task_context["selected_ids"]
 
-        for model_name in cfg.models:
+        for model_index, model_name in enumerate(cfg.models, start=1):
             adapter_cls = HFEncoderAdapter
             if adapter_cls is None:
                 from .model_adapters import HFEncoderAdapter as adapter_cls
 
             adapter = None
             code_embeddings = None
+            model_started = time.perf_counter()
             try:
+                _log_progress(
+                    f"[Task {task_index}/{len(tasks)}][Model {model_index}/{len(cfg.models)}] "
+                    f"Loading {model_name}"
+                )
                 adapter = adapter_cls(
                     model_name_or_path=model_name,
                     max_query_length=cfg.max_query_length,
@@ -163,9 +177,13 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
                     batch_size=cfg.batch_size,
                     device=device,
                 )
+                _log_progress(
+                    f"[Task {task_index}/{len(tasks)}][Model {model_index}/{len(cfg.models)}] "
+                    "Encoding code corpus"
+                )
                 code_embeddings = adapter.encode_codes(task_context["codes"])
 
-                for tier in task_context["tiers"]:
+                for tier_index, tier in enumerate(task_context["tiers"], start=1):
                     original_queries = task_context["queries"]
                     perturbed_queries = (
                         original_queries
@@ -174,6 +192,10 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
                     )
 
                     started = time.perf_counter()
+                    _log_progress(
+                        f"[Task {task_index}/{len(tasks)}][Model {model_index}/{len(cfg.models)}]"
+                        f"[Tier {tier_index}/{len(task_context['tiers'])}] Running {tier}"
+                    )
                     query_embeddings = adapter.encode_queries(perturbed_queries)
                     score_matrix = (query_embeddings @ code_embeddings.T).detach().cpu().numpy()
                     ranks = paired_ranks(score_matrix)
@@ -181,6 +203,12 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
                     metrics["MeanRank"] = float(np.mean(ranks))
                     metrics["MedianRank"] = float(np.median(ranks))
                     runtime_sec = time.perf_counter() - started
+                    _log_progress(
+                        f"[Task {task_index}/{len(tasks)}][Model {model_index}/{len(cfg.models)}]"
+                        f"[Tier {tier_index}/{len(task_context['tiers'])}] "
+                        f"Done {tier}: MRR={float(metrics['MRR']):.4f}, R@10={float(metrics.get('Recall@10', np.nan)):.4f}, "
+                        f"time={runtime_sec:.2f}s"
+                    )
 
                     metrics_rows.append(
                         {
@@ -226,6 +254,10 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
                 if adapter is not None:
                     del adapter
                 maybe_empty_device_cache(device)
+                _log_progress(
+                    f"[Task {task_index}/{len(tasks)}][Model {model_index}/{len(cfg.models)}] "
+                    f"Finished {model_name} in {time.perf_counter() - model_started:.2f}s"
+                )
 
     _attach_clean_deltas(metrics_rows)
     _write_csv(run_dir / "metrics.csv", metrics_rows)
@@ -241,6 +273,7 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
     }
     (run_dir / "summary.json").write_text(json.dumps(summary_payload, indent=2), encoding="utf-8")
     (run_dir / "summary.md").write_text(_build_summary_markdown(cfg, metrics_rows), encoding="utf-8")
+    _log_progress(f"Completed evaluation. Artifacts written to {run_dir}")
     return run_dir
 
 
@@ -399,6 +432,10 @@ def _make_run_dir(output_root: Path) -> Path:
         candidate = output_root / f"{timestamp}_{suffix:02d}"
         suffix += 1
     return candidate
+
+
+def _log_progress(message: str) -> None:
+    print(f"[ood_robustness] {message}", flush=True)
 
 
 if __name__ == "__main__":
