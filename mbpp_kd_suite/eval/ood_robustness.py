@@ -156,6 +156,7 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
         task_payloads.append(task_context["payload"])
         if "selected_ids" in task_context:
             selected_ids[task_name] = task_context["selected_ids"]
+        tier_queries = _build_tier_queries(task_context["queries"], task_context["tiers"], cfg.split_seed)
 
         for model_index, model_name in enumerate(cfg.models, start=1):
             adapter_cls = HFEncoderAdapter
@@ -184,13 +185,7 @@ def run_workflow(cfg: WorkflowConfig) -> Path:
                 code_embeddings = adapter.encode_codes(task_context["codes"])
 
                 for tier_index, tier in enumerate(task_context["tiers"], start=1):
-                    original_queries = task_context["queries"]
-                    perturbed_queries = (
-                        original_queries
-                        if tier == "clean"
-                        else perturb_queries(original_queries, tier=tier, seed=cfg.split_seed)
-                    )
-
+                    perturbed_queries = tier_queries[tier]
                     started = time.perf_counter()
                     _log_progress(
                         f"[Task {task_index}/{len(tasks)}][Model {model_index}/{len(cfg.models)}]"
@@ -367,6 +362,16 @@ def _attach_clean_deltas(metrics_rows: list[dict[str, Any]]) -> None:
             continue
         row["delta_mrr_vs_clean"] = float(row["mrr"] - baseline["mrr"])
         row["delta_recall10_vs_clean"] = float(row["recall@10"] - baseline["recall@10"])
+
+
+def _build_tier_queries(queries: list[str], tiers: tuple[str, ...], seed: int) -> dict[str, list[str]]:
+    cached: dict[str, list[str]] = {}
+    for tier in tiers:
+        started = time.perf_counter()
+        _log_progress(f"[Perturbations] Preparing tier '{tier}' for {len(queries)} queries")
+        cached[tier] = queries if tier == "clean" else perturb_queries(queries, tier=tier, seed=seed)
+        _log_progress(f"[Perturbations] Prepared tier '{tier}' in {time.perf_counter() - started:.2f}s")
+    return cached
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
