@@ -41,6 +41,7 @@ _FUNCTION_WORDS = {
 _WORD_RE = re.compile(r"[A-Za-z]+")
 _PUNCT_RE = re.compile(r"[^\w\s]")
 _SPACE_RE = re.compile(r"\s+")
+_TEXTATTACK_AUGMENTER_CACHE: dict[tuple[str, float, int], Any] = {}
 
 
 @dataclass(frozen=True)
@@ -62,10 +63,43 @@ _TIER_SPECS: dict[str, PerturbationSpec] = {
 
 def perturb_queries(queries: list[str], tier: str, seed: int) -> list[str]:
     normalized_tier = _normalize_tier(tier)
-    return [
-        perturb_query(query, normalized_tier, seed=seed, query_index=index)
-        for index, query in enumerate(queries)
-    ]
+    if normalized_tier == "clean":
+        return list(queries)
+
+    spec = _TIER_SPECS[normalized_tier]
+    prepared = [_grammar_pre_normalize(query) if spec.pre_normalize_grammar else query for query in queries]
+
+    try:
+        augmenter = _get_textattack_augmenter(spec)
+    except ModuleNotFoundError:
+        augmenter = None
+    except Exception:
+        augmenter = None
+
+    if augmenter is None:
+        return [
+            _perturb_with_manual_fallback(text, tier=normalized_tier, seed=seed, query_index=index)
+            for index, text in enumerate(prepared)
+        ]
+
+    perturbed: list[str] = []
+    try:
+        for index, text in enumerate(prepared):
+            perturbed.append(
+                _perturb_with_textattack(
+                    text,
+                    spec=spec,
+                    seed=seed,
+                    query_index=index,
+                    augmenter=augmenter,
+                )
+            )
+        return perturbed
+    except Exception:
+        return [
+            _perturb_with_manual_fallback(text, tier=normalized_tier, seed=seed, query_index=index)
+            for index, text in enumerate(prepared)
+        ]
 
 
 def perturb_query(query: str, tier: str, seed: int, query_index: int = 0) -> str:
@@ -76,7 +110,13 @@ def perturb_query(query: str, tier: str, seed: int, query_index: int = 0) -> str
     spec = _TIER_SPECS[normalized_tier]
     text = _grammar_pre_normalize(query) if spec.pre_normalize_grammar else query
     try:
-        return _perturb_with_textattack(text, spec=spec, seed=seed, query_index=query_index)
+        return _perturb_with_textattack(
+            text,
+            spec=spec,
+            seed=seed,
+            query_index=query_index,
+            augmenter=_get_textattack_augmenter(spec),
+        )
     except ModuleNotFoundError:
         return _perturb_with_manual_fallback(text, tier=normalized_tier, seed=seed, query_index=query_index)
     except Exception:
@@ -90,28 +130,37 @@ def _normalize_tier(tier: str) -> str:
     return normalized
 
 
-def _perturb_with_textattack(text: str, *, spec: PerturbationSpec, seed: int, query_index: int) -> str:
-    random.seed(f"{seed}:{query_index}:{spec.augmenter_kind}")
+def _get_textattack_augmenter(spec: PerturbationSpec) -> Any:
+    cache_key = (spec.augmenter_kind, spec.pct_words_to_swap, spec.transformations_per_example)
+    cached = _TEXTATTACK_AUGMENTER_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
 
+    augmenter = _build_textattack_augmenter(spec)
+    _TEXTATTACK_AUGMENTER_CACHE[cache_key] = augmenter
+    return augmenter
+
+
+def _build_textattack_augmenter(spec: PerturbationSpec) -> Any:
     if spec.augmenter_kind == "charswap":
         from textattack.augmentation.recipes import CharSwapAugmenter
 
-        augmenter = CharSwapAugmenter(
+        return CharSwapAugmenter(
             pct_words_to_swap=spec.pct_words_to_swap,
             transformations_per_example=spec.transformations_per_example,
             high_yield=False,
             fast_augment=True,
         )
-    elif spec.augmenter_kind == "deletion":
+    if spec.augmenter_kind == "deletion":
         from textattack.augmentation.recipes import DeletionAugmenter
 
-        augmenter = DeletionAugmenter(
+        return DeletionAugmenter(
             pct_words_to_swap=spec.pct_words_to_swap,
             transformations_per_example=spec.transformations_per_example,
             high_yield=False,
             fast_augment=True,
         )
-    elif spec.augmenter_kind == "mixed":
+    if spec.augmenter_kind == "mixed":
         from textattack.augmentation import Augmenter
         from textattack.constraints.pre_transformation import RepeatModification, StopwordModification
         from textattack.transformations import (
@@ -132,7 +181,7 @@ def _perturb_with_textattack(text: str, *, spec: PerturbationSpec, seed: int, qu
                 WordSwapQWERTY(),
             ]
         )
-        augmenter = Augmenter(
+        return Augmenter(
             transformation=transformation,
             constraints=[RepeatModification(), StopwordModification()],
             pct_words_to_swap=spec.pct_words_to_swap,
@@ -140,8 +189,11 @@ def _perturb_with_textattack(text: str, *, spec: PerturbationSpec, seed: int, qu
             high_yield=False,
             fast_augment=True,
         )
-    else:
-        raise ValueError(f"Unsupported TextAttack augmenter kind: {spec.augmenter_kind}")
+    raise ValueError(f"Unsupported TextAttack augmenter kind: {spec.augmenter_kind}")
+
+
+def _perturb_with_textattack(text: str, *, spec: PerturbationSpec, seed: int, query_index: int, augmenter: Any) -> str:
+    random.seed(f"{seed}:{query_index}:{spec.augmenter_kind}")
 
     augmented = augmenter.augment(text)
     if isinstance(augmented, tuple):
