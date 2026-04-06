@@ -1,0 +1,23 @@
+{
+  "dataset_name": "codesearchnet",
+  "dataset_path": null,
+  "max_train_samples": 5000,
+  "max_validation_samples": 1000,
+  "max_test_samples": 1000,
+  "model_source": "local",
+  "model_name_or_path": "artifacts/codesearchnet_posthoc_pilot/20260326_170318/posthoc_score_distill/best-val",
+  "hf_subfolder": null,
+  "checkpoint_format": "suite_student_dir",
+  "split": "test",
+  "ks": [
+    1,
+    5,
+    10
+  ],
+  "max_query_length": 160,
+  "max_code_length": 256,
+  "batch_size": 16,
+  "device": "auto",
+  "output_dir": "runs_posthoc_pilot_gate",
+  "seed": 42
+}

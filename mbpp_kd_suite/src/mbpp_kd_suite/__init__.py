@@ -1,3 +1,9 @@
-from mbpp_kd_suite.experiment import main
+from __future__ import annotations
 
-__all__ = ["main"]
+
+def main() -> None:
+    from mbpp_kd_suite.experiment import main as experiment_main
+    experiment_main()
+
+
+__all__ = ['main']

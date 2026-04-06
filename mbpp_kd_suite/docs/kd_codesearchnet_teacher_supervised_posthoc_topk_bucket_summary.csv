@@ -1,0 +1,7 @@
+bucket,count,avg_teacher_rank,avg_baseline_rank,avg_kd_rank,example_query
+kd_helps,77,8.42,17.94,7.71,wrapper
+kd_hurts,24,3.54,2.17,3.75,Detect operating system.
+student_rank1,865,2.18,1.00,1.02,"str->list
+    Convert XML to URL List.
+    From Biligrab."
+teacher_wins_kd_not_transfer,38,1.26,2.68,3.26,Extracts video ID from URL.

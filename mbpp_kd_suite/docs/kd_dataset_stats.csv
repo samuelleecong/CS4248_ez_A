@@ -1,0 +1,7 @@
+dataset,split,count,avg_query_tokens,avg_code_tokens,median_query_tokens,median_code_tokens,avg_query_token_overlap_rate,median_query_token_overlap_rate,avg_query_code_jaccard,median_query_code_jaccard
+mbpp,train,374,14.59,23.53,14.00,17.00,0.0693,0.0625,0.0407,0.0364
+mbpp,validation,90,14.36,25.34,14.00,18.50,0.0607,0.0667,0.0327,0.0351
+mbpp,test,500,14.44,24.59,14.00,19.00,0.0627,0.0408,0.0369,0.0232
+codesearchnet,train,412178,37.71,100.03,19.00,64.00,0.9984,1.0000,0.4553,0.4444
+codesearchnet,validation,23107,43.19,109.03,22.00,66.00,0.9982,1.0000,0.4751,0.4737
+codesearchnet,test,22176,39.15,100.88,19.00,64.00,0.9969,1.0000,0.4537,0.4444
