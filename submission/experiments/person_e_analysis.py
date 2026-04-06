@@ -112,8 +112,19 @@ def load_student(repo_id: str, name: str, cache_dir: Path, device: torch.device)
 
 def load_teacher(repo_id: str, cache_dir: Path, device: torch.device) -> tuple[Path, AutoModel, AutoTokenizer]:
     snapshot_dir = ensure_snapshot(repo_id, cache_dir)
-    tokenizer = AutoTokenizer.from_pretrained(str(snapshot_dir))
-    model = AutoModel.from_pretrained(str(snapshot_dir)).to(device)
+    model_path = snapshot_dir
+    tokenizer_path = snapshot_dir
+
+    if not ((snapshot_dir / "model.safetensors").exists() or (snapshot_dir / "pytorch_model.bin").exists()):
+        backbone_dir = snapshot_dir / "backbone"
+        tokenizer_dir = snapshot_dir / "tokenizer"
+        if (backbone_dir / "model.safetensors").exists() or (backbone_dir / "pytorch_model.bin").exists():
+            model_path = backbone_dir
+        if tokenizer_dir.exists():
+            tokenizer_path = tokenizer_dir
+
+    tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+    model = AutoModel.from_pretrained(str(model_path)).to(device)
     model.eval()
     return snapshot_dir, model, tokenizer
 
