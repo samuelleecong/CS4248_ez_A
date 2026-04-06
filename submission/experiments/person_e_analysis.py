@@ -27,7 +27,7 @@ DEFAULT_METHOD_REPOS: dict[str, str] = {
     "hard_neg_pair": "cs4248-nlp/paper-s1-hnp-dw100-pw10-tinybert-general-4l-312d-taco-hf-20260402-015143",
     "bimga": "cs4248-nlp/paper-s1-bimga-dw50-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143",
 }
-DEFAULT_TEACHER_REPO = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_TEACHER_REPO = "cs4248-nlp/ft-teacher-all-mpnet-base-v2-taco-20260326-110507"
 DEFAULT_DATASET_NAME = "BEE-spoke-data/TACO-hf"
 
 

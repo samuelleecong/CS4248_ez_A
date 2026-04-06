@@ -5,7 +5,7 @@ Knowledge Distillation for Text-to-Code Retrieval (CS4248, April 2026)
 ## Setup
 
 - **Student**: TinyBERT-4L (14M params, 312d) — `huawei-noah/TinyBERT_General_4L_312D`
-- **Teacher**: MiniLM-L6-v2 (22M params, 384d) — `sentence-transformers/all-MiniLM-L6-v2`
+- **Teacher**: Fine-tuned teacher checkpoint used for analysis and teacher-side embeddings — `cs4248-nlp/ft-teacher-all-mpnet-base-v2-taco-20260326-110507`
 - **Dataset**: TACO code search — `BEE-spoke-data/TACO-hf` (18K train, 1K val, 1K test)
 - **Training**: Two-phase (phase 1: supervised fine-tune both models, phase 2: KD from fine-tuned teacher)
 - **Evaluation**: Symmetric (student encodes both queries and documents)
@@ -176,7 +176,13 @@ val_mrrs = [ep["validation_MRR"] for ep in hist]
 
 ## HuggingFace Model IDs
 
-All trained models are uploaded to the `cs4248-nlp` HuggingFace organization.
+The student run checkpoints are uploaded to the `cs4248-nlp` HuggingFace organization. The fine-tuned teacher used for analysis is stored separately under the repo ID below.
+
+Teacher used for downstream analysis and teacher-side embedding references:
+
+| Role | HuggingFace Repo |
+|------|------------------|
+| fine-tuned teacher | `cs4248-nlp/ft-teacher-all-mpnet-base-v2-taco-20260326-110507` |
 
 **Pattern**: `cs4248-nlp/paper-{run_name}-tinybert-general-4l-312d-taco-hf-20260402-015143` (with underscores replaced by hyphens)
 
