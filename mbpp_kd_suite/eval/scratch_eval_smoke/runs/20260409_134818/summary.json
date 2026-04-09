@@ -1,0 +1,84 @@
+{
+  "run_dir": "C:\\Users\\timso\\OneDrive\\Desktop\\academic-WMDs\\y3s2\\cs4248\\CS4248_ez_A\\mbpp_kd_suite\\eval\\scratch_eval_smoke\\runs\\20260409_134818",
+  "tasks": [
+    {
+      "task": "mbpp_ood",
+      "dataset_name": "mbpp_sanitized_ood",
+      "split": "test",
+      "count": 2
+    },
+    {
+      "task": "taco_robustness",
+      "dataset_name": "taco_local",
+      "split": "test",
+      "count": 4
+    }
+  ],
+  "models": [
+    "org/mock-model"
+  ],
+  "metrics": [
+    {
+      "model_name": "org/mock-model",
+      "task": "mbpp_ood",
+      "dataset_name": "mbpp_sanitized_ood",
+      "split": "test",
+      "perturbation_tier": "clean",
+      "mrr": 0.75,
+      "recall@1": 0.5,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mean_rank": 1.5,
+      "median_rank": 1.5,
+      "runtime_sec": 0.02311790000021574,
+      "query_count": 2,
+      "code_count": 2,
+      "delta_mrr_vs_clean": 0.0,
+      "delta_recall10_vs_clean": 0.0
+    },
+    {
+      "model_name": "org/mock-model",
+      "task": "taco_robustness",
+      "dataset_name": "taco_local",
+      "split": "test",
+      "perturbation_tier": "clean",
+      "mrr": 0.5208333333333333,
+      "recall@1": 0.25,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mean_rank": 2.5,
+      "median_rank": 2.5,
+      "runtime_sec": 0.0003865999997287872,
+      "query_count": 4,
+      "code_count": 4,
+      "delta_mrr_vs_clean": 0.0,
+      "delta_recall10_vs_clean": 0.0
+    },
+    {
+      "model_name": "org/mock-model",
+      "task": "taco_robustness",
+      "dataset_name": "taco_local",
+      "split": "test",
+      "perturbation_tier": "keyword_swap_type",
+      "mrr": 0.5208333333333333,
+      "recall@1": 0.25,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mean_rank": 2.5,
+      "median_rank": 2.5,
+      "runtime_sec": 0.0002832000000125845,
+      "query_count": 4,
+      "code_count": 4,
+      "delta_mrr_vs_clean": 0.0,
+      "delta_recall10_vs_clean": 0.0
+    }
+  ],
+  "lexical_probe_results_count": 4,
+  "example_cases_count": 4,
+  "selected_ids": {
+    "mbpp_ood": [
+      "9",
+      "7"
+    ]
+  }
+}

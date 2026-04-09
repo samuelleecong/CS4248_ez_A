@@ -1,0 +1,122 @@
+{
+  "sort": {
+    "synonyms": ["order", "arrange"],
+    "neutralize": ["process"],
+    "swap_type": ["reverse", "shuffle"]
+  },
+  "sorted": {
+    "synonyms": ["ordered", "arranged"],
+    "neutralize": ["processed"],
+    "swap_type": ["reversed", "shuffled"]
+  },
+  "reverse": {
+    "synonyms": ["invert", "flip"],
+    "neutralize": ["change"],
+    "swap_type": ["sort", "rotate"]
+  },
+  "prime": {
+    "synonyms": ["irreducible"],
+    "neutralize": ["special"],
+    "swap_type": ["even", "odd"]
+  },
+  "even": {
+    "synonyms": ["divisible"],
+    "neutralize": ["special"],
+    "swap_type": ["prime", "odd"]
+  },
+  "odd": {
+    "synonyms": ["non-even"],
+    "neutralize": ["special"],
+    "swap_type": ["even", "prime"]
+  },
+  "substring": {
+    "synonyms": ["segment"],
+    "neutralize": ["piece"],
+    "swap_type": ["subsequence", "prefix"]
+  },
+  "subsequence": {
+    "synonyms": ["sequence"],
+    "neutralize": ["piece"],
+    "swap_type": ["substring", "prefix"]
+  },
+  "matrix": {
+    "synonyms": ["grid"],
+    "neutralize": ["structure"],
+    "swap_type": ["array", "tree"]
+  },
+  "array": {
+    "synonyms": ["list"],
+    "neutralize": ["collection"],
+    "swap_type": ["matrix", "string"]
+  },
+  "list": {
+    "synonyms": ["sequence"],
+    "neutralize": ["collection"],
+    "swap_type": ["string", "matrix"]
+  },
+  "tree": {
+    "synonyms": ["hierarchy"],
+    "neutralize": ["structure"],
+    "swap_type": ["graph", "array"]
+  },
+  "graph": {
+    "synonyms": ["network"],
+    "neutralize": ["structure"],
+    "swap_type": ["tree", "matrix"]
+  },
+  "binary": {
+    "synonyms": ["two-way"],
+    "neutralize": ["structured"],
+    "swap_type": ["decimal", "ternary"]
+  },
+  "palindrome": {
+    "synonyms": ["mirror-string"],
+    "neutralize": ["pattern"],
+    "swap_type": ["anagram", "substring"]
+  },
+  "count": {
+    "synonyms": ["tally"],
+    "neutralize": ["measure"],
+    "swap_type": ["sum", "list"]
+  },
+  "sum": {
+    "synonyms": ["total"],
+    "neutralize": ["aggregate"],
+    "swap_type": ["count", "product"]
+  },
+  "merge": {
+    "synonyms": ["combine"],
+    "neutralize": ["process"],
+    "swap_type": ["split", "sort"]
+  },
+  "factorial": {
+    "synonyms": ["product-series"],
+    "neutralize": ["value"],
+    "swap_type": ["fibonacci", "sum"]
+  },
+  "search": {
+    "synonyms": ["find"],
+    "neutralize": ["locate"],
+    "swap_type": ["sort", "filter"]
+  },
+  "maximum": {
+    "synonyms": ["largest"],
+    "neutralize": ["extreme"],
+    "swap_type": ["minimum", "median"]
+  },
+  "minimum": {
+    "synonyms": ["smallest"],
+    "neutralize": ["extreme"],
+    "swap_type": ["maximum", "median"]
+  },
+  "string": {
+    "synonyms": ["text"],
+    "neutralize": ["value"],
+    "swap_type": ["array", "integer"]
+  },
+  "integer": {
+    "synonyms": ["number"],
+    "neutralize": ["value"],
+    "swap_type": ["string", "matrix"]
+  }
+}

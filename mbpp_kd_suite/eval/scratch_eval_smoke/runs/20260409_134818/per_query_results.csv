@@ -1,0 +1,21 @@
+model_name,task,dataset_name,split,perturbation_tier,record_id,original_query,perturbed_query,code,rank,reciprocal_rank
+org/mock-model,mbpp_ood,mbpp_sanitized_ood,test,clean,9,mbpp prompt 9,mbpp prompt 9,"def mbpp_9():
+    return 9",2,0.5
+org/mock-model,mbpp_ood,mbpp_sanitized_ood,test,clean,7,mbpp prompt 7,mbpp prompt 7,"def mbpp_7():
+    return 7",1,1.0
+org/mock-model,taco_robustness,taco_local,test,clean,test:0,sort array values test 0,sort array values test 0,"def fn_test_0():
+    return sorted([0, 1])",4,0.25
+org/mock-model,taco_robustness,taco_local,test,clean,test:1,sort array values test 1,sort array values test 1,"def fn_test_1():
+    return sorted([1, 2])",3,0.3333333333333333
+org/mock-model,taco_robustness,taco_local,test,clean,test:2,sort array values test 2,sort array values test 2,"def fn_test_2():
+    return sorted([2, 3])",2,0.5
+org/mock-model,taco_robustness,taco_local,test,clean,test:3,sort array values test 3,sort array values test 3,"def fn_test_3():
+    return sorted([3, 4])",1,1.0
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:0,sort array values test 0,shuffle string values test 0,"def fn_test_0():
+    return sorted([0, 1])",4,0.25
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:1,sort array values test 1,reverse string values test 1,"def fn_test_1():
+    return sorted([1, 2])",3,0.3333333333333333
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:2,sort array values test 2,shuffle matrix values test 2,"def fn_test_2():
+    return sorted([2, 3])",2,0.5
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:3,sort array values test 3,reverse string values test 3,"def fn_test_3():
+    return sorted([3, 4])",1,1.0

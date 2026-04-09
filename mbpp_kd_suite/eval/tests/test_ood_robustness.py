@@ -12,11 +12,7 @@ import torch
 
 from eval.ood_data import load_mbpp_ood_corpus, load_taco_retrieval_corpus
 from eval.ood_robustness import WorkflowConfig, run_workflow
-from eval.perturbations import perturb_queries
-
-_TMP_ROOT = Path(__file__).resolve().parent / ".tmp"
-_TMP_ROOT.mkdir(parents=True, exist_ok=True)
-
+from eval.perturbations import LEXICAL_PROBE_TIERS, perturb_queries
 
 class PerturbationTest(unittest.TestCase):
     def test_clean_tier_preserves_queries(self) -> None:
@@ -38,10 +34,18 @@ class PerturbationTest(unittest.TestCase):
         heavy_delta = _changed_word_count(source, heavy)
         self.assertGreaterEqual(heavy_delta, light_delta)
 
+    def test_keyword_probe_is_deterministic_and_changes_domain_term(self) -> None:
+        queries = ["Write a function to sort an array of integers."]
+        first = perturb_queries(queries, tier="keyword_swap_type", seed=3)[0]
+        second = perturb_queries(queries, tier="keyword_swap_type", seed=3)[0]
+        self.assertEqual(first, second)
+        self.assertNotEqual(first, queries[0])
+        self.assertTrue(any(term in first.lower() for term in ("reverse", "shuffle", "matrix", "string")))
+
 
 class OODDataTest(unittest.TestCase):
     def test_mbpp_ood_split_is_deterministic_and_persistable(self) -> None:
-        with tempfile.TemporaryDirectory(dir=_TMP_ROOT) as tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
             mbpp_path = Path(tmpdir) / "mbpp.jsonl"
             with mbpp_path.open("w", encoding="utf-8") as handle:
                 for idx in range(30):
@@ -64,7 +68,7 @@ class OODDataTest(unittest.TestCase):
             self.assertGreater(len(ids_a["test"]), 0)
 
     def test_local_taco_split_dir_produces_nonempty_pairs(self) -> None:
-        with tempfile.TemporaryDirectory(dir=_TMP_ROOT) as tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             payload = {
                 "question": "Return the sum of all digits in n",
@@ -96,7 +100,7 @@ class OODDataTest(unittest.TestCase):
 
 class WorkflowSmokeTest(unittest.TestCase):
     def test_workflow_writes_expected_artifacts_with_mock_adapter(self) -> None:
-        with tempfile.TemporaryDirectory(dir=_TMP_ROOT) as tmpdir:
+        with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             mbpp_path = root / "mbpp.jsonl"
             taco_dir = root / "taco"
@@ -143,6 +147,7 @@ class WorkflowSmokeTest(unittest.TestCase):
                 split="test",
                 split_seed=9,
                 perturbation_tier="mixed_light",
+                lexical_map_path=None,
                 ks=(1, 5, 10),
                 max_query_length=64,
                 max_code_length=64,
@@ -156,11 +161,17 @@ class WorkflowSmokeTest(unittest.TestCase):
 
             metrics_path = run_dir / "metrics.csv"
             per_query_path = run_dir / "per_query_results.csv"
+            lexical_probe_path = run_dir / "lexical_probe_results.csv"
+            example_cases_path = run_dir / "example_cases.csv"
+            analysis_summary_path = run_dir / "analysis_summary.md"
             summary_path = run_dir / "summary.json"
             selected_ids_path = run_dir / "selected_ids.json"
 
             self.assertTrue(metrics_path.exists())
             self.assertTrue(per_query_path.exists())
+            self.assertTrue(lexical_probe_path.exists())
+            self.assertTrue(example_cases_path.exists())
+            self.assertTrue(analysis_summary_path.exists())
             self.assertTrue(summary_path.exists())
             self.assertTrue(selected_ids_path.exists())
 
@@ -175,6 +186,56 @@ class WorkflowSmokeTest(unittest.TestCase):
             taco_noisy = next(row for row in rows if row["task"] == "taco_robustness" and row["perturbation_tier"] == "mixed_light")
             self.assertEqual(float(taco_clean["delta_mrr_vs_clean"]), 0.0)
             self.assertLessEqual(float(taco_noisy["delta_mrr_vs_clean"]), 0.0)
+
+    def test_workflow_writes_keyword_probe_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            taco_dir = root / "taco"
+            taco_dir.mkdir(parents=True, exist_ok=True)
+            for split_name, filename in (
+                ("train", "train.jsonl"),
+                ("validation", "validation.jsonl"),
+                ("test", "test.jsonl"),
+            ):
+                path = taco_dir / filename
+                with path.open("w", encoding="utf-8") as handle:
+                    for idx in range(4):
+                        handle.write(
+                            json.dumps(
+                                {
+                                    "question": f"sort array values {split_name} {idx}",
+                                    "starter_code": "",
+                                    "solutions": json.dumps([f"def fn_{split_name}_{idx}():\n    return sorted([{idx}, {idx + 1}])\n"]),
+                                }
+                            )
+                            + "\n"
+                        )
+
+            cfg = WorkflowConfig(
+                models=("org/mock-model",),
+                task="taco_robustness",
+                mbpp_dataset_path=None,
+                taco_dataset_name="BEE-spoke-data/TACO-hf",
+                taco_dataset_path=str(taco_dir),
+                split="test",
+                split_seed=4,
+                perturbation_tier="keyword_swap_type",
+                lexical_map_path=None,
+                ks=(1, 5, 10),
+                max_query_length=64,
+                max_code_length=64,
+                batch_size=8,
+                device="cpu",
+                output_dir=str(root / "runs"),
+            )
+            with patch("eval.ood_robustness.HFEncoderAdapter", new=_FakeHFEncoderAdapter):
+                run_dir = run_workflow(cfg)
+
+            lexical_rows = list(csv.DictReader((run_dir / "lexical_probe_results.csv").open("r", encoding="utf-8", newline="")))
+            self.assertTrue(lexical_rows)
+            self.assertTrue(all(row["perturbation_tier"] in LEXICAL_PROBE_TIERS for row in lexical_rows))
+            example_rows = list(csv.DictReader((run_dir / "example_cases.csv").open("r", encoding="utf-8", newline="")))
+            self.assertTrue(any(row["case_type"].startswith("keyword_") for row in example_rows))
 
 
 class _FakeHFEncoderAdapter:
