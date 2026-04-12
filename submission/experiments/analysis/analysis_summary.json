@@ -1,0 +1,6 @@
+{
+  "device": "mps",
+  "num_runs_registry": 31,
+  "num_hf_replayed": 31,
+  "output_root": "/Users/kaichen/Desktop/School/Y4S2/CS4248 Natural Language Processing/CODE4248/Project/CS4248_ez_A/submission/experiments/analysis"
+}

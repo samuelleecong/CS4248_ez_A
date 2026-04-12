@@ -1,0 +1,103 @@
+{
+  "dataset": {
+    "name": "codesearchnet",
+    "path": null,
+    "counts": {
+      "train": 5000,
+      "validation": 1000,
+      "test": 1000
+    }
+  },
+  "model": {
+    "adapter_type": "suite_student_dir",
+    "model_name_or_path": "/Users/kaichen/Desktop/School/Y4S2/CS4248 Natural Language Processing/CODE4248/Project/CS4248_ez_A/mbpp_kd_suite/artifacts/codesearchnet_posthoc_pilot/20260326_170318/posthoc_score_distill/best-val",
+    "resolved_model_dir": "/Users/kaichen/Desktop/School/Y4S2/CS4248 Natural Language Processing/CODE4248/Project/CS4248_ez_A/mbpp_kd_suite/artifacts/codesearchnet_posthoc_pilot/20260326_170318/posthoc_score_distill/best-val/model",
+    "pooling": "mean",
+    "query_prefix": "",
+    "doc_prefix": "",
+    "hidden_size": 128,
+    "has_projection": false,
+    "source": "local",
+    "hf_subfolder": null,
+    "checkpoint_format": "suite_student_dir"
+  },
+  "split": "validation",
+  "metrics": {
+    "MRR": 0.9205486823750603,
+    "MedianRank": 1.0,
+    "Recall@1": 0.872,
+    "MAP@1": 0.872,
+    "nDCG@1": 0.872,
+    "Recall@5": 0.98,
+    "MAP@5": 0.9191166666666667,
+    "nDCG@5": 0.9346555842677804,
+    "Recall@10": 0.985,
+    "MAP@10": 0.9197833333333334,
+    "nDCG@10": 0.9362710886289883
+  },
+  "profiling": {
+    "stages": [
+      {
+        "stage": "model_load",
+        "duration_sec": 0.221648083999753,
+        "peak_memory_bytes": 544555008.0
+      },
+      {
+        "stage": "dataset_load",
+        "duration_sec": 35.713090499979444,
+        "peak_memory_bytes": 1362477056.0
+      },
+      {
+        "stage": "query_encode",
+        "duration_sec": 1.034851791919209,
+        "peak_memory_bytes": 956514304.0
+      },
+      {
+        "stage": "code_encode",
+        "duration_sec": 0.7202507499605417,
+        "peak_memory_bytes": 841826304.0
+      },
+      {
+        "stage": "similarity_retrieval",
+        "duration_sec": 0.00038533296901732683,
+        "peak_memory_bytes": 844906496.0
+      },
+      {
+        "stage": "metric_aggregation",
+        "duration_sec": 0.034499292029067874,
+        "peak_memory_bytes": 845234176.0
+      },
+      {
+        "stage": "total_eval",
+        "duration_sec": 37.82679558289237,
+        "peak_memory_bytes": 1362477056.0
+      }
+    ],
+    "total_duration_sec": 37.82679558289237,
+    "peak_memory_bytes": 1362477056.0
+  },
+  "counts": {
+    "queries": 1000,
+    "codes": 1000
+  },
+  "config": {
+    "ks": [
+      1,
+      5,
+      10
+    ],
+    "max_train_samples": 5000,
+    "max_validation_samples": 1000,
+    "max_test_samples": 1000,
+    "max_query_length": 160,
+    "max_code_length": 256,
+    "batch_size": 16,
+    "device": "mps",
+    "seed": 42
+  },
+  "run": {
+    "timestamp": "2026-03-26 17:09:33",
+    "run_dir": "/Users/kaichen/Desktop/School/Y4S2/CS4248 Natural Language Processing/CODE4248/Project/CS4248_ez_A/mbpp_kd_suite/eval/runs_posthoc_pilot_gate/codesearchnet/validation/20260326_170933_posthoc_score_distill__best-val",
+    "relative_run_dir": "codesearchnet/validation/20260326_170933_posthoc_score_distill__best-val"
+  }
+}

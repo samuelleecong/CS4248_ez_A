@@ -2,8 +2,8 @@ from __future__ import annotations
 
 
 def main() -> None:
-    from mbpp_kd_suite.experiment import main as _main
+    from mbpp_kd_suite.experiment import main as experiment_main
+    experiment_main()
 
-    _main()
 
-__all__ = ["main"]
+__all__ = ['main']

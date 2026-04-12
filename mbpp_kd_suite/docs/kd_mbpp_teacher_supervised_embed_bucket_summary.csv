@@ -1,0 +1,5 @@
+bucket,count,avg_teacher_rank,avg_baseline_rank,avg_kd_rank,example_query
+kd_helps,127,6.77,184.35,112.10,Write a function to sort a given matrix in ascending order according to the sum of its rows.
+kd_hurts,355,3.77,83.60,198.43,Write a python function to remove first and last occurrence of a given character from the string.
+student_rank1,54,1.13,1.00,34.02,Write a function to count the most common words in a dictionary.
+teacher_wins_kd_not_transfer,314,2.35,94.47,217.44,Write a python function to remove first and last occurrence of a given character from the string.
