@@ -216,6 +216,15 @@ def build_margin_bins(margins: np.ndarray) -> np.ndarray:
     return bins
 
 
+def build_margin_deciles(margins: np.ndarray) -> np.ndarray:
+    order = np.argsort(margins)
+    deciles = np.empty(len(margins), dtype=np.int64)
+    splits = np.array_split(order, 10)
+    for idx, indices in enumerate(splits, start=1):
+        deciles[indices] = idx
+    return deciles
+
+
 def jaccard(a: np.ndarray, b: np.ndarray) -> float:
     union = np.logical_or(a, b).sum()
     if union == 0:
@@ -288,6 +297,64 @@ def plot_rank_cdf(per_query_df: pd.DataFrame, output_path: Path, max_rank: int =
     plt.close(fig)
 
 
+def plot_margin_decile_lines(decile_summary: pd.DataFrame, output_path: Path) -> None:
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    methods = list(decile_summary["method"].unique())
+    x = np.arange(1, 11)
+
+    for method in methods:
+        subset = (
+            decile_summary[decile_summary["method"] == method]
+            .sort_values("margin_decile")
+        )
+        linewidth = 3 if method == "bimga" else 2
+        alpha = 1.0 if method == "bimga" else 0.8
+        ax.plot(
+            x,
+            subset["mrr"].values,
+            marker="o",
+            linewidth=linewidth,
+            alpha=alpha,
+            label=method,
+        )
+
+    ax.set_xticks(x)
+    ax.set_xlabel("Teacher Margin Decile (low confidence -> high confidence)")
+    ax.set_ylabel("MRR")
+    ax.set_title("Margin-Stratified MRR by Teacher-Margin Decile")
+    ax.set_ylim(0.0, max(0.35, float(decile_summary["mrr"].max()) * 1.1))
+    ax.legend(frameon=False)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_margin_decile_heatmap(decile_summary: pd.DataFrame, output_path: Path) -> None:
+    pivot = (
+        decile_summary.pivot(index="method", columns="margin_decile", values="mrr")
+        .reindex(index=list(decile_summary["method"].unique()))
+        .reindex(columns=list(range(1, 11)))
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 4.5))
+    im = ax.imshow(pivot.values, cmap="YlOrRd", aspect="auto")
+    ax.set_xticks(range(pivot.shape[1]), labels=[str(col) for col in pivot.columns])
+    ax.set_yticks(range(pivot.shape[0]), labels=pivot.index)
+    ax.set_xlabel("Teacher Margin Decile (low -> high)")
+    ax.set_ylabel("Method")
+    ax.set_title("MRR Heatmap Across Teacher-Margin Deciles")
+
+    for i in range(pivot.shape[0]):
+        for j in range(pivot.shape[1]):
+            value = pivot.iloc[i, j]
+            ax.text(j, i, f"{value:.2f}", ha="center", va="center", color="black", fontsize=9)
+
+    fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="MRR")
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main() -> None:
     args = parse_args()
     set_seed(args.seed)
@@ -327,6 +394,7 @@ def main() -> None:
     hardest_negative = masked.max(axis=1)
     teacher_margin = diagonal - hardest_negative
     margin_bin = build_margin_bins(teacher_margin)
+    margin_decile = build_margin_deciles(teacher_margin)
 
     base_df = pd.DataFrame(
         {
@@ -337,6 +405,7 @@ def main() -> None:
             "teacher_hardest_negative_score": hardest_negative,
             "teacher_margin": teacher_margin,
             "margin_bin": margin_bin,
+            "margin_decile": margin_decile,
         }
     )
 
@@ -429,6 +498,31 @@ def main() -> None:
     plot_margin_mrr(
         margin_summary,
         output_path=args.output_dir / "analysis4_margin_stratified_mrr.png",
+    )
+
+    decile_summary = (
+        per_query_df.groupby(["method", "margin_decile"], sort=False)
+        .agg(
+            queries=("query_idx", "count"),
+            mrr=("reciprocal_rank", "mean"),
+            recall_at_1=("top1_hit", "mean"),
+            median_rank=("rank", "median"),
+            mean_teacher_margin=("teacher_margin", "mean"),
+            min_teacher_margin=("teacher_margin", "min"),
+            max_teacher_margin=("teacher_margin", "max"),
+        )
+        .reset_index()
+        .sort_values(["margin_decile", "method"])
+        .reset_index(drop=True)
+    )
+    decile_summary.to_csv(args.output_dir / "analysis4_margin_deciles.csv", index=False)
+    plot_margin_decile_lines(
+        decile_summary=decile_summary,
+        output_path=args.output_dir / "analysis4_margin_decile_lines.png",
+    )
+    plot_margin_decile_heatmap(
+        decile_summary=decile_summary,
+        output_path=args.output_dir / "analysis4_margin_decile_heatmap.png",
     )
 
     plot_rank_cdf(
