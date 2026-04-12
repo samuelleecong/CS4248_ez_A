@@ -1,0 +1,11 @@
+{
+  "name": "s1_score_dw50",
+  "method": "score_distill",
+  "batch_size": 32,
+  "seed": 42,
+  "distill_weight": 50,
+  "align_weight": 1.0,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "supervised": false
+}
