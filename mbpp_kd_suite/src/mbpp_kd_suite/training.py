@@ -1012,4 +1012,12 @@ def train_student(
         if not isinstance(student_model.proj, nn.Identity):
             torch.save(student_model.proj.state_dict(), model_dir / "projection.pt")
 
+        # Save full checkpoint for resuming training later
+        torch.save({
+            "model_state_dict": student_model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "epoch": stopped_epoch,
+            "best_val_mrr": best_val_mrr,
+        }, exp_dir / "training_checkpoint.pt")
+
     return metrics, student_model, student_tokenizer

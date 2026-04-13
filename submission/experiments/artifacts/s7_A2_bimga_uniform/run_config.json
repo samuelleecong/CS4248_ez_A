@@ -1,0 +1,11 @@
+{
+  "name": "s7_A2_bimga_uniform",
+  "method": "bimga_uniform",
+  "batch_size": 32,
+  "seed": 42,
+  "distill_weight": 100,
+  "align_weight": 10,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "supervised": false
+}

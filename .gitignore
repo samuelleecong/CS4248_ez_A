@@ -64,3 +64,18 @@ submission/experiments/artifacts/**/tensorboard/
 # ----------------------------
 kd-viz/
 slides
+
+# ----------------------------
+# Claude Code / IDE config
+# ----------------------------
+.claude/
+
+# ----------------------------
+# uv binary
+# ----------------------------
+uv
+
+# ----------------------------
+# Attention analysis caches (large numpy files)
+# ----------------------------
+mbpp_kd_suite/attention_figures/_cache/

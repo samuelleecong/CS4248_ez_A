@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+    body {
+        font-family: "Computer Modern", "Latin Modern Math", "STIX Two Math", serif;
+        background: white;
+        margin: 0;
+        padding: 24px 36px;
+        width: 680px;
+    }
+    h2 {
+        margin: 0 0 14px 0;
+        font-size: 20px;
+        text-align: center;
+        color: #1a1a1a;
+    }
+    .formula {
+        margin: 8px 0;
+        font-size: 16px;
+        text-align: center;
+        line-height: 2.0;
+    }
+    .katex { font-size: 1.1em; }
+</style>
+</head>
+<body>
+    <h2>Hard-Negative Pairwise Distillation</h2>
+    <div class="formula">$$\mathcal{L}_{KL} = \mathrm{KL}\!\left(\mathrm{softmax}\!\left(\frac{\mathbf{S}_s}{\tau_d}\right) \;\Big\|\; \mathrm{softmax}\!\left(\frac{\mathbf{S}_t}{\tau_d}\right)\right) \cdot \tau_d^{\,2}$$</div>
+    <div class="formula">$$\mathcal{L}_{pair} = \frac{1}{|M|}\sum_{(i,j)\in M} \mathrm{BCE}\!\left(\sigma\!\left(\frac{s^s_{ii} - s^s_{ij}}{\tau_d}\right),\; \sigma\!\left(\frac{s^t_{ii} - s^t_{ij}}{\tau_d}\right)\right)$$</div>
+    <div class="formula">$$M = \{(i,\,j) : j \in \text{top-}k\text{ hardest negatives for query } i\}$$</div>
+    <div class="formula">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_d \,\mathcal{L}_{KL} + \lambda_p \,\mathcal{L}_{pair}$$</div>
+<script>
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+        ],
+        throwOnError: false,
+    });
+</script>
+</body>
+</html>

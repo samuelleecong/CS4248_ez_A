@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cluster-Based Routing — Supplementary Figures</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #ffffff;
+    --ink: #111;
+    --ink-2: #444;
+    --ink-3: #777;
+    --border: #ccc;
+    --grid: #e8e8e8;
+    --bimga: #2a7f62;
+    --uniform: #3a8a72;
+    --embed: #3366a5;
+    --score: #c4880b;
+    --hnp: #b04848;
+    --soft: #cc5500;
+    --hard: #7777aa;
+    --oracle: #222;
+    --baseline: #aaa;
+    --control: #ccc;
+    --highlight-bg: #fef9f3;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Crimson Pro', 'Georgia', serif;
+    font-size: 11pt;
+    line-height: 1.55;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+  }
+
+  /* ── Paper header ── */
+  .paper-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 0.5pt solid var(--border);
+  }
+  .paper-header h1 {
+    font-size: 16pt;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+  .paper-header .authors {
+    font-size: 10pt;
+    color: var(--ink-2);
+    font-style: italic;
+  }
+
+  /* ── Section headings ── */
+  h2 {
+    font-size: 12pt;
+    font-weight: 600;
+    margin: 1.8rem 0 0.6rem;
+  }
+  h2 .section-num {
+    margin-right: 0.5em;
+  }
+
+  p {
+    margin-bottom: 0.7rem;
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  /* ── Figure container ── */
+  .figure {
+    margin: 1.5rem 0;
+    page-break-inside: avoid;
+  }
+  .figure-box {
+    border: 0.5pt solid var(--border);
+    padding: 1.2rem 1.5rem;
+    background: var(--bg);
+  }
+  .figure-caption {
+    margin-top: 0.6rem;
+    font-size: 9.5pt;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .figure-caption strong {
+    color: var(--ink);
+  }
+
+  /* ── Table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin: 0.5rem 0;
+  }
+  table th {
+    font-weight: 600;
+    text-align: left;
+    padding: 4pt 6pt;
+    border-bottom: 1.5pt solid var(--ink);
+    font-size: 9pt;
+  }
+  table td {
+    padding: 3pt 6pt;
+    border-bottom: 0.5pt solid var(--grid);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9pt;
+  }
+  table td:first-child {
+    font-family: 'Crimson Pro', serif;
+    font-size: 9.5pt;
+  }
+  table tr:last-child td { border-bottom: 1.5pt solid var(--ink); }
+  table .best { font-weight: 600; }
+  table .muted { color: var(--ink-3); }
+
+  /* ── Bar chart (SVG) ── */
+  svg text {
+    font-family: 'Crimson Pro', serif;
+    fill: var(--ink-2);
+  }
+  svg text.mono {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  svg text.label {
+    font-size: 8.5pt;
+  }
+  svg text.tick {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7.5pt;
+    fill: var(--ink-3);
+  }
+  svg text.val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 7pt;
+    fill: var(--ink-2);
+  }
+
+  /* ── Cluster map ── */
+  .cluster-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 0.5pt solid var(--grid);
+  }
+  .cluster-row:last-child { border-bottom: none; }
+  .cluster-cell {
+    padding: 6pt 8pt;
+    font-size: 9pt;
+  }
+  .cluster-cell.id {
+    width: 60px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8.5pt;
+    color: var(--ink-3);
+    flex-shrink: 0;
+  }
+  .cluster-cell.model {
+    width: 130px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8.5pt;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .cluster-cell.stats {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8pt;
+    font-size: 8.5pt;
+  }
+  .cluster-bar {
+    height: 10px;
+    border-radius: 1px;
+    opacity: 0.75;
+  }
+  .cluster-mrr-bar {
+    height: 10px;
+    border-radius: 1px;
+    opacity: 0.5;
+  }
+
+  /* ── Inline math ── */
+  .eq {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9.5pt;
+    background: #f7f7f5;
+    padding: 0 3pt;
+    border-radius: 2pt;
+  }
+
+  .footnote {
+    font-size: 8.5pt;
+    color: var(--ink-3);
+    margin-top: 0.4rem;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="paper-header">
+  <h1>Cluster-Based Routing for Knowledge Distillation Student Ensembles</h1>
+  <div class="authors">Supplementary figures for Section 5.4: Routing Analysis</div>
+</div>
+
+<!-- ═══════════ Section 1: Motivation ═══════════ -->
+<h2><span class="section-num">1</span>Motivation</h2>
+
+<p>
+Knowledge distillation methods transfer different types of teacher signal to the student: score-level ranking (score_distill), embedding geometry (embed_distill), pairwise preference (hard_neg_pair), and bidirectional alignment (BiMGA). A natural question is whether these methods are <em>complementary</em> — i.e., whether they succeed on different subsets of queries — and if so, whether we can exploit this complementarity at inference time.
+</p>
+
+<p>
+We investigate two ensemble strategies: (1) <strong>model merging</strong>, which averages model weights at different interpolation ratios, and (2) <strong>cluster-based routing</strong>, which assigns each query to the best-performing student based on the query's embedding cluster. All experiments use the 30-epoch models from Set 1 (TinyBERT-4L student, MiniLM-L6-v2 teacher, TACO dataset, symmetric evaluation).
+</p>
+
+<!-- ═══════════ Section 2: Model Merging ═══════════ -->
+<h2><span class="section-num">2</span>Model Merging</h2>
+
+<p>
+We evaluate linear weight interpolation between all pairs of the five trained students at ratios <span class="eq">&alpha; &isin; {0.0, 0.25, 0.5, 0.75, 1.0}</span>, yielding 25 merged models. The merged model weights are computed as <span class="eq">(1-&alpha;)&middot;W<sub>A</sub> + &alpha;&middot;W<sub>B</sub></span>.
+</p>
+
+<p>
+The best merge achieves MRR = 0.2980 (BiMGA 75% + hard_neg_pair 25%), which is only +0.0007 above BiMGA alone (0.2973). All merges at <span class="eq">&alpha; = 0.5</span> underperform both parent models, and the benefit decreases monotonically as the weaker model's contribution increases. We conclude that weight-space averaging is ineffective for these models — their learned representations occupy sufficiently different regions of parameter space that interpolation degrades both.
+</p>
+
+<!-- ═══════════ Section 3: Cluster-Based Routing ═══════════ -->
+<h2><span class="section-num">3</span>Cluster-Based Routing</h2>
+
+<p>
+We cluster validation queries using k-means on fine-tuned teacher query embeddings, evaluate each student's MRR on each cluster, and build a routing dictionary mapping clusters to students. At test time, each query is assigned to its nearest cluster centroid and routed to the corresponding student.
+</p>
+
+<p>
+We evaluate two routing strategies:
+</p>
+<p>
+<strong>Hard routing.</strong> Each query is scored by the single best student for its cluster. This is equivalent to a <em>mixture of experts</em> with non-overlapping assignment.
+</p>
+<p>
+<strong>Soft routing.</strong> Each query's retrieval score is a weighted combination of all students' scores, where the weights are proportional to each student's validation MRR on that cluster: <span class="eq">s(q, d) = &Sigma;<sub>m</sub> w<sub>m,c(q)</sub> &middot; s<sub>m</sub>(q, d)</span>, with weights normalized to sum to 1.
+</p>
+
+<!-- Figure 1: Strategy Comparison Table -->
+<div class="figure">
+  <div class="figure-box">
+    <table>
+      <tr>
+        <th>Strategy</th>
+        <th style="text-align:center">k = 4</th>
+        <th style="text-align:center">k = 8</th>
+        <th style="text-align:center">k = 12</th>
+        <th style="text-align:center">k = 16</th>
+      </tr>
+      <tr>
+        <td>Best single model</td>
+        <td class="muted" style="text-align:center">0.298</td>
+        <td class="muted" style="text-align:center">0.298</td>
+        <td class="muted" style="text-align:center">0.298</td>
+        <td class="muted" style="text-align:center">0.298</td>
+      </tr>
+      <tr>
+        <td>Hard routing</td>
+        <td style="text-align:center">0.298</td>
+        <td style="text-align:center">0.295</td>
+        <td style="text-align:center">0.284</td>
+        <td style="text-align:center">0.287</td>
+      </tr>
+      <tr>
+        <td>Soft routing</td>
+        <td class="best" style="text-align:center">0.310</td>
+        <td class="best" style="text-align:center">0.310</td>
+        <td class="best" style="text-align:center">0.308</td>
+        <td class="best" style="text-align:center">0.309</td>
+      </tr>
+      <tr>
+        <td>Oracle (per-query best)</td>
+        <td style="text-align:center">0.381</td>
+        <td style="text-align:center">0.381</td>
+        <td style="text-align:center">0.381</td>
+        <td style="text-align:center">0.381</td>
+      </tr>
+    </table>
+  </div>
+  <div class="figure-caption">
+    <strong>Table 1.</strong> Test MRR for routing strategies across cluster counts. Soft routing achieves +0.012 MRR over the best single model (bimga_uniform, 0.298), consistent across all values of k. Hard routing fails to improve because at low k, all clusters select the same model. The oracle upper bound (0.381) represents the MRR achievable by selecting the best model <em>per query</em>.
+  </div>
+</div>
+
+<!-- Figure 2: Bar chart -->
+<div class="figure">
+  <div class="figure-box">
+    <svg id="barChart" width="680" height="300" viewBox="0 0 680 300"></svg>
+  </div>
+  <div class="figure-caption">
+    <strong>Figure 1.</strong> Test MRR comparison across routing strategies. The dashed line marks the best single-model baseline (bimga_uniform, 0.298). Soft routing (orange) consistently exceeds this baseline by approximately +0.012 MRR regardless of the number of clusters. The oracle (black) shows the theoretical upper bound at 0.381, indicating substantial untapped complementarity between models.
+  </div>
+</div>
+
+<!-- ═══════════ Section 4: Cluster Analysis ═══════════ -->
+<h2><span class="section-num">4</span>Per-Cluster Routing Analysis (k = 8)</h2>
+
+<p>
+Table 2 shows the per-cluster routing assignments at k = 8. Four distinct models are selected across the eight clusters, confirming that different KD methods develop specializations on different query subsets.
+</p>
+
+<div class="figure">
+  <div class="figure-box">
+    <table>
+      <tr>
+        <th>Cluster</th>
+        <th>Best Model</th>
+        <th style="text-align:center">Size</th>
+        <th style="text-align:center">Val MRR</th>
+        <th>Characterization</th>
+      </tr>
+      <tr>
+        <td>C<sub>0</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--bimga)">bimga</td>
+        <td style="text-align:center">64</td>
+        <td style="text-align:center">0.284</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Hard queries, small cluster</td>
+      </tr>
+      <tr>
+        <td>C<sub>1</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--embed)">embed_distill</td>
+        <td style="text-align:center">97</td>
+        <td style="text-align:center">0.401</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Medium difficulty, geometry-sensitive</td>
+      </tr>
+      <tr>
+        <td>C<sub>2</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--uniform)">bimga_uniform</td>
+        <td style="text-align:center">144</td>
+        <td style="text-align:center">0.311</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Hard queries, large cluster</td>
+      </tr>
+      <tr>
+        <td>C<sub>3</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--score)">score_distill</td>
+        <td style="text-align:center">109</td>
+        <td style="text-align:center">0.849</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Easy queries, ranking-sufficient</td>
+      </tr>
+      <tr>
+        <td>C<sub>4</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--uniform)">bimga_uniform</td>
+        <td style="text-align:center">160</td>
+        <td style="text-align:center">0.834</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Easy queries, alignment-sensitive</td>
+      </tr>
+      <tr>
+        <td>C<sub>5</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--bimga)">bimga</td>
+        <td style="text-align:center">142</td>
+        <td style="text-align:center">0.314</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Hard queries, margin-weighting helps</td>
+      </tr>
+      <tr>
+        <td>C<sub>6</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--uniform)">bimga_uniform</td>
+        <td style="text-align:center">157</td>
+        <td style="text-align:center">0.521</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Medium difficulty, bidirectional alignment preferred</td>
+      </tr>
+      <tr>
+        <td>C<sub>7</sub></td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:8.5pt;color:var(--uniform)">bimga_uniform</td>
+        <td style="text-align:center">127</td>
+        <td style="text-align:center">0.310</td>
+        <td class="muted" style="font-family:'Crimson Pro',serif;font-size:9pt">Hard queries, large cluster</td>
+      </tr>
+    </table>
+  </div>
+  <div class="figure-caption">
+    <strong>Table 2.</strong> Per-cluster routing assignments at k = 8. Clusters are formed by k-means on fine-tuned teacher query embeddings (validation set). The "Best Model" column shows the student with the highest per-cluster MRR. Clusters C<sub>3</sub> and C<sub>4</sub> represent "easy" query subsets (val MRR > 0.8) where score_distill and bimga_uniform respectively dominate. The "hard" clusters (C<sub>0</sub>, C<sub>2</sub>, C<sub>5</sub>, C<sub>7</sub>, val MRR ~0.3) are split between bimga and bimga_uniform. Notably, C<sub>1</sub> uniquely selects embed_distill, suggesting a query subset where unidirectional query alignment outperforms bidirectional methods.
+  </div>
+</div>
+
+<!-- Figure 3: Complementarity -->
+<div class="figure">
+  <div class="figure-box">
+    <svg id="gapChart" width="680" height="260" viewBox="0 0 680 260"></svg>
+  </div>
+  <div class="figure-caption">
+    <strong>Figure 2.</strong> Test MRR for all models and routing strategies. The oracle (per-query best model, 0.381) exceeds the best single model (0.298) by +0.083, demonstrating that KD methods with distinct loss formulations produce genuinely complementary retrieval behavior. Soft routing captures 14% of this oracle gap (+0.012 / +0.083), yielding MRR = 0.310 with zero additional training cost.
+  </div>
+</div>
+
+<!-- ═══════════ Section 5: Discussion ═══════════ -->
+<h2><span class="section-num">5</span>Discussion</h2>
+
+<p>
+The routing analysis reveals three findings relevant to the broader study of knowledge distillation for retrieval:
+</p>
+
+<p>
+<strong>KD methods are complementary, not redundant.</strong> The oracle MRR of 0.381 versus the best single-model MRR of 0.298 represents a +28% relative improvement. This gap is not explained by random variation — it reflects systematic differences in which queries each method handles well. Score-based KD (score_distill) dominates on "easy" clusters where relative ranking information suffices (C<sub>3</sub>), while embedding alignment methods (bimga, bimga_uniform) are preferred on harder clusters where geometric proximity to the teacher embedding space matters (C<sub>0</sub>, C<sub>2</sub>, C<sub>5</sub>, C<sub>7</sub>).
+</p>
+
+<p>
+<strong>Soft routing is robust; hard routing is not.</strong> Soft routing achieves consistent gains (+0.012 MRR) across all values of k, because the weighted score combination preserves information from all models even when the cluster assignment is imperfect. Hard routing, by contrast, degenerates at low k (all clusters select the same model) and suffers from cluster boundary errors at high k. This suggests that for practical deployment, soft routing with a small k (4&ndash;8) is preferred.
+</p>
+
+<p>
+<strong>Weight averaging fails where score averaging succeeds.</strong> Model merging produces negligible gains (+0.0007 at best) because the trained students occupy different regions of parameter space — their weight vectors are not meaningfully interpolable. Score-level combination (soft routing) succeeds because it operates in the output space where the models' complementary strengths can be directly aggregated. This distinction has practical implications: soft routing requires maintaining multiple models at inference time, but the routing overhead (one cosine similarity lookup against cluster centroids) is negligible compared to the encoding cost.
+</p>
+
+<p class="footnote">
+All routing experiments use 30-epoch models from Set 1. Routing with 70-epoch models (Set 7) may yield different cluster assignments as methods converge further. Teacher embeddings for clustering are from the fine-tuned MiniLM-L6-v2 teacher.
+</p>
+
+<script>
+// ── Figure 1: Bar Chart ──
+(function() {
+  const svg = document.getElementById('barChart');
+  const W = 680, H = 300;
+  const margin = { top: 30, right: 20, bottom: 60, left: 55 };
+  const cw = W - margin.left - margin.right;
+  const ch = H - margin.top - margin.bottom;
+
+  const minV = 0.24, maxV = 0.40;
+  const yScale = v => margin.top + ch * (1 - (v - minV) / (maxV - minV));
+  const groups = [
+    { label: 'Best Single', bars: [{ v: 0.298, c: 'var(--baseline)', label: '' }] },
+    { label: 'k = 4', bars: [{ v: 0.298, c: 'var(--hard)', label: 'Hard' }, { v: 0.310, c: 'var(--soft)', label: 'Soft' }] },
+    { label: 'k = 8', bars: [{ v: 0.295, c: 'var(--hard)', label: 'Hard' }, { v: 0.310, c: 'var(--soft)', label: 'Soft' }] },
+    { label: 'k = 12', bars: [{ v: 0.284, c: 'var(--hard)', label: 'Hard' }, { v: 0.308, c: 'var(--soft)', label: 'Soft' }] },
+    { label: 'k = 16', bars: [{ v: 0.287, c: 'var(--hard)', label: 'Hard' }, { v: 0.309, c: 'var(--soft)', label: 'Soft' }] },
+    { label: 'Oracle', bars: [{ v: 0.381, c: 'var(--oracle)', label: '' }] },
+  ];
+
+  // Grid lines
+  for (let v = 0.24; v <= 0.40; v += 0.02) {
+    const y = yScale(v);
+    svg.innerHTML += `<line x1="${margin.left}" y1="${y}" x2="${W - margin.right}" y2="${y}" stroke="var(--grid)" stroke-width="0.5"/>`;
+    svg.innerHTML += `<text x="${margin.left - 8}" y="${y + 3}" text-anchor="end" class="tick">${v.toFixed(2)}</text>`;
+  }
+
+  // Baseline dashed line
+  const baseY = yScale(0.298);
+  svg.innerHTML += `<line x1="${margin.left}" y1="${baseY}" x2="${W - margin.right}" y2="${baseY}" stroke="var(--ink-3)" stroke-width="0.7" stroke-dasharray="4,3"/>`;
+  svg.innerHTML += `<text x="${W - margin.right + 2}" y="${baseY - 4}" class="tick" font-size="7pt" fill="var(--ink-3)">baseline</text>`;
+
+  // Bars
+  const groupW = cw / groups.length;
+  const barW = 28;
+
+  groups.forEach((g, gi) => {
+    const gx = margin.left + gi * groupW + groupW / 2;
+    const nBars = g.bars.length;
+    const totalBarsW = nBars * barW + (nBars - 1) * 4;
+
+    g.bars.forEach((b, bi) => {
+      const x = gx - totalBarsW / 2 + bi * (barW + 4);
+      const y = yScale(b.v);
+      const h = yScale(minV) - y;
+      svg.innerHTML += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${b.c}" rx="1.5"/>`;
+      svg.innerHTML += `<text x="${x + barW/2}" y="${y - 5}" text-anchor="middle" class="val">${b.v.toFixed(3)}</text>`;
+    });
+
+    // Group label
+    svg.innerHTML += `<text x="${gx}" y="${H - margin.bottom + 20}" text-anchor="middle" class="label" font-size="9pt">${g.label}</text>`;
+  });
+
+  // Y-axis label
+  svg.innerHTML += `<text x="12" y="${margin.top + ch/2}" text-anchor="middle" transform="rotate(-90, 12, ${margin.top + ch/2})" font-size="9pt" fill="var(--ink-2)">Test MRR</text>`;
+
+  // Axis lines
+  svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${H - margin.bottom}" stroke="var(--ink)" stroke-width="0.7"/>`;
+  svg.innerHTML += `<line x1="${margin.left}" y1="${H - margin.bottom}" x2="${W - margin.right}" y2="${H - margin.bottom}" stroke="var(--ink)" stroke-width="0.7"/>`;
+
+  // Legend
+  const legend = [
+    { c: 'var(--baseline)', l: 'Best single model' },
+    { c: 'var(--hard)', l: 'Hard routing' },
+    { c: 'var(--soft)', l: 'Soft routing' },
+    { c: 'var(--oracle)', l: 'Oracle' },
+  ];
+  legend.forEach((item, i) => {
+    const lx = margin.left + 10 + i * 145;
+    const ly = H - 12;
+    svg.innerHTML += `<rect x="${lx}" y="${ly - 7}" width="10" height="10" fill="${item.c}" rx="1.5"/>`;
+    svg.innerHTML += `<text x="${lx + 15}" y="${ly + 2}" class="label" font-size="8pt">${item.l}</text>`;
+  });
+})();
+
+// ── Figure 2: Horizontal Bar Chart (Complementarity) ──
+(function() {
+  const svg = document.getElementById('gapChart');
+  const W = 680, H = 260;
+  const margin = { top: 15, right: 55, bottom: 10, left: 160 };
+  const cw = W - margin.left - margin.right;
+  const ch = H - margin.top - margin.bottom;
+
+  const data = [
+    { label: 'Oracle (per-query best)', v: 0.381, c: 'var(--oracle)' },
+    { label: 'Soft routing (k = 4)', v: 0.310, c: 'var(--soft)' },
+    { label: 'bimga_uniform', v: 0.298, c: 'var(--uniform)' },
+    { label: 'bimga', v: 0.297, c: 'var(--bimga)' },
+    { label: 'embed_distill', v: 0.282, c: 'var(--embed)' },
+    { label: 'hard_neg_pair', v: 0.268, c: 'var(--hnp)' },
+    { label: 'score_distill', v: 0.266, c: 'var(--score)' },
+    { label: 'Control (no KD)', v: 0.198, c: 'var(--control)' },
+  ];
+
+  const minV = 0.15, maxV = 0.40;
+  const xScale = v => margin.left + cw * ((v - minV) / (maxV - minV));
+  const barH = 22;
+  const gap = 7;
+
+  // Grid
+  for (let v = 0.15; v <= 0.40; v += 0.05) {
+    const x = xScale(v);
+    svg.innerHTML += `<line x1="${x}" y1="${margin.top}" x2="${x}" y2="${H - margin.bottom}" stroke="var(--grid)" stroke-width="0.5"/>`;
+    svg.innerHTML += `<text x="${x}" y="${margin.top - 4}" text-anchor="middle" class="tick">${v.toFixed(2)}</text>`;
+  }
+
+  // Baseline dashed line at 0.298
+  const bx = xScale(0.298);
+  svg.innerHTML += `<line x1="${bx}" y1="${margin.top}" x2="${bx}" y2="${H - margin.bottom}" stroke="var(--ink-3)" stroke-width="0.7" stroke-dasharray="3,3"/>`;
+
+  data.forEach((d, i) => {
+    const y = margin.top + 8 + i * (barH + gap);
+    const w = xScale(d.v) - margin.left;
+
+    // Label
+    svg.innerHTML += `<text x="${margin.left - 8}" y="${y + barH/2 + 3}" text-anchor="end" font-size="9pt" fill="var(--ink-2)">${d.label}</text>`;
+
+    // Bar
+    svg.innerHTML += `<rect x="${margin.left}" y="${y}" width="${Math.max(w, 1)}" height="${barH}" fill="${d.c}" rx="1.5" opacity="0.85"/>`;
+
+    // Value
+    svg.innerHTML += `<text x="${margin.left + w + 6}" y="${y + barH/2 + 3}" class="val" font-size="8pt">${d.v.toFixed(3)}</text>`;
+  });
+
+  // Bracket for oracle gap
+  const oracleY = margin.top + 8 + barH / 2;
+  const softY = margin.top + 8 + (barH + gap) + barH / 2;
+  const singleY = margin.top + 8 + 2 * (barH + gap) + barH / 2;
+
+  // Oracle-to-single bracket
+  const bxRight = xScale(0.40) + 15;
+  svg.innerHTML += `<line x1="${bxRight}" y1="${oracleY}" x2="${bxRight}" y2="${singleY}" stroke="var(--ink-3)" stroke-width="0.7"/>`;
+  svg.innerHTML += `<line x1="${bxRight - 3}" y1="${oracleY}" x2="${bxRight}" y2="${oracleY}" stroke="var(--ink-3)" stroke-width="0.7"/>`;
+  svg.innerHTML += `<line x1="${bxRight - 3}" y1="${singleY}" x2="${bxRight}" y2="${singleY}" stroke="var(--ink-3)" stroke-width="0.7"/>`;
+  svg.innerHTML += `<text x="${bxRight + 4}" y="${(oracleY + singleY) / 2 + 3}" font-size="7pt" fill="var(--ink-3)">+0.083</text>`;
+
+  // Axis
+  svg.innerHTML += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${H - margin.bottom}" stroke="var(--ink)" stroke-width="0.7"/>`;
+})();
+</script>
+
+</body>
+</html>

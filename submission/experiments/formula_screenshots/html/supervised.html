@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+    body {
+        font-family: "Computer Modern", "Latin Modern Math", "STIX Two Math", serif;
+        background: white;
+        margin: 0;
+        padding: 24px 36px;
+        width: 680px;
+    }
+    h2 {
+        margin: 0 0 14px 0;
+        font-size: 20px;
+        text-align: center;
+        color: #1a1a1a;
+    }
+    .formula {
+        margin: 8px 0;
+        font-size: 16px;
+        text-align: center;
+        line-height: 2.0;
+    }
+    .katex { font-size: 1.1em; }
+</style>
+</head>
+<body>
+    <h2>Supervised Baseline</h2>
+    <div class="formula">$$\mathbf{S} = \mathbf{S}_q \cdot \mathbf{S}_d^\top$$</div>
+    <div class="formula">$$\mathcal{L} = \mathrm{CE}\!\left(\mathrm{softmax}\!\left(\frac{\mathbf{S}}{\tau}\right),\; \mathbf{y}\right) = -\frac{1}{B}\sum_{i=1}^{B} \log \frac{\exp(s_{ii}/\tau)}{\sum_{j}\exp(s_{ij}/\tau)}$$</div>
+<script>
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+        ],
+        throwOnError: false,
+    });
+</script>
+</body>
+</html>

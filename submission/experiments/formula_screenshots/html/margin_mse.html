@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+    body {
+        font-family: "Computer Modern", "Latin Modern Math", "STIX Two Math", serif;
+        background: white;
+        margin: 0;
+        padding: 24px 36px;
+        width: 680px;
+    }
+    h2 {
+        margin: 0 0 14px 0;
+        font-size: 20px;
+        text-align: center;
+        color: #1a1a1a;
+    }
+    .formula {
+        margin: 8px 0;
+        font-size: 16px;
+        text-align: center;
+        line-height: 2.0;
+    }
+    .katex { font-size: 1.1em; }
+</style>
+</head>
+<body>
+    <h2>Margin MSE</h2>
+    <div class="formula">$$m^s_{ij} = s^s_{ii} - s^s_{ij} \qquad m^t_{ij} = s^t_{ii} - s^t_{ij}$$</div>
+    <div class="formula">$$\mathcal{L}_{mse} = \frac{1}{|M|}\sum_{\substack{i,j \\ i \neq j}} \left(m^s_{ij} - m^t_{ij}\right)^2$$</div>
+    <div class="formula">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_p \,\mathcal{L}_{mse}$$</div>
+<script>
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+        ],
+        throwOnError: false,
+    });
+</script>
+</body>
+</html>
