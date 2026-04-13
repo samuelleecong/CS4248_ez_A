@@ -76,6 +76,7 @@ slides
 uv
 
 # ----------------------------
-# Attention analysis caches (large numpy files)
+# Attention analysis (caches + generated figures)
 # ----------------------------
-mbpp_kd_suite/attention_figures/_cache/
+mbpp_kd_suite/attention_figures/
+mbpp_kd_suite/attention_*.py
