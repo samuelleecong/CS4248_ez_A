@@ -70,6 +70,71 @@ Differences: A2 vs A1 = +0.016 MRR, A3 vs A1 = -0.003 MRR, A4 vs A2 = -0.001 MRR
 | hard_neg_pair (dw=100,pw=10) | 0.2683 | 0.2629 | 0.2571 | 0.263 +/- 0.006 |
 | bimga (dw=100,aw=10) | 0.2936 | 0.3041 | 0.3047 | 0.301 +/- 0.006 |
 
+### Set 5: Second Model Pair — MiniLM-L6 student, mpnet-base-v2 teacher (seed=42)
+
+Validates that BiMGA generalises beyond the TinyBERT/MiniLM pair.
+
+| Run | Method | Test MRR | vs Control |
+|-----|--------|:--------:|:----------:|
+| s5_control | control | 0.346 | — |
+| s5_score_dw100 | score_distill | 0.378 | +0.031 |
+| s5_embed_dw100_aw10 | embed_distill | 0.378 | +0.032 |
+| s5_bimga_dw100_aw10 | bimga | 0.403 | +0.057 |
+
+### Set 7: Saturation Runs (70 epochs, patience=7, bs=32, seed=42)
+
+Best config per method from Set 1, trained for 70 epochs. Resumed from Set 1 checkpoints.
+
+| Run | Method | 30ep MRR | 70ep MRR | Gain | Stopped |
+|-----|--------|:--------:|:--------:|:----:|:-------:|
+| s7_control_bs32 | control | 0.198 | 0.205 | +0.007 | ep 39 |
+| s7_score_dw100 | score_distill | 0.266 | 0.286 | +0.020 | ep 70 |
+| s7_embed_dw100_aw10 | embed_distill | 0.282 | 0.303 | +0.021 | ep 69 |
+| s7_hnp_dw100_pw10 | hard_neg_pair | 0.268 | 0.309 | +0.041 | ep 70 |
+| s7_bimga_dw50_aw10 | bimga | 0.297 | 0.315 | +0.018 | ep 70 |
+| s7_A2_bimga_uniform | bimga_uniform | 0.298 | 0.314 | +0.016 | ep 70 |
+
+### Set 8: Extended Saturation (120 epochs, patience=10)
+
+Unsaturated models from Set 7 continued to 120 epochs.
+
+| Run | Method | 70ep MRR | 120ep MRR | Stopped |
+|-----|--------|:--------:|:---------:|:-------:|
+| s8_A2_bimga_uniform | bimga_uniform | 0.314 | 0.313 | ep 78 |
+| s8_hnp_dw100_pw10 | hard_neg_pair | 0.309 | 0.302 | ep 82 |
+| s8_score_dw100 | score_distill | 0.286 | 0.301 | ep 120 |
+| s8_bimga_dw50_aw10 | bimga (dw=50) | 0.315 | 0.316 | ep 120 |
+
+### Set 9: Deep Saturation (200 epochs, patience=15)
+
+Remaining unsaturated models from Set 8 continued to 200 epochs.
+
+| Run | Method | 120ep MRR | Final MRR | Stopped |
+|-----|--------|:---------:|:---------:|:-------:|
+| s9_score_dw100 | score_distill | 0.301 | 0.301 | ep 132 |
+| s9_bimga_dw50_aw10 | bimga (dw=50) | 0.316 | 0.325 | ep 159 |
+
+### Set 10: BiMGA at dw=100 (200 epochs, patience=15)
+
+New BiMGA run at dw=100/aw=10 trained from scratch to saturation.
+
+| Run | Method | Config | Final MRR | R@1 | R@10 | Stopped |
+|-----|--------|--------|:---------:|:---:|:----:|:-------:|
+| s10_bimga_dw100_aw10 | bimga | dw=100, aw=10 | 0.325 | 0.241 | 0.486 | ep 159 |
+
+### Final Saturated Models
+
+Each method's best fully-saturated checkpoint, used for analysis. All trained at bs=32, seed=42.
+
+| # | Run | Method | MRR | R@1 | R@10 | Epochs | Asym MRR | Doc Cosine |
+|:-:|-----|--------|:---:|:---:|:----:|:------:|:--------:|:----------:|
+| 1 | s7_control_bs32 | control | 0.205 | 0.143 | 0.331 | 39 | — | — |
+| 2 | s7_embed_dw100_aw10 | embed_distill | 0.303 | 0.218 | 0.461 | 69 | 0.310 | 0.679 |
+| 3 | s8_A2_bimga_uniform | bimga_uniform | 0.313 | 0.232 | 0.469 | 78 | 0.316 | 0.856 |
+| 4 | s8_hnp_dw100_pw10 | hard_neg_pair | 0.302 | 0.221 | 0.461 | 82 | 0.007 | 0.001 |
+| 5 | s9_score_dw100 | score_distill | 0.301 | 0.215 | 0.466 | 132 | 0.006 | -0.000 |
+| 6 | s10_bimga_dw100_aw10 | **bimga** | **0.325** | **0.241** | **0.486** | 159 | 0.321 | 0.881 |
+
 ## Symmetric vs Asymmetric Evaluation
 
 Every model was evaluated in both symmetric mode (student encodes both sides) and asymmetric mode (student queries, teacher docs). Best config per method shown.
@@ -87,8 +152,8 @@ Note: "Doc Cosine" = average cosine similarity between student doc embeddings an
 
 ## Caveats
 
-- **Training not saturated**: All KD methods ran the full 30 epochs without early stopping triggering. bimga, score_distill, and hard_neg_pair all hit new validation MRR peaks at epoch 30. More epochs would likely change absolute numbers.
-- **Early stopping**: Control stopped at epoch 7 (bs=32) and 17 (bs=64).
+- **Sets 1-4 not saturated**: All KD methods ran the full 30 epochs without early stopping triggering. Sets 7-10 continued training to saturation (early stopping triggered for all methods).
+- **Early stopping**: Control stopped at epoch 39; embed_distill at 69; bimga_uniform at 78; hard_neg_pair at 82; score_distill at 132; bimga at 159. See "Final Saturated Models" table for definitive results.
 - **Batch size comparison**: The phase 1 checkpoint was trained at bs=32. Set 2 (bs=64) starts from this same checkpoint, so the bs=64 control was not trained from scratch at bs=64 — it tests batch size sensitivity during phase 2 KD training only.
 - **Ablation config mismatch**: A1 and A4 in the ablation table use their respective best configs from Set 1. A1 (embed_distill) is at dw=100/aw=10; A4 (bimga) is at dw=50/aw=10 (its best). A2 and A3 were run at dw=100/aw=10 to match A1.
 - **Multi-seed Set 4 uses dw=100**: Set 4 runs use dw=100 (the best for embed_distill, score_distill, hard_neg_pair), but bimga's best config in Set 1 was dw=50/aw=10 (0.2973) not dw=100/aw=10 (0.2936). The multi-seed bimga runs use dw=100 for consistency across methods.
@@ -180,7 +245,18 @@ All trained models are uploaded to the `cs4248-nlp` HuggingFace organization.
 
 **Pattern**: `cs4248-nlp/paper-{run_name}-tinybert-general-4l-312d-taco-hf-20260402-015143` (with underscores replaced by hyphens)
 
-Examples:
+**Final saturated models (Sets 7-10):**
+
+| Run Name | HuggingFace Repo |
+|----------|-----------------|
+| s7_control_bs32 | `cs4248-nlp/paper-s7-control-bs32-tinybert-general-4l-312d-taco-hf-20260402-015143` |
+| s7_embed_dw100_aw10 | `cs4248-nlp/paper-s7-embed-dw100-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143` |
+| s8_A2_bimga_uniform | `cs4248-nlp/paper-s8-a2-bimga-uniform-tinybert-general-4l-312d-taco-hf-20260402-015143` |
+| s8_hnp_dw100_pw10 | `cs4248-nlp/paper-s8-hnp-dw100-pw10-tinybert-general-4l-312d-taco-hf-20260402-015143` |
+| s9_score_dw100 | `cs4248-nlp/paper-s9-score-dw100-tinybert-general-4l-312d-taco-hf-20260402-015143` |
+| s10_bimga_dw100_aw10 | `cs4248-nlp/paper-s10-bimga-dw100-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143` |
+
+**Earlier models (Sets 1-3):**
 
 | Run Name | HuggingFace Repo |
 |----------|-----------------|
@@ -205,7 +281,7 @@ model = AutoModel.from_pretrained(repo)
 
 # Load projection layer (312d backbone -> 384d teacher space)
 proj = torch.nn.Linear(312, 384, bias=False)
-proj.load_state_dict(torch.load(hf_hub_download(repo, "projection.pt"), weights_only=True))
+proj.load_state_dict(torch.load(hf_hub_download(repo, "projection.pt"), map_location="cpu", weights_only=True))
 
 def encode(text, max_length=160):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=max_length)
@@ -243,5 +319,5 @@ Note: the control model (`s1_control_bs32`) has no projection layer. Load it wit
 | `distill_temperature` | Softmax temperature for KD | 0.2 (fixed) |
 | `batch_size` | Training batch size | 32, 64 |
 | `seed` | Random seed | 42, 123, 456 |
-| `epochs` | Phase 2 training epochs | 30 (fixed) |
+| `epochs` | Phase 2 training epochs | 30 (Sets 1-4), 70 (Set 7), 120 (Set 8), 200 (Sets 9-10) |
 | `lr` | Learning rate (AdamW) | 2e-5 (fixed) |
