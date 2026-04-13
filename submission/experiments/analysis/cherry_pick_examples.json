@@ -1,0 +1,118 @@
+{
+  "dataset": "BEE-spoke-data/TACO-hf",
+  "test_size": 1000,
+  "label_a": "BiMGA",
+  "label_b": "embed_distill",
+  "symmetric_mrr": {
+    "BiMGA": 0.2973333265806367,
+    "embed_distill": 0.281810456472268
+  },
+  "disagreement_counts": {
+    "only_BiMGA_recall_at_1": 47,
+    "only_embed_distill_recall_at_1": 36
+  },
+  "examples_only_BiMGA_r1": [
+    {
+      "test_index": 18,
+      "query": "Allen and Bessie are playing a simple number game. They both know a function $f: \\{0, 1\\}^n \\to \\mathbb{R}$, i.\u00a0e. the function takes $n$ binary arguments and returns a real value. At the start of the game, the variables $x_1, x_2, \\dots, x_n$ are all set to $-1$. Each round, with equal probability, one of Allen or ...",
+      "gold_code": "(n, r) = [int(x) for x in input().split()]\nn = 2 ** n\nxs = [int(x) for x in input().split()]\ns = sum(xs)\nres = [0 for _ in range(r + 1)]\nfor i in range(r):\n\tres[i] = s / n\n\t(i, val) = [int(x) for x in input().split()]\n\ts += val - xs[i]\n\txs[i] = val\nres[r] = s / n\nprint('\\n'.join(map(str, res)))",
+      "BiMGA_symmetric_rank_of_gold": 1,
+      "BiMGA_top1_predicted_code": "(n, r) = [int(x) for x in input().split()]\nn = 2 ** n\nxs = [int(x) for x in input().split()]\ns = sum(xs)\nres = [0 for _ in range(r + 1)]\nfor i in range(r):\n\tres[i] = s / n\n\t(i, val) = [int(x) for x in input().split()]\n\ts += val - xs[i]\n\txs[i] = val\nres[r] = s / n\nprint('\\n'.join(map(str, res)))",
+      "BiMGA_top1_is_gold": true,
+      "embed_distill_symmetric_rank_of_gold": 5,
+      "embed_distill_top1_predicted_code": "from sys import stdin\nc = [[0] * 1002 for _ in range(0, 1002)]\nMOD = int(1000000000.0 + 7)\nfor i in range(0, 1002):\n\tc[i][0] = c[i][i] = 1\n\tfor j in range(0, i):\n\t\tc[i][j] = (c[i - 1][j - 1] + c[i - 1][j]) % MOD\nr = map(int, stdin.read().split())\nn = next(r)\nans = 1\nsum = 0\nfor _ in range(0, n):\n\tx = next(r)\n\tans = ans * c[sum + x - 1][sum] % MOD\n\tsum += x\nprint(ans)"
+    },
+    {
+      "test_index": 71,
+      "query": "Certainly, everyone is familiar with tic-tac-toe game. The rules are very simple indeed. Two players take turns marking the cells in a 3 \u00d7 3 grid (one player always draws crosses, the other \u2014 noughts). The player who succeeds first in placing three of his marks in a horizontal, vertical or diagonal line wins, and th...",
+      "gold_code": "first_row = input()\nsecond_row = input()\nthird_row = input()\nc = 0\no = 0\nfor i in range(0, 3):\n\tif first_row[i] == 'X':\n\t\tc = c + 1\n\telif first_row[i] == '0':\n\t\to = o + 1\nfor i in range(0, 3):\n\tif second_row[i] == 'X':\n\t\tc = c + 1\n\telif second_row[i] == '0':\n\t\to = o + 1\nfor i in range(0, 3):\n\tif third_row[i] == 'X':\n\t\tc = c + 1\n\telif third_row[i] == '0':\n\t\to = o + 1\nr = 0\nif first_row[0] == 'X' and second_row[1] == 'X' and (third_row[2] == 'X'):\n\tr = 1 + r\nif first_row[0] == 'X' and second_ro...",
+      "BiMGA_symmetric_rank_of_gold": 1,
+      "BiMGA_top1_predicted_code": "first_row = input()\nsecond_row = input()\nthird_row = input()\nc = 0\no = 0\nfor i in range(0, 3):\n\tif first_row[i] == 'X':\n\t\tc = c + 1\n\telif first_row[i] == '0':\n\t\to = o + 1\nfor i in range(0, 3):\n\tif second_row[i] == 'X':\n\t\tc = c + 1\n\telif second_row[i] == '0':\n\t\to = o + 1\nfor i in range(0, 3):\n\tif third_row[i] == 'X':\n\t\tc = c + 1\n\telif third_row[i] == '0':\n\t\to = o + 1\nr = 0\nif first_row[0] == 'X' and second_row[1] == 'X' and (third_row[2] == 'X'):\n\tr = 1 + r\nif first_row[0] == 'X' and second_ro...",
+      "BiMGA_top1_is_gold": true,
+      "embed_distill_symmetric_rank_of_gold": 2,
+      "embed_distill_top1_predicted_code": "(COLUMNS, ROWS) = ('ABCDEFG', range(6))\nLINES = [{(COLUMNS[i + k], ROWS[j]) for k in range(4)} for i in range(len(COLUMNS) - 3) for j in range(len(ROWS))] + [{(COLUMNS[i], ROWS[j + k]) for k in range(4)} for i in range(len(COLUMNS)) for j in range(len(ROWS) - 3)] + [{(COLUMNS[i + k], ROWS[j + k]) for k in range(4)} for i in range(len(COLUMNS) - 3) for j in range(len(ROWS) - 3)] + [{(COLUMNS[i + k], ROWS[j - k]) for k in range(4)} for i in range(len(COLUMNS) - 3) for j in range(3, len(ROWS))]\n..."
+    },
+    {
+      "test_index": 76,
+      "query": "We have the integer `9457`. \n\nWe distribute its digits in two buckets having the following possible distributions (we put the generated numbers as strings and we add the corresponding formed integers for each partition):\n```\n- one bucket with one digit and the other with three digits \n[['9'], ['4','5','7']] --> ['9'...",
+      "gold_code": "def subsets(collection):\n\tif len(collection) == 1:\n\t\tyield [collection]\n\t\treturn\n\tfirst = collection[0]\n\tfor smaller in subsets(collection[1:]):\n\t\tyield ([first] + smaller)\n\t\tfor (n, subset) in enumerate(smaller):\n\t\t\tyield (smaller[:n] + [first + subset] + smaller[n + 1:])\n\ndef bucket_digit_distributions_total_sum(n):\n\treturn sum((sum(map(int, sub)) for sub in subsets(str(n)))) - n\n\ndef find(n, z):\n\tf_nf = bucket_digit_distributions_total_sum(n) + z\n\twhile 1:\n\t\tn += 1\n\t\tif bucket_digit_distri...",
+      "BiMGA_symmetric_rank_of_gold": 1,
+      "BiMGA_top1_predicted_code": "def subsets(collection):\n\tif len(collection) == 1:\n\t\tyield [collection]\n\t\treturn\n\tfirst = collection[0]\n\tfor smaller in subsets(collection[1:]):\n\t\tyield ([first] + smaller)\n\t\tfor (n, subset) in enumerate(smaller):\n\t\t\tyield (smaller[:n] + [first + subset] + smaller[n + 1:])\n\ndef bucket_digit_distributions_total_sum(n):\n\treturn sum((sum(map(int, sub)) for sub in subsets(str(n)))) - n\n\ndef find(n, z):\n\tf_nf = bucket_digit_distributions_total_sum(n) + z\n\twhile 1:\n\t\tn += 1\n\t\tif bucket_digit_distri...",
+      "BiMGA_top1_is_gold": true,
+      "embed_distill_symmetric_rank_of_gold": 5,
+      "embed_distill_top1_predicted_code": "from itertools import combinations_with_replacement\n\ndef find_all(sum_dig, digs):\n\tcombs = combinations_with_replacement(list(range(1, 10)), digs)\n\ttarget = [''.join((str(x) for x in list(comb))) for comb in combs if sum(comb) == sum_dig]\n\tif not target:\n\t\treturn []\n\treturn [len(target), int(target[0]), int(target[-1])]"
+    },
+    {
+      "test_index": 84,
+      "query": "You've got an array a, consisting of n integers: a1, a2, ..., an. Your task is to find a minimal by inclusion segment [l, r] (1 \u2264 l \u2264 r \u2264 n) such, that among numbers al, al + 1, ..., ar there are exactly k distinct numbers.\n\nSegment [l, r] (1 \u2264 l \u2264 r \u2264 n; l, r are integers) of length m = r - l + 1, satisfying the gi...",
+      "gold_code": "MAX_N = 100005\n(n, k) = map(int, input().split(' '))\na = list(map(int, input().split(' ')))\ncnt = [0 for i in range(MAX_N)]\nl = 0\ncount = 0\nfor i in range(n):\n\tcnt[a[i]] += 1\n\tif cnt[a[i]] == 1:\n\t\tcount += 1\n\tif count == k:\n\t\twhile l <= i:\n\t\t\tcnt[a[l]] -= 1\n\t\t\tif cnt[a[l]] == 0:\n\t\t\t\tprint(l + 1, end=' ')\n\t\t\t\tprint(i + 1)\n\t\t\t\texit(0)\n\t\t\tl += 1\nprint('-1 -1')",
+      "BiMGA_symmetric_rank_of_gold": 1,
+      "BiMGA_top1_predicted_code": "MAX_N = 100005\n(n, k) = map(int, input().split(' '))\na = list(map(int, input().split(' ')))\ncnt = [0 for i in range(MAX_N)]\nl = 0\ncount = 0\nfor i in range(n):\n\tcnt[a[i]] += 1\n\tif cnt[a[i]] == 1:\n\t\tcount += 1\n\tif count == k:\n\t\twhile l <= i:\n\t\t\tcnt[a[l]] -= 1\n\t\t\tif cnt[a[l]] == 0:\n\t\t\t\tprint(l + 1, end=' ')\n\t\t\t\tprint(i + 1)\n\t\t\t\texit(0)\n\t\t\tl += 1\nprint('-1 -1')",
+      "BiMGA_top1_is_gold": true,
+      "embed_distill_symmetric_rank_of_gold": 3,
+      "embed_distill_top1_predicted_code": "(n, k) = map(int, input().split())\na = list(map(int, input().split()))\nmn = min(a)\nif max(a) - mn > k:\n\tprint('NO')\nelse:\n\tprint('YES')\n\tfor i in range(n):\n\t\tarr = [1] * mn\n\t\tarr += [1 + i for i in range(a[i] - mn)]\n\t\tprint(' '.join(map(str, arr)))"
+    },
+    {
+      "test_index": 106,
+      "query": "You are given two strings S and A of lengths N and M respectively.\nString S contains characters from the set \\texttt{\\{?, a, b, c, d, e\\}}. \nString A contains characters from the set \\texttt{\\{a, b, c, d, e\\}}. \n\nLet S' denote the string formed by replacing all the \\texttt{?} in S using the characters from the set \\...",
+      "gold_code": "def solve(S, A, m, n):\n\tS = list(S)\n\t(i, j) = (0, 0)\n\twhile i < m and j < n:\n\t\tif S[i] == A[j]:\n\t\t\tj += 1\n\t\telif S[i] == '?':\n\t\t\tif A[j] != 'a':\n\t\t\t\tS[i] = 'a'\n\t\t\telse:\n\t\t\t\tS[i] = 'e'\n\t\ti += 1\n\tif j < n:\n\t\treturn ''.join(S)\n\treturn -1\nt = int(input())\nfor i in range(t):\n\t(m, n) = map(int, input().split())\n\tS = input()\n\tA = input()\n\tprint(solve(S, A, m, n))",
+      "BiMGA_symmetric_rank_of_gold": 1,
+      "BiMGA_top1_predicted_code": "def solve(S, A, m, n):\n\tS = list(S)\n\t(i, j) = (0, 0)\n\twhile i < m and j < n:\n\t\tif S[i] == A[j]:\n\t\t\tj += 1\n\t\telif S[i] == '?':\n\t\t\tif A[j] != 'a':\n\t\t\t\tS[i] = 'a'\n\t\t\telse:\n\t\t\t\tS[i] = 'e'\n\t\ti += 1\n\tif j < n:\n\t\treturn ''.join(S)\n\treturn -1\nt = int(input())\nfor i in range(t):\n\t(m, n) = map(int, input().split())\n\tS = input()\n\tA = input()\n\tprint(solve(S, A, m, n))",
+      "BiMGA_top1_is_gold": true,
+      "embed_distill_symmetric_rank_of_gold": 2,
+      "embed_distill_top1_predicted_code": "for _ in range(int(input())):\n\tstring = []\n\t(n, m) = map(int, input().split())\n\tfor i in range(n):\n\t\tst = input()\n\t\tsr = []\n\t\tfor j in st:\n\t\t\tsr.append(j)\n\t\tstring.append(sr)\n\tans = string[0]\n\tgl_ok = False\n\tgl_ans = ''\n\tfor i in range(m):\n\t\ts = ans[i]\n\t\tfor j in range(ord('a'), ord('z') + 1):\n\t\t\tans[i] = chr(j)\n\t\t\tok = True\n\t\t\tfor k in range(n):\n\t\t\t\tcnt = 0\n\t\t\t\tfor l in range(m):\n\t\t\t\t\tif string[k][l] != ans[l]:\n\t\t\t\t\t\tcnt += 1\n\t\t\t\tif cnt > 1:\n\t\t\t\t\tok = False\n\t\t\t\t\tbreak\n\t\t\tif ok:\n\t\t\t\tgl_ok = T..."
+    }
+  ],
+  "examples_only_embed_distill_r1": [
+    {
+      "test_index": 47,
+      "query": "Nudist Beach is planning a military operation to attack the Life Fibers. In this operation, they will attack and capture several cities which are currently under the control of the Life Fibers.\n\nThere are n cities, labeled from 1 to n, and m bidirectional roads between them. Currently, there are Life Fibers in every...",
+      "gold_code": "import heapq\n\ndef read_data():\n\t(n, m, k) = map(int, input().split())\n\tEs = [[] for i in range(n)]\n\tfs = [False] * n\n\tgs = [0.0] * n\n\ths = [0.0] * n\n\tfortresses = list(map(int, input().split()))\n\tfor f in fortresses:\n\t\tfs[f - 1] = True\n\tfor i in range(m):\n\t\t(a, b) = map(int, input().split())\n\t\ta -= 1\n\t\tb -= 1\n\t\tEs[a].append(b)\n\t\tEs[b].append(a)\n\t\tgs[a] += 1\n\t\tgs[b] += 1\n\t\ths[a] += fs[b]\n\t\ths[b] += fs[a]\n\treturn (n, m, k, fs, gs, hs, Es)\n\ndef solve(n, m, k, fs, gs, hs, Es):\n\thq = [(-h / g, i) ...",
+      "embed_distill_symmetric_rank_of_gold": 1,
+      "embed_distill_top1_predicted_code": "import heapq\n\ndef read_data():\n\t(n, m, k) = map(int, input().split())\n\tEs = [[] for i in range(n)]\n\tfs = [False] * n\n\tgs = [0.0] * n\n\ths = [0.0] * n\n\tfortresses = list(map(int, input().split()))\n\tfor f in fortresses:\n\t\tfs[f - 1] = True\n\tfor i in range(m):\n\t\t(a, b) = map(int, input().split())\n\t\ta -= 1\n\t\tb -= 1\n\t\tEs[a].append(b)\n\t\tEs[b].append(a)\n\t\tgs[a] += 1\n\t\tgs[b] += 1\n\t\ths[a] += fs[b]\n\t\ths[b] += fs[a]\n\treturn (n, m, k, fs, gs, hs, Es)\n\ndef solve(n, m, k, fs, gs, hs, Es):\n\thq = [(-h / g, i) ...",
+      "embed_distill_top1_is_gold": true,
+      "BiMGA_symmetric_rank_of_gold": 3,
+      "BiMGA_top1_predicted_code": "n,m=list(map(int,input().split()))\ncities=input().split()\nINF=10000000\nd={}\nadj=[[INF for i in range(n)] for j in range(n)]\nfor i in range(n):\n\td[cities[i]]=i\nfor j in range(m):\n\ta,b,c=input().split()\n\tadj[d[a]][d[b]]=int(c)\n\tadj[d[b]][d[a]]=int(c)\ndef f_w(n):\n\tfor k in range(n):\n\t\tfor i in range(n):\n\t\t\tfor j in range(n):\n\t\t\t\tadj[i][j]=min(adj[i][j],adj[i][k]+adj[k][j])\nf_w(n)\nq=int(input())\nwhile q!=0:\n\ta,b=input().split()\n\tprint(adj[d[a]][d[b]])\n\tq-=1"
+    },
+    {
+      "test_index": 55,
+      "query": "Read problem statements in [Hindi], [Bengali], [Mandarin Chinese], [Russian], and [Vietnamese] as well.\n\nChef and Chefina are playing a game.\n\nChef has $N$ monsters (numbered $1$ through $N$). For each valid $i$, the $i$-th monster has a value $V_{1,i}$ and it is either in attack mode or defense mode. The initial st...",
+      "gold_code": "from heapq import *\nimport sys\ninput = sys.stdin.readline\nt = int(input())\nwhile t:\n\tt -= 1\n\t(n, m) = map(int, input().split())\n\tvalchef = list(map(int, input().split()))\n\tchm = input()\n\tvalchefina = list(map(int, input().split()))\n\tchfm = input()\n\tchefa = []\n\tchefd = []\n\tchefinaa = []\n\tchefinad = []\n\tfor i in range(n):\n\t\tif chm[i] == 'A':\n\t\t\tchefa.append(valchef[i])\n\t\telse:\n\t\t\tchefd.append(-valchef[i])\n\tfor i in range(m):\n\t\tif chfm[i] == 'A':\n\t\t\tchefinaa.append(valchefina[i])\n\t\telse:\n\t\t\tchef...",
+      "embed_distill_symmetric_rank_of_gold": 1,
+      "embed_distill_top1_predicted_code": "from heapq import *\nimport sys\ninput = sys.stdin.readline\nt = int(input())\nwhile t:\n\tt -= 1\n\t(n, m) = map(int, input().split())\n\tvalchef = list(map(int, input().split()))\n\tchm = input()\n\tvalchefina = list(map(int, input().split()))\n\tchfm = input()\n\tchefa = []\n\tchefd = []\n\tchefinaa = []\n\tchefinad = []\n\tfor i in range(n):\n\t\tif chm[i] == 'A':\n\t\t\tchefa.append(valchef[i])\n\t\telse:\n\t\t\tchefd.append(-valchef[i])\n\tfor i in range(m):\n\t\tif chfm[i] == 'A':\n\t\t\tchefinaa.append(valchefina[i])\n\t\telse:\n\t\t\tchef...",
+      "embed_distill_top1_is_gold": true,
+      "BiMGA_symmetric_rank_of_gold": 3,
+      "BiMGA_top1_predicted_code": "for _ in range(int(input())):\n\tstring = []\n\t(n, m) = map(int, input().split())\n\tfor i in range(n):\n\t\tst = input()\n\t\tsr = []\n\t\tfor j in st:\n\t\t\tsr.append(j)\n\t\tstring.append(sr)\n\tans = string[0]\n\tgl_ok = False\n\tgl_ans = ''\n\tfor i in range(m):\n\t\ts = ans[i]\n\t\tfor j in range(ord('a'), ord('z') + 1):\n\t\t\tans[i] = chr(j)\n\t\t\tok = True\n\t\t\tfor k in range(n):\n\t\t\t\tcnt = 0\n\t\t\t\tfor l in range(m):\n\t\t\t\t\tif string[k][l] != ans[l]:\n\t\t\t\t\t\tcnt += 1\n\t\t\t\tif cnt > 1:\n\t\t\t\t\tok = False\n\t\t\t\t\tbreak\n\t\t\tif ok:\n\t\t\t\tgl_ok = T..."
+    },
+    {
+      "test_index": 89,
+      "query": "Recently, Dima met with Sasha in a philatelic store, and since then they are collecting coins together. Their favorite occupation is to sort collections of coins. Sasha likes having things in order, that is why he wants his coins to be arranged in a row in such a way that firstly come coins out of circulation, and t...",
+      "gold_code": "import sys\ninput = sys.stdin.readline\nn = int(input())\np = list(map(int, input().split()))\nflag = [1] * n\nr = n - 1\ncnt = 0\nprint(1, end=' ')\nfor i in range(n - 1):\n\tflag[p[i] - 1] = 0\n\twhile flag[r] == 0:\n\t\tr -= 1\n\t\tcnt += 1\n\tprint(i + 2 - cnt, end=' ')\nprint(1)",
+      "embed_distill_symmetric_rank_of_gold": 1,
+      "embed_distill_top1_predicted_code": "import sys\ninput = sys.stdin.readline\nn = int(input())\np = list(map(int, input().split()))\nflag = [1] * n\nr = n - 1\ncnt = 0\nprint(1, end=' ')\nfor i in range(n - 1):\n\tflag[p[i] - 1] = 0\n\twhile flag[r] == 0:\n\t\tr -= 1\n\t\tcnt += 1\n\tprint(i + 2 - cnt, end=' ')\nprint(1)",
+      "embed_distill_top1_is_gold": true,
+      "BiMGA_symmetric_rank_of_gold": 5,
+      "BiMGA_top1_predicted_code": "n = int(input())\nl = list(map(int, input().split(' ')))\nout = [-1] * n\npas = 0\npos = [0]\nout[0] = 0\nwhile pos:\n\tpas += 1\n\tnew_pos = []\n\tfor p in pos:\n\t\tfor q in [p - 1, p + 1, l[p] - 1]:\n\t\t\tif q >= 0 and q < n and (out[q] == -1):\n\t\t\t\tout[q] = pas\n\t\t\t\tnew_pos.append(q)\n\tpos = new_pos\nprint(*out)"
+    },
+    {
+      "test_index": 117,
+      "query": "Write a program to find the mode of a given list of integers. Mode of a number is defined as the number which is most frequently occured. \nFor example: \nL = {1,2,2,3} // Here mode is 2(most frequently occured)  \n\nIt is possible that multiple answers are possible for a list. In that case print all possible answers in...",
+      "gold_code": "_ = eval(input())\n\nwhile _:\n\t_ -= 1\n\t\n\teval(input())\n\tnums = list(map(int, input().split()))\n\tdi = {}\n\tfor i in nums:\n\t\tdi[i] = di.get(i, 0) + 1\n\tk = list(di.keys())\n\tv = list(di.values())\n\tm = max(v)\n\ts = v.index(m)\n\tli = []\n\twhile True:\n\t\tli.append(k[s])\n\t\ttry:\n\t\t\ts = v.index(m, s+1)\n\t\texcept:\n\t\t\tbreak\n\tfor i in sorted(li, reverse=True):\n\t\tprint(i, end=' ')\n\tprint('')",
+      "embed_distill_symmetric_rank_of_gold": 1,
+      "embed_distill_top1_predicted_code": "_ = eval(input())\n\nwhile _:\n\t_ -= 1\n\t\n\teval(input())\n\tnums = list(map(int, input().split()))\n\tdi = {}\n\tfor i in nums:\n\t\tdi[i] = di.get(i, 0) + 1\n\tk = list(di.keys())\n\tv = list(di.values())\n\tm = max(v)\n\ts = v.index(m)\n\tli = []\n\twhile True:\n\t\tli.append(k[s])\n\t\ttry:\n\t\t\ts = v.index(m, s+1)\n\t\texcept:\n\t\t\tbreak\n\tfor i in sorted(li, reverse=True):\n\t\tprint(i, end=' ')\n\tprint('')",
+      "embed_distill_top1_is_gold": true,
+      "BiMGA_symmetric_rank_of_gold": 2,
+      "BiMGA_top1_predicted_code": "def printEnergy(l):\n\ten = 0\n\t\n\tfor i in range(0, len(l) - 1):\n\t\ten += max(l[i], l[i+1])\n\t\t\n\tprint(en)\n\n\nt = int(input())\n\nfor i in range(t):\n\tn = int(input())\n\tl = [int(x) for x in input().split()]\n\tprintEnergy(l)"
+    },
+    {
+      "test_index": 124,
+      "query": "Similar setting of the [previous](https://www.codewars.com/kata/progressive-spiral-number-position/), this time you are called to identify in which \"branch\" of the spiral a given number will end up.\n\nConsidering a square of numbers disposed as the 25 items in [the previous kata](https://www.codewars.com/kata/progres...",
+      "gold_code": "from math import ceil\n\ndef branch(n):\n\tif n == 1:\n\t\treturn 0\n\tl = int(ceil(n ** 0.5)) // 2\n\tn -= (2 * l - 1) ** 2 + 1\n\treturn n // (2 * l or 1)",
+      "embed_distill_symmetric_rank_of_gold": 1,
+      "embed_distill_top1_predicted_code": "from math import ceil\n\ndef branch(n):\n\tif n == 1:\n\t\treturn 0\n\tl = int(ceil(n ** 0.5)) // 2\n\tn -= (2 * l - 1) ** 2 + 1\n\treturn n // (2 * l or 1)",
+      "embed_distill_top1_is_gold": true,
+      "BiMGA_symmetric_rank_of_gold": 2,
+      "BiMGA_top1_predicted_code": "from bisect import *\ntable = [0, 1, 4, 9, 49, 100, 144, 400, 441, 900, 1444, 4900, 9409, 10000, 10404, 11449, 14400, 19044, 40000, 40401, 44100, 44944, 90000, 144400, 419904, 490000, 491401, 904401, 940900, 994009, 1000000, 1004004, 1014049, 1040400, 1100401, 1144900, 1440000, 1904400, 1940449, 4000000, 4004001, 4040100, 4410000, 4494400, 9000000, 9909904, 9941409, 11909401, 14010049, 14040009, 14440000, 19909444, 40411449, 41990400, 49000000, 49014001, 49140100, 49999041, 90440100, 94090000,..."
+    }
+  ]
+}
