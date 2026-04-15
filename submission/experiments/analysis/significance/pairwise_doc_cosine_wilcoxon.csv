@@ -1,0 +1,16 @@
+metric,run_a,method_a,run_b,method_b,n_valid,mean_delta,median_delta,ci_low,ci_high,fraction_a_higher,fraction_tie,raw_p_value,adjusted_p_value,status,reason
+doc_cosine,s10_bimga_dw100_aw10,bimga,s8_A2_bimga_uniform,bimga_uniform,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s10_bimga_dw100_aw10,bimga,s7_embed_dw100_aw10,embed_distill,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s10_bimga_dw100_aw10,bimga,s8_hnp_dw100_pw10,hard_neg_pair,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s10_bimga_dw100_aw10,bimga,s9_score_dw100,score_distill,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s10_bimga_dw100_aw10,bimga,s7_control_bs32,control,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s8_A2_bimga_uniform,bimga_uniform,s7_embed_dw100_aw10,embed_distill,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s8_A2_bimga_uniform,bimga_uniform,s8_hnp_dw100_pw10,hard_neg_pair,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s8_A2_bimga_uniform,bimga_uniform,s9_score_dw100,score_distill,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s8_A2_bimga_uniform,bimga_uniform,s7_control_bs32,control,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s7_embed_dw100_aw10,embed_distill,s8_hnp_dw100_pw10,hard_neg_pair,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s7_embed_dw100_aw10,embed_distill,s9_score_dw100,score_distill,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s7_embed_dw100_aw10,embed_distill,s7_control_bs32,control,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s8_hnp_dw100_pw10,hard_neg_pair,s9_score_dw100,score_distill,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s8_hnp_dw100_pw10,hard_neg_pair,s7_control_bs32,control,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished
+doc_cosine,s9_score_dw100,score_distill,s7_control_bs32,control,0,,,,,,,,,not_applicable,fine_tuned_teacher_targets_unpublished

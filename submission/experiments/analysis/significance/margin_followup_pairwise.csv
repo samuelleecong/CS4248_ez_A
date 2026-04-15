@@ -1,0 +1,5 @@
+comparison,other_margin_better_queries,bimga_rr_wins_when_other_margin_better,other_rr_wins_when_other_margin_better,rr_ties_when_other_margin_better,bimga_margin_better_queries,bimga_rr_wins_when_bimga_margin_better,agreement_rate_non_tie,discordance_rate_non_tie,spearman_margin_rr_delta,pearson_margin_rr_delta
+bimga_vs_score_distill,557,133,338,86,443,298,0.8,0.19999999999999996,0.6632574700923043,0.5294956152347816
+bimga_vs_hard_neg_pair,578,158,338,82,422,283,0.7791718946047679,0.22082810539523212,0.6572142885347237,0.5198108933195821
+bimga_vs_embed_distill,480,94,287,99,520,344,0.8110539845758354,0.18894601542416456,0.656223061422589,0.5100891019661545
+bimga_vs_bimga_uniform,376,42,219,115,624,360,0.7942386831275721,0.20576131687242794,0.6075159578838022,0.3910299545904512
