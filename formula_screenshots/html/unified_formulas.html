@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+    body {
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background: white;
+        margin: 0;
+        padding: 32px 44px 36px 44px;
+        width: 820px;
+        color: #1a1a1a;
+    }
+    h1 {
+        margin: 0 0 6px 0;
+        font-size: 22px;
+        text-align: center;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 13px;
+        color: #555;
+        margin: 0 0 20px 0;
+    }
+
+    /* --- Notation --- */
+    .notation-section {
+        background: #f7f8fa;
+        border: 1px solid #dde0e6;
+        border-radius: 6px;
+        padding: 14px 20px 10px 20px;
+        margin-bottom: 22px;
+    }
+    .notation-section h2 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+    .notation-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3px 32px;
+        font-size: 13.5px;
+        line-height: 1.7;
+    }
+    .notation-grid .entry {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+    }
+    .notation-grid .sym {
+        flex-shrink: 0;
+        min-width: 90px;
+        text-align: right;
+    }
+    .notation-grid .desc {
+        color: #444;
+    }
+
+    /* --- Shared loss --- */
+    .shared-section {
+        margin-bottom: 20px;
+    }
+    .shared-section h2 {
+        margin: 0 0 6px 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border-bottom: 2px solid #dde0e6;
+        padding-bottom: 4px;
+    }
+    .shared-block {
+        background: #fafbfc;
+        border-left: 3px solid #4a90d9;
+        padding: 10px 16px;
+        margin: 8px 0;
+        border-radius: 0 4px 4px 0;
+    }
+    .shared-block .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #2a5a8a;
+        margin-bottom: 2px;
+    }
+    .shared-block .desc {
+        font-size: 12.5px;
+        color: #555;
+        margin-bottom: 4px;
+    }
+    .shared-block .formula {
+        font-size: 15px;
+        text-align: center;
+        line-height: 2.0;
+        margin: 4px 0 0 0;
+    }
+
+    /* --- Method cards --- */
+    .methods-header {
+        margin: 22px 0 8px 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border-bottom: 2px solid #dde0e6;
+        padding-bottom: 4px;
+    }
+    .method-card {
+        border: 1px solid #dde0e6;
+        border-radius: 6px;
+        margin: 10px 0;
+        overflow: hidden;
+    }
+    .method-header {
+        padding: 8px 16px;
+        font-size: 14.5px;
+        font-weight: 700;
+    }
+    .method-body {
+        padding: 6px 16px 10px 16px;
+    }
+    .method-desc {
+        font-size: 12.5px;
+        color: #444;
+        line-height: 1.5;
+        margin-bottom: 6px;
+        font-style: italic;
+    }
+    .method-formula {
+        font-size: 14.5px;
+        text-align: center;
+        line-height: 2.0;
+        margin: 4px 0 2px 0;
+    }
+    .method-subtext {
+        font-size: 11.5px;
+        color: #666;
+        text-align: center;
+        margin: 0 0 2px 0;
+    }
+    .method-combined {
+        font-size: 15px;
+        text-align: center;
+        line-height: 2.0;
+        margin: 4px 0 0 0;
+        padding-top: 4px;
+        border-top: 1px dashed #ccc;
+    }
+
+    /* Color accents per method */
+    .mc-supervised .method-header  { background: #e8f4e8; color: #2d6a2d; }
+    .mc-score .method-header       { background: #e3eef8; color: #2a5a8a; }
+    .mc-embed .method-header       { background: #f0e8f5; color: #5e3d7a; }
+    .mc-hnp .method-header         { background: #fce8e2; color: #8a3a2a; }
+    .mc-bimga .method-header       { background: #fff3dc; color: #7a5a10; }
+    .mc-bimga-u .method-header     { background: #fff3dc; color: #7a5a10; }
+    .mc-adam .method-header         { background: #e2f0f0; color: #2a6a6a; }
+    .mc-qed .method-header         { background: #f5f0e8; color: #6a5a2d; }
+    .mc-mmse .method-header        { background: #eee8f0; color: #4a3d5e; }
+
+    .katex { font-size: 1.05em; }
+</style>
+</head>
+<body>
+
+<h1>Knowledge Distillation Loss Functions</h1>
+<p class="subtitle">Teacher: all-MiniLM-L6-v2 (frozen) &rarr; Student: TinyBERT-4L (trainable) on MBPP</p>
+
+<!-- ========== NOTATION ========== -->
+<div class="notation-section">
+    <h2>Notation</h2>
+    <div class="notation-grid">
+        <div class="entry">
+            <span class="sym">$$\mathbf{S}_q,\; \mathbf{S}_d$$</span>
+            <span class="desc">Student query / document embeddings</span>
+        </div>
+        <div class="entry">
+            <span class="sym">$$\mathbf{T}_q,\; \mathbf{T}_d$$</span>
+            <span class="desc">Teacher query / document embeddings</span>
+        </div>
+        <div class="entry">
+            <span class="sym">$$s^s_{ij},\; s^t_{ij}$$</span>
+            <span class="desc">Student / teacher similarity scores</span>
+        </div>
+        <div class="entry">
+            <span class="sym">$$B$$</span>
+            <span class="desc">Batch size (in-batch negatives)</span>
+        </div>
+        <div class="entry">
+            <span class="sym">$$\tau,\; \tau_d$$</span>
+            <span class="desc">Temperature for CE / distillation</span>
+        </div>
+        <div class="entry">
+            <span class="sym">$$\lambda_d,\; \lambda_a,\; \lambda_p$$</span>
+            <span class="desc">Loss weights (distill / align / pairwise)</span>
+        </div>
+        <div class="entry">
+            <span class="sym">$$\sigma(\cdot)$$</span>
+            <span class="desc">Sigmoid function</span>
+        </div>
+        <div class="entry">
+            <span class="sym">$$\|\cdot\|_2$$</span>
+            <span class="desc">L2 (Euclidean) norm</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== SHARED LOSSES ========== -->
+<div class="shared-section">
+    <h2>Shared Base Losses</h2>
+
+    <div class="shared-block">
+        <div class="label">Contrastive Cross-Entropy Loss</div>
+        <div class="desc">Trains the student to rank the positive document highest among in-batch negatives.</div>
+        <div class="formula">$$\mathcal{L}_{CE} = -\frac{1}{B}\sum_{i=1}^{B} \log \frac{\exp(s_{ii}/\tau)}{\sum_{j}\exp(s_{ij}/\tau)}$$</div>
+    </div>
+
+    <div class="shared-block">
+        <div class="label">Score Distribution Distillation</div>
+        <div class="desc">Transfers knowledge by training the student to match the teacher's output probability distribution (soft labels), capturing nuanced inter-document relationships.</div>
+        <div class="formula">$$\mathcal{L}_{KL} = \mathrm{KL}\!\left(\mathrm{softmax}\!\left(\frac{\mathbf{S}_s}{\tau_d}\right) \;\Big\|\; \mathrm{softmax}\!\left(\frac{\mathbf{S}_t}{\tau_d}\right)\right) \cdot \tau_d^{\,2}$$</div>
+    </div>
+</div>
+
+<!-- ========== METHOD CARDS ========== -->
+<div class="methods-header">Method Variants</div>
+
+<!-- 1. Supervised -->
+<div class="method-card mc-supervised">
+    <div class="method-header">1. Supervised Baseline</div>
+    <div class="method-body">
+        <div class="method-desc">No teacher signal. Student learns from labeled pairs only using contrastive retrieval.</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE}$$</div>
+    </div>
+</div>
+
+<!-- 2. Score Distillation -->
+<div class="method-card mc-score">
+    <div class="method-header">2. Score Distillation</div>
+    <div class="method-body">
+        <div class="method-desc">Transfers knowledge by training the student to match the teacher's output probability distribution (soft labels), capturing nuanced class relationships.</div>
+        <div class="method-subtext">Cross-encoder scoring: student queries scored against teacher documents</div>
+        <div class="method-formula">$$\mathbf{S}_s = \mathbf{S}_q \cdot \mathbf{T}_d^\top \qquad \mathbf{S}_t = \mathbf{T}_q \cdot \mathbf{T}_d^\top$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_d \,\mathcal{L}_{KL}$$</div>
+    </div>
+</div>
+
+<!-- 3. Embedding Distillation -->
+<div class="method-card mc-embed">
+    <div class="method-header">3. Embedding Distillation</div>
+    <div class="method-body">
+        <div class="method-desc">Aligns the internal feature representations of the student with those of the teacher, encouraging similar understanding at intermediate layers.</div>
+        <div class="method-formula">$$\mathcal{L}_{align} = \frac{1}{B}\sum_{i=1}^{B} \left\|\mathbf{S}_{q_i} - \mathbf{T}_{q_i}\right\|_2$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_d \,\mathcal{L}_{KL} + \lambda_a \,\mathcal{L}_{align}$$</div>
+    </div>
+</div>
+
+<!-- 4. Hard-Negative Pairwise -->
+<div class="method-card mc-hnp">
+    <div class="method-header">4. Hard-Negative Pairwise Distillation</div>
+    <div class="method-body">
+        <div class="method-desc">Preserves relational knowledge by teaching the student to mimic pairwise relationships or similarities between data samples learned by the teacher.</div>
+        <div class="method-formula">$$\mathcal{L}_{pair} = \frac{1}{|M|}\sum_{(i,j)\in M} \mathrm{BCE}\!\left(\sigma\!\left(\frac{s^s_{ii} - s^s_{ij}}{\tau_d}\right),\; \sigma\!\left(\frac{s^t_{ii} - s^t_{ij}}{\tau_d}\right)\right)$$</div>
+        <div class="method-subtext">$$M = \{(i,j) : j \in \text{top-}k\text{ hardest negatives for query } i\}$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_d \,\mathcal{L}_{KL} + \lambda_p \,\mathcal{L}_{pair}$$</div>
+    </div>
+</div>
+
+<!-- 5. QED Align -->
+<div class="method-card mc-qed">
+    <div class="method-header">5. Query Embedding Alignment (QED)</div>
+    <div class="method-body">
+        <div class="method-desc">Direct query-only L2 alignment without score distillation. The simplest embedding alignment baseline.</div>
+        <div class="method-formula">$$\mathcal{L}_{align} = \frac{1}{B}\sum_{i=1}^{B} \left\|\mathbf{S}_{q_i} - \mathbf{T}_{q_i}\right\|_2$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_a \,\mathcal{L}_{align}$$</div>
+    </div>
+</div>
+
+<!-- 6. Margin MSE -->
+<div class="method-card mc-mmse">
+    <div class="method-header">6. Margin MSE</div>
+    <div class="method-body">
+        <div class="method-desc">Preserves pairwise ranking margins by minimizing the squared difference between student and teacher score margins across all document pairs.</div>
+        <div class="method-formula">$$m^s_{ij} = s^s_{ii} - s^s_{ij} \qquad m^t_{ij} = s^t_{ii} - s^t_{ij}$$</div>
+        <div class="method-formula">$$\mathcal{L}_{mse} = \frac{1}{|M|}\sum_{\substack{i,j \\ i \neq j}} \left(m^s_{ij} - m^t_{ij}\right)^2$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_p \,\mathcal{L}_{mse}$$</div>
+    </div>
+</div>
+
+<!-- 7. BiMGA -->
+<div class="method-card mc-bimga">
+    <div class="method-header">7. BiMGA -- Bidirectional Margin-Guided Alignment (Ours)</div>
+    <div class="method-body">
+        <div class="method-desc">Improves student learning by aligning both query and document representations bidirectionally, weighted by teacher confidence margins -- capturing richer structural and semantic information.</div>
+        <div class="method-subtext">Margin-based confidence weighting: high-confidence pairs receive stronger alignment</div>
+        <div class="method-formula">$$m_i = s^t_{ii} - \max_{j \neq i}\, s^t_{ij} \qquad w_i = \sigma\!\left(\frac{m_i}{\tau_d}\right)$$</div>
+        <div class="method-formula">$$\mathcal{L}_{align} = \frac{1}{B}\sum_{i=1}^{B} w_i \left(\left\|\mathbf{S}_{q_i} - \mathbf{T}_{q_i}\right\|_2 + \left\|\mathbf{S}_{d_i} - \mathbf{T}_{d_i}\right\|_2\right)$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_d \,\mathcal{L}_{KL} + \lambda_a \,\mathcal{L}_{align}$$</div>
+    </div>
+</div>
+
+<!-- 8. BiMGA Uniform -->
+<div class="method-card mc-bimga-u">
+    <div class="method-header">8. BiMGA Uniform (Ablation)</div>
+    <div class="method-body">
+        <div class="method-desc">Ablation of BiMGA with uniform weighting (w_i = 1) to isolate the effect of margin-guided confidence weighting.</div>
+        <div class="method-formula">$$\mathcal{L}_{align} = \frac{1}{B}\sum_{i=1}^{B} \left(\left\|\mathbf{S}_{q_i} - \mathbf{T}_{q_i}\right\|_2 + \left\|\mathbf{S}_{d_i} - \mathbf{T}_{d_i}\right\|_2\right)$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_d \,\mathcal{L}_{KL} + \lambda_a \,\mathcal{L}_{align}$$</div>
+    </div>
+</div>
+
+<!-- 9. ADAM-Lite -->
+<div class="method-card mc-adam">
+    <div class="method-header">9. ADAM-Lite -- Dark Example Distillation</div>
+    <div class="method-body">
+        <div class="method-desc">Generates synthetic hard negatives ("dark examples") by interpolating positive and negative document embeddings, then distills over these augmented examples weighted by teacher confidence.</div>
+        <div class="method-formula">$$\tilde{\mathbf{d}}_k = \mathrm{normalize}\!\left(\alpha\,\mathbf{d}^{+} + (1-\alpha)\,\mathbf{d}^{-}_k\right)$$</div>
+        <div class="method-subtext">Confidence gate: teacher certainty modulates dark-example loss strength</div>
+        <div class="method-formula">$$c_i = \sigma\!\left(\frac{s^t_{i,+} - \overline{s^t_{i,\mathrm{dark}}}}{\tau_d}\right)$$</div>
+        <div class="method-formula">$$\mathcal{L}_{dark} = \frac{1}{B}\sum_{i=1}^{B} c_i \cdot \mathrm{KL}\!\left(\mathrm{softmax}\!\left(\frac{\tilde{\mathbf{S}}^s_i}{\tau_d}\right) \;\Big\|\; \mathrm{softmax}\!\left(\frac{\tilde{\mathbf{S}}^t_i}{\tau_d}\right)\right) \cdot \tau_d^{\,2}$$</div>
+        <div class="method-combined">$$\mathcal{L} = \mathcal{L}_{CE} + \lambda_d \left(\mathcal{L}_{KL} + \mathcal{L}_{dark}\right)$$</div>
+    </div>
+</div>
+
+<script>
+    renderMathInElement(document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+        ],
+        throwOnError: false,
+    });
+</script>
+</body>
+</html>
