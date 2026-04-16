@@ -1,0 +1,13 @@
+{
+  "name": "s10_bimga_dw100_aw10",
+  "method": "bimga",
+  "batch_size": 32,
+  "seed": 42,
+  "distill_weight": 100.0,
+  "align_weight": 10.0,
+  "pair_weight": 1.0,
+  "distill_temperature": 0.2,
+  "epochs": 200,
+  "patience": 15,
+  "lr": 2e-05
+}
