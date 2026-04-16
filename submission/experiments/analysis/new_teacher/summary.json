@@ -1,0 +1,44 @@
+{
+  "dataset_name": "BEE-spoke-data/TACO-hf",
+  "teacher_repo": "cs4248-nlp/ft-teacher-all-mpnet-base-v2-taco-20260326-110507",
+  "teacher_snapshot_dir": "/content/CS4248_ez_A/submission/experiments/hf_cache/models--cs4248-nlp--ft-teacher-all-mpnet-base-v2-taco-20260326-110507/snapshots/09b92c9c0f23bfe9a91ac9f5a717a1c7f8529e14",
+  "methods": {
+    "score_distill": {
+      "repo_id": "cs4248-nlp/paper-s1-score-dw100-tinybert-general-4l-312d-taco-hf-20260402-015143",
+      "snapshot_dir": "/content/CS4248_ez_A/submission/experiments/hf_cache/models--cs4248-nlp--paper-s1-score-dw100-tinybert-general-4l-312d-taco-hf-20260402-015143/snapshots/77e1c5fa4fb1633bcfcece98ddfba5112b127149",
+      "test_mrr": 0.2664227355557375,
+      "recall_at_1": 0.184
+    },
+    "embed_distill": {
+      "repo_id": "cs4248-nlp/paper-s1-embed-dw100-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143",
+      "snapshot_dir": "/content/CS4248_ez_A/submission/experiments/hf_cache/models--cs4248-nlp--paper-s1-embed-dw100-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143/snapshots/015ee79ac823381b11972ec93e56b2054cf407e5",
+      "test_mrr": 0.28181661497652044,
+      "recall_at_1": 0.2
+    },
+    "hard_neg_pair": {
+      "repo_id": "cs4248-nlp/paper-s1-hnp-dw100-pw10-tinybert-general-4l-312d-taco-hf-20260402-015143",
+      "snapshot_dir": "/content/CS4248_ez_A/submission/experiments/hf_cache/models--cs4248-nlp--paper-s1-hnp-dw100-pw10-tinybert-general-4l-312d-taco-hf-20260402-015143/snapshots/7ce2f92a26cba76bbb3d72dfd181a0540d839440",
+      "test_mrr": 0.26832719144106354,
+      "recall_at_1": 0.18
+    },
+    "bimga": {
+      "repo_id": "cs4248-nlp/paper-s1-bimga-dw50-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143",
+      "snapshot_dir": "/content/CS4248_ez_A/submission/experiments/hf_cache/models--cs4248-nlp--paper-s1-bimga-dw50-aw10-tinybert-general-4l-312d-taco-hf-20260402-015143/snapshots/fbdcd936c8e8a0a847903fffaa22c47642ca34ed",
+      "test_mrr": 0.29733644636607,
+      "recall_at_1": 0.211
+    }
+  },
+  "margin_bin_counts": {
+    "low": 334,
+    "medium": 333,
+    "high": 333
+  },
+  "best_high_margin_method": {
+    "method": "bimga",
+    "mrr": 0.6312657917452164
+  },
+  "best_low_margin_method": {
+    "method": "score_distill",
+    "mrr": 0.04622933163956804
+  }
+}
