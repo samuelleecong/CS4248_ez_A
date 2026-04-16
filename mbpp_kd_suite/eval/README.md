@@ -34,7 +34,33 @@ For built-in CLI help, run:
 uv run mbpp-kd-eval --help
 ```
 
-A `run` means one evaluator execution over exactly one dataset split with one model. Each run writes one timestamped output folder plus local aggregate indices under `eval/runs/`.
+For the multi-model OOD + robustness workflow added for MBPP sanitized OOD and
+TACO perturbation studies, use:
+
+```bash
+uv run mbpp-kd-ood-robustness \
+  --model sentence-transformers/all-MiniLM-L6-v2 \
+  --task all \
+  --perturbation-tier all
+```
+
+The perturbation tiers in `mbpp-kd-ood-robustness` are TextAttack-backed. The
+current implementation uses TextAttack augmenters/transformations for typo and
+mixed-noise generation instead of hand-written perturbation rules.
+
+The robustness workflow also supports deterministic lexical probes for
+keyword-reliance analysis:
+- `keyword_synonym`
+- `keyword_neutralize`
+- `keyword_swap_type`
+- `identifier_mask`
+- `structure_preserve_lexical_change`
+
+These probes use a curated replacement map bundled in
+`eval/ood_analysis/lexical_replacements.json`, with optional library-assisted synonym
+generation as a fallback for some terms.
+
+A `run` means one evaluator execution over exactly one dataset split with one model. Each run writes one timestamped output folder plus local aggregate indices under `eval/runs/`, with the OOD and perturbation workflow now using its own `eval/runs/ood_analysis/` subfolder by default.
 
 ## Examples
 

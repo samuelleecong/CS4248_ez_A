@@ -1,0 +1,5 @@
+case_type,model_name,task,dataset_name,perturbation_tier,record_id,original_query,perturbed_query,clean_rank,perturbed_rank,delta_rank,top_retrieved_code_summary
+keyword_failure,org/mock-model,taco_robustness,taco_local,keyword_swap_type,test:0,sort array values test 0,shuffle string values test 0,4,4,0,def fn_test_3():
+keyword_success,org/mock-model,taco_robustness,taco_local,keyword_swap_type,test:3,sort array values test 3,reverse string values test 3,1,1,0,def fn_test_3():
+mbpp_ood_success,org/mock-model,mbpp_ood,mbpp_sanitized_ood,clean,7,mbpp prompt 7,mbpp prompt 7,1,1,0,def mbpp_7():
+mbpp_ood_failure,org/mock-model,mbpp_ood,mbpp_sanitized_ood,clean,9,mbpp prompt 9,mbpp prompt 9,2,2,0,def mbpp_9():

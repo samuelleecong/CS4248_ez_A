@@ -1,0 +1,5 @@
+model_name,task,dataset_name,split,perturbation_tier,record_id,original_query,perturbed_query,gold_rank,reciprocal_rank,top_retrieved_rank_index,top_retrieved_code_summary,top_retrieved_matches_gold
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:0,sort array values test 0,shuffle string values test 0,4,0.25,3,def fn_test_3():,False
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:1,sort array values test 1,reverse string values test 1,3,0.3333333333333333,3,def fn_test_3():,False
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:2,sort array values test 2,shuffle matrix values test 2,2,0.5,3,def fn_test_3():,False
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,test:3,sort array values test 3,reverse string values test 3,1,1.0,3,def fn_test_3():,True

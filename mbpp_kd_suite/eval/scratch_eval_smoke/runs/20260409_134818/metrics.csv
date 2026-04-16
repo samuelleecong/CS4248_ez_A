@@ -1,0 +1,4 @@
+model_name,task,dataset_name,split,perturbation_tier,mrr,recall@1,recall@5,recall@10,mean_rank,median_rank,runtime_sec,query_count,code_count,delta_mrr_vs_clean,delta_recall10_vs_clean
+org/mock-model,mbpp_ood,mbpp_sanitized_ood,test,clean,0.75,0.5,1.0,1.0,1.5,1.5,0.02311790000021574,2,2,0.0,0.0
+org/mock-model,taco_robustness,taco_local,test,clean,0.5208333333333333,0.25,1.0,1.0,2.5,2.5,0.0003865999997287872,4,4,0.0,0.0
+org/mock-model,taco_robustness,taco_local,test,keyword_swap_type,0.5208333333333333,0.25,1.0,1.0,2.5,2.5,0.0002832000000125845,4,4,0.0,0.0

@@ -1,0 +1,23 @@
+{
+  "models": [
+    "org/mock-model"
+  ],
+  "task": "all",
+  "mbpp_dataset_path": "scratch_eval_smoke\\mbpp.jsonl",
+  "taco_dataset_name": "BEE-spoke-data/TACO-hf",
+  "taco_dataset_path": "scratch_eval_smoke\\taco",
+  "split": "test",
+  "split_seed": 9,
+  "perturbation_tier": "keyword_swap_type",
+  "lexical_map_path": null,
+  "ks": [
+    1,
+    5,
+    10
+  ],
+  "max_query_length": 64,
+  "max_code_length": 64,
+  "batch_size": 8,
+  "device": "cpu",
+  "output_dir": "scratch_eval_smoke\\runs"
+}
