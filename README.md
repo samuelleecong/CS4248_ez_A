@@ -2,7 +2,7 @@
 
 NLP project on **knowledge distillation for text-to-code retrieval**, evaluated on the [TACO](https://huggingface.co/datasets/BEE-spoke-data/TACO-hf) competitive-programming dataset.
 
-We distil a small TinyBERT-4L (14M params, 312d) student from a fine-tuned `all-mpnet-base-v2` teacher, comparing four distillation families (score distill, embed distill, hard-negative-pair distill, BiMGA) and probing where each method's gains come from.
+We distil a small TinyBERT-4L (14M params, 312d) student from a `sentence-transformers/all-MiniLM-L6-v2` teacher (fine-tuned to saturation on TACO in phase 1 of a two-phase pipeline, then frozen for phase 2 distillation). We compare four distillation families — score distill, embed distill, hard-negative-pair distill, BiMGA — and probe where each method's gains come from.
 
 ## Repo Layout
 
@@ -89,9 +89,13 @@ Each run writes `history.json`, `metrics.json`, and `run_config.json` under `sub
 | Role | HuggingFace |
 |------|-------------|
 | Student backbone | `huawei-noah/TinyBERT_General_4L_312D` |
-| Fine-tuned teacher | `cs4248-nlp/ft-teacher-all-mpnet-base-v2-taco-20260326-110507` |
+| Teacher backbone | `sentence-transformers/all-MiniLM-L6-v2` (fine-tuned to saturation in phase 1, frozen in phase 2) |
 | Per-run student checkpoints | `cs4248-nlp/paper-{run_name}-tinybert-general-4l-312d-taco-hf-20260402-015143` |
 | Dataset | `BEE-spoke-data/TACO-hf` (18K train / 1K val / 1K test) |
+
+The phase-1 fine-tuned MiniLM-L6-v2 teacher is **not published as a standalone HF repo** — it lives inside the phase-1 checkpoint `.pt` and is loaded into every phase-2 run via `ckpt["ft_teacher_targets"]` (see `mbpp_kd_suite/src/mbpp_kd_suite/two_phase_kd_experiment.py`). The closest published companion artifact is the fine-tuned MiniLM-L6-v2 used as the *student* in the Set 5 mpnet→MiniLM pair: `cs4248-nlp/ft-student-all-minilm-l6-v2-taco-20260326-110507`.
+
+Set 5 also pairs MiniLM-L6-v2 (as student) against `cs4248-nlp/ft-teacher-all-mpnet-base-v2-taco-20260326-110507` (as teacher); that mpnet teacher is *only* used by Set 5 and by Immanuel's separate new-teacher diagnostics in `submission/experiments/analysis/new_teacher/`. It is **not** the teacher behind Sets 1-4 and Sets 7-10.
 
 Full per-run table: `submission/experiments/README.md`.
 
