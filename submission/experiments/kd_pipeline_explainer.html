@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BiMGA Knowledge Distillation Pipeline — Explainer</title>
+<style>
+  :root {
+    --blue: #4a90d9;
+    --blue-dark: #2a5a8a;
+    --orange: #e8744f;
+    --orange-dark: #b35530;
+    --yellow: #f5c542;
+    --yellow-dark: #c9a035;
+    --green: #6ab070;
+    --green-dark: #3d7a46;
+    --purple: #b8a9c9;
+    --purple-dark: #7d6b94;
+    --teal: #7ec8c8;
+    --teal-dark: #4a9696;
+    --red: #d96030;
+    --bg: #fafafa;
+    --text: #1a1a2e;
+    --muted: #555;
+    --card-bg: #fff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+    color: var(--blue-dark);
+  }
+
+  h1 + p.subtitle {
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin: 2.2rem 0 0.8rem;
+    color: var(--text);
+    border-bottom: 2px solid var(--yellow);
+    padding-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  h2 .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #fff;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  p { margin-bottom: 0.8rem; }
+
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .stage {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    border-left: 5px solid var(--blue);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    position: relative;
+  }
+
+  .stage.frozen   { border-left-color: var(--blue); }
+  .stage.trainable { border-left-color: var(--orange); }
+  .stage.compute  { border-left-color: var(--purple); }
+  .stage.loss     { border-left-color: var(--yellow-dark); }
+  .stage.total    { border-left-color: var(--red); }
+  .stage.eval     { border-left-color: var(--teal-dark); }
+  .stage.data     { border-left-color: var(--green); }
+
+  .stage h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 0.4rem;
+  }
+
+  .badge.frozen   { background: var(--blue); color: #fff; }
+  .badge.train    { background: var(--orange); color: #fff; }
+
+  .math {
+    background: #f0f0f5;
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    margin: 0.6rem 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    overflow-x: auto;
+    line-height: 1.9;
+  }
+
+  .math .label {
+    color: var(--muted);
+    font-family: Georgia, serif;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  .arrow-down {
+    text-align: center;
+    font-size: 1.4rem;
+    color: #aaa;
+    margin: 0.2rem 0;
+    line-height: 1;
+  }
+
+  .loss-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.8rem;
+    margin: 0.8rem 0;
+  }
+
+  .loss-card {
+    background: #fffbee;
+    border: 2px solid var(--yellow);
+    border-radius: 8px;
+    padding: 0.9rem;
+  }
+
+  .loss-card h4 {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    color: var(--orange-dark);
+  }
+
+  .loss-card p {
+    font-size: 0.82rem;
+    margin-bottom: 0.3rem;
+    color: var(--text);
+  }
+
+  .loss-card .formula {
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    color: var(--purple-dark);
+  }
+
+  .key-point {
+    background: #eef5ff;
+    border-left: 4px solid var(--blue);
+    padding: 0.7rem 1rem;
+    margin: 0.8rem 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.9rem;
+  }
+
+  .key-point strong {
+    color: var(--blue-dark);
+  }
+
+  .talk-track {
+    background: linear-gradient(135deg, #fff8ee 0%, #fff3dd 100%);
+    border: 2px solid var(--yellow);
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .talk-track h3 {
+    color: var(--orange-dark);
+    font-size: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .talk-track ol {
+    margin-left: 1.2rem;
+  }
+
+  .talk-track li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .talk-track li strong { color: var(--text); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8rem 0;
+    font-size: 0.88rem;
+  }
+
+  th {
+    background: var(--blue);
+    color: #fff;
+    padding: 0.5rem 0.7rem;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 0.5rem 0.7rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  tr:nth-child(even) td { background: #f8f8fb; }
+
+  .bimga-highlight {
+    background: linear-gradient(135deg, #ffeee8 0%, #ffe4db 100%);
+    border: 2px solid var(--orange);
+    border-radius: 10px;
+    padding: 1.3rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .bimga-highlight h3 {
+    color: var(--orange-dark);
+    margin-bottom: 0.6rem;
+  }
+
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .compare-card {
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.88rem;
+  }
+
+  .compare-card.baseline {
+    background: #f0f0f5;
+    border: 1px solid #ccc;
+  }
+
+  .compare-card.ours {
+    background: #fff0eb;
+    border: 2px solid var(--orange);
+  }
+
+  .compare-card h4 {
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  @media (max-width: 700px) {
+    .loss-grid { grid-template-columns: 1fr; }
+    .comparison { grid-template-columns: 1fr; }
+    body { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<h1>BiMGA Knowledge Distillation Pipeline</h1>
+<p class="subtitle">A step-by-step explainer for the multi-objective KD training diagram</p>
+
+<!-- ============================================================ -->
+<h2><span class="step-num">1</span> Input: MBPP Dataset</h2>
+
+<div class="stage data">
+  <h3>Query-Code Pairs</h3>
+  <p>
+    Each training example is a <strong>(query, code)</strong> pair from the MBPP dataset.
+    The query is a natural language description of a programming task; the code is its solution.
+    A batch of <em>B</em> pairs yields <em>B</em> queries and <em>B</em> documents.
+  </p>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="step-num">2</span> Dual Encoding</h2>
+
+<div class="pipeline">
+
+<div class="stage frozen">
+  <h3>Teacher Encoder <span class="badge frozen">Frozen</span></h3>
+  <p>
+    <strong>all-MiniLM-L6-v2</strong> (fine-tuned in Phase 1, then frozen for Phase 2).
+    Its embeddings are <strong>precomputed once</strong> and stored — no forward pass during training.
+    This yields fixed teacher embeddings <strong>T<sub>q</sub></strong> and <strong>T<sub>d</sub></strong>.
+  </p>
+  <div class="key-point">
+    <strong>Why precompute?</strong> The teacher never updates, so computing its embeddings once
+    saves a full forward pass per batch. The student trains against a stable target.
+  </div>
+</div>
+
+<div class="stage trainable">
+  <h3>Student Encoder <span class="badge train">Trainable</span></h3>
+  <p>
+    <strong>TinyBERT (4 layers, 12 heads)</strong> — a much smaller model.
+    On every batch it runs a live forward pass over queries and documents,
+    producing <strong>S<sub>q</sub></strong> and <strong>S<sub>d</sub></strong>.
+    These update via backpropagation.
+  </p>
+</div>
+
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="step-num">3</span> Scoring + Pairing</h2>
+
+<div class="stage compute">
+  <h3>Score Matrix Computation</h3>
+  <p>
+    Two in-batch similarity matrices are computed via dot products:
+  </p>
+  <div class="math">
+    <span class="label">Student scores:</span>
+    &nbsp; S<sub>sc</sub> = S<sub>q</sub> &middot; S<sub>d</sub><sup>T</sup>
+    &nbsp;&nbsp; <span class="label">shape (B &times; B)</span><br>
+    <span class="label">Teacher scores:</span>
+    &nbsp; T<sub>sc</sub> = T<sub>q</sub> &middot; T<sub>d</sub><sup>T</sup>
+    &nbsp;&nbsp; <span class="label">shape (B &times; B)</span>
+  </div>
+  <p>
+    Each entry <code>S<sub>sc</sub>[i, j]</code> is the cosine-like similarity between query <em>i</em>
+    and document <em>j</em> in the student's embedding space. The diagonal holds the positive
+    (correct) pairs; off-diagonal entries are in-batch negatives.
+  </p>
+
+  <div class="key-point">
+    <strong>Critical design choice:</strong> Each model scores within its <em>own</em> embedding space.
+    The student uses <code>S<sub>q</sub> &middot; S<sub>d</sub><sup>T</sup></code>, not
+    <code>S<sub>q</sub> &middot; T<sub>d</sub><sup>T</sup></code>.
+    This keeps training consistent with evaluation, where no teacher is available.
+    Cross-space alignment is handled separately by the alignment loss.
+  </p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="step-num">4</span> Multi-Objective Loss</h2>
+
+<p>
+  The score matrices and raw embeddings feed into three complementary loss terms.
+  Each addresses a different aspect of what the student should learn:
+</p>
+
+<div class="loss-grid">
+
+<div class="loss-card">
+  <h4>L<sub>CE</sub> &mdash; Contrastive Retrieval</h4>
+  <p>Standard in-batch contrastive loss (cross-entropy).</p>
+  <p class="formula">CE(S<sub>sc</sub> / &tau;, labels)</p>
+  <p>
+    <strong>Input:</strong> Student scores only.<br>
+    <strong>Goal:</strong> The student should rank the correct document highest for each query.
+    The diagonal of S<sub>sc</sub> should dominate each row.
+  </p>
+  <p><strong>Analogy:</strong> "Get the right answer."</p>
+</div>
+
+<div class="loss-card">
+  <h4>L<sub>KL</sub> &mdash; Score Distillation</h4>
+  <p>KL divergence between score distributions.</p>
+  <p class="formula">KL(softmax(S<sub>sc</sub>/&tau;) || softmax(T<sub>sc</sub>/&tau;)) &middot; &tau;&sup2;</p>
+  <p>
+    <strong>Input:</strong> Both score matrices.<br>
+    <strong>Goal:</strong> The student's full ranking distribution should match the teacher's &mdash;
+    not just the top-1, but the relative confidence across <em>all</em> documents.
+  </p>
+  <p><strong>Analogy:</strong> "Rank everything the way the teacher would."</p>
+</div>
+
+<div class="loss-card">
+  <h4>L<sub>align</sub> &mdash; Embedding Alignment</h4>
+  <p>L2 distance between student and teacher embeddings.</p>
+  <p class="formula">||S<sub>q</sub> - T<sub>q</sub>||<sub>2</sub> + ||S<sub>d</sub> - T<sub>d</sub>||<sub>2</sub></p>
+  <p>
+    <strong>Input:</strong> Raw embeddings (bypasses score matrices).<br>
+    <strong>Goal:</strong> Pull the student's embedding vectors directly toward the teacher's in vector space.
+  </p>
+  <p><strong>Analogy:</strong> "Think the way the teacher thinks."</p>
+</div>
+
+</div>
+
+<div class="key-point">
+  <strong>Why three losses?</strong>
+  L<sub>CE</sub> gives the student a task-specific signal (retrieval).
+  L<sub>KL</sub> transfers the teacher's dark knowledge &mdash; relative similarities between non-matching pairs
+  that cross-entropy ignores.
+  L<sub>align</sub> forces the embedding spaces to converge structurally, not just in output rankings.
+  Each addresses a layer of the problem the others miss.
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="step-num">5</span> Total Loss &amp; Backpropagation</h2>
+
+<div class="stage total">
+  <h3>Weighted Sum</h3>
+  <div class="math">
+    L = L<sub>CE</sub> + &lambda;<sub>d</sub> &middot; L<sub>KL</sub> + &lambda;<sub>a</sub> &middot; L<sub>align</sub>
+  </div>
+  <p>
+    The combined gradient updates <strong>only the student encoder</strong>.
+    The teacher remains frozen. The hyperparameters &lambda;<sub>d</sub> and &lambda;<sub>a</sub>
+    control the relative strength of distillation vs. alignment.
+  </p>
+</div>
+
+<div class="arrow-down">&darr;</div>
+
+<div class="stage eval">
+  <h3>Evaluation</h3>
+  <p>Evaluated on held-out data using <strong>MRR</strong>, <strong>Recall@k</strong>, and <strong>nDCG</strong>.
+  At evaluation time, only the student encoder exists &mdash; no teacher, no distillation losses.
+  This is why S<sub>sc</sub> must use student-encoded documents during training.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="step-num">6</span> What Makes BiMGA Different</h2>
+
+<div class="bimga-highlight">
+  <h3>BiMGA: Bidirectional Margin-Guided Alignment</h3>
+  <p>
+    BiMGA modifies the alignment loss L<sub>align</sub> in two ways that distinguish it from
+    simpler methods like Embed Distill (which only aligns query embeddings with uniform weight):
+  </p>
+
+  <div class="comparison">
+    <div class="compare-card baseline">
+      <h4>Embed Distill (Baseline)</h4>
+      <p><strong>Query-only, uniform weight:</strong></p>
+      <p class="formula" style="font-family: 'Courier New', monospace; font-size: 0.85rem;">
+        L<sub>align</sub> = mean( ||S<sub>q</sub> - T<sub>q</sub>||<sub>2</sub> )
+      </p>
+      <p>Aligns only queries. Treats all examples equally regardless of difficulty.</p>
+    </div>
+    <div class="compare-card ours">
+      <h4>BiMGA (Ours)</h4>
+      <p><strong>Bidirectional, margin-weighted:</strong></p>
+      <p class="formula" style="font-family: 'Courier New', monospace; font-size: 0.85rem;">
+        w<sub>i</sub> = &sigma;((pos<sub>i</sub> - hardneg<sub>i</sub>) / &tau;)<br>
+        L<sub>align</sub> = mean( w<sub>i</sub> &middot; (||S<sub>q</sub> - T<sub>q</sub>|| + ||S<sub>d</sub> - T<sub>d</sub>||) )
+      </p>
+      <p>
+        Aligns <strong>both</strong> queries and documents. Weights each example by the teacher's
+        confidence (margin between positive and hardest in-batch negative). Confident examples
+        get stronger alignment pressure.
+      </p>
+    </div>
+  </div>
+
+  <div class="key-point">
+    <strong>Why margin weighting?</strong>
+    When the teacher is confident about a ranking (large margin), we trust that alignment signal
+    and push harder. When the teacher is unsure (small margin), we ease off &mdash;
+    forcing the student to match an uncertain teacher could hurt more than help.
+  </div>
+
+  <div class="key-point">
+    <strong>Why bidirectional?</strong>
+    Aligning only queries lets the student cheat &mdash; it can learn good query representations
+    that work against the teacher's document space but fail when paired with its own documents at test time.
+    Aligning both queries <em>and</em> documents forces the shared backbone to restructure
+    its internal representations, which is why the CKA analysis shows BiMGA's gains
+    are in the <strong>middle layers</strong> (L2, L3), not just the output.
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2><span class="step-num">7</span> Method Comparison</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>L<sub>CE</sub></th>
+      <th>L<sub>KL</sub></th>
+      <th>L<sub>align</sub></th>
+      <th>Key Difference</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Control (Supervised)</td>
+      <td>Yes</td>
+      <td>&mdash;</td>
+      <td>&mdash;</td>
+      <td>No distillation at all</td>
+    </tr>
+    <tr>
+      <td>Score Distill</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>&mdash;</td>
+      <td>Matches ranking distributions only</td>
+    </tr>
+    <tr>
+      <td>Embed Distill</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Query L2</td>
+      <td>Adds query-only alignment</td>
+    </tr>
+    <tr>
+      <td>Hard Neg Pairwise</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>&mdash;</td>
+      <td>Adds pairwise preference loss on hard negatives</td>
+    </tr>
+    <tr>
+      <td>BiMGA Uniform</td>
+      <td>Yes</td>
+      <td>Yes</td>
+      <td>Bidirectional, uniform</td>
+      <td>Ablation: bidirectional but no margin weighting</td>
+    </tr>
+    <tr>
+      <td><strong>BiMGA (Full)</strong></td>
+      <td><strong>Yes</strong></td>
+      <td><strong>Yes</strong></td>
+      <td><strong>Bidirectional, margin-weighted</strong></td>
+      <td><strong>Full method: both design choices active</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<div class="talk-track">
+  <h3>Talking Points for the Professor</h3>
+  <ol>
+    <li>
+      <strong>Scoring is self-contained per model.</strong>
+      S<sub>sc</sub> = S<sub>q</sub> &middot; S<sub>d</sub><sup>T</sup> (not S<sub>q</sub> &middot; T<sub>d</sub><sup>T</sup>).
+      This matters because at test time the teacher is gone — training must mirror evaluation conditions.
+    </li>
+    <li>
+      <strong>The three losses are complementary, not redundant.</strong>
+      L<sub>CE</sub> is task supervision. L<sub>KL</sub> transfers dark knowledge (relative ranking confidence across all in-batch negatives).
+      L<sub>align</sub> operates in embedding space directly, forcing structural convergence that score-level losses cannot achieve.
+    </li>
+    <li>
+      <strong>BiMGA's two innovations are independently testable.</strong>
+      The ablation BiMGA Uniform isolates the effect of bidirectionality (both query + doc alignment)
+      from the margin weighting. The fact that BiMGA Uniform already outperforms Embed Distill (query-only)
+      confirms that bidirectional alignment is valuable on its own.
+    </li>
+    <li>
+      <strong>Margin weighting is a confidence-gated curriculum.</strong>
+      The sigmoid on the teacher's margin acts as soft gating: when the teacher is confident
+      (large gap between positive and hardest negative), alignment pressure is high;
+      when the teacher is uncertain, the student gets slack. This avoids forcing the student
+      to imitate the teacher's mistakes.
+    </li>
+    <li>
+      <strong>The CKA evidence is non-circular.</strong>
+      BiMGA directly optimises embedding L2 distance, so high CKA at the output layer would be trivially expected.
+      The surprising finding is that CKA gains peak at <em>middle</em> layers (L2-L3), meaning
+      bidirectional alignment reshapes the internal processing pipeline, not just the final projection.
+    </li>
+  </ol>
+</div>
+
+<footer>
+  CS4248 NLP Project &mdash; BiMGA Knowledge Distillation for Code Search
+</footer>
+
+</body>
+</html>
